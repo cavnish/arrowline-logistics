@@ -1,0 +1,155 @@
+import SEOMeta from "../components/SEOMeta";
+import HeroSection from "../components/HeroSection";
+import TrustStrip from "../components/TrustStrip";
+import AboutSection from "../components/AboutSection";
+import ServicesSection from "../components/ServicesSection";
+import WhyChooseUsSection from "../components/WhyChooseUsSection";
+import ProcessSection from "../components/ProcessSection";
+import IndustriesPreviewBar from "../components/IndustriesPreviewBar";
+import InteractiveMap from "../components/InteractiveMap";
+import VideoShowcase from "../components/VideoShowcase";
+import QuoteCalculatorSection from "../components/QuoteCalculatorSection";
+import CaseStudiesSection from "../components/CaseStudiesSection";
+import FAQSection from "../components/FAQSection";
+import BlogSection from "../components/BlogSection";
+import TrackTraceBar from "../components/TrackTraceBar";
+import ArrowlineLogo from "../components/ArrowlineLogo";
+import { Sparkles } from "lucide-react";
+
+interface HomeProps {
+  onOpenQuote: () => void;
+  onSelectService: (slug: string) => void;
+  onNavigateTo: (pageId: string) => void;
+  onFormSuccess: (data: any) => void;
+}
+
+export default function Home({ onOpenQuote, onSelectService, onNavigateTo, onFormSuccess }: HomeProps) {
+  return (
+    <div className="w-full overflow-hidden bg-[#F5F8FA]">
+      <SEOMeta
+        title="Arrowline Logistics | Logistics Company in India | Transportation Services"
+        description="Arrowline Logistics is a premier logistics and transportation company in India providing road transportation (FTL/PTL), multimodal logistics, container transport, rail freight and custom clearance centered at Mundra Port, Gujarat."
+        keywords="Logistics Company in India, Logistics Services in India, Transportation Services in India, Freight Transportation Services, Road Transportation Services India, FTL Transportation, PTL Transportation, Multimodal Logistics India, Container Transportation India, Project Cargo India, Supply Chain Logistics India"
+      />
+
+      {/* 1. Cinematic Hero (Light Crisp Theme) */}
+      <HeroSection
+        onOpenQuote={onOpenQuote}
+        onExploreServices={() => {
+          const el = document.getElementById("services-section");
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }}
+      />
+
+      {/* 2. Trust Strip */}
+      <TrustStrip />
+
+      {/* 3. About Arrowline (Split Layout) */}
+      <AboutSection
+        onNavigateToAbout={() => onNavigateTo("about")}
+      />
+
+      {/* 5. Multimodal Services Grid (7 Core Verticals) */}
+      <ServicesSection
+        onSelectService={onSelectService}
+      />
+
+      {/* 7. Why Choose Arrowline (Value Proposition & Semicircular Visual) */}
+      <WhyChooseUsSection
+        onOpenQuote={onOpenQuote}
+      />
+
+      {/* 8. Logistics Work Process (6 Steps) */}
+      <ProcessSection />
+
+      {/* 9. Industries We Serve (Quick Preview linking to Dedicated Page) */}
+      <IndustriesPreviewBar
+        onNavigateToIndustries={() => onNavigateTo("industries")}
+      />
+
+      {/* 10. India Coverage Map & Hubs */}
+      <section className="py-16 lg:py-24 bg-[#F5F8FA] border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <InteractiveMap />
+        </div>
+      </section>
+
+      {/* 11. Operations / Video Showcase & Social Links */}
+      <VideoShowcase
+        videoUrl={null}
+        title="See Arrowline in Action"
+        subtitle="Watch how we move India's supply chain — from Mundra Port to every corner of the nation, one delivery at a time."
+        duration="2:14"
+      />
+
+      {/* 12. Instant Tariff Calculator & Client Testimonials (Split Section) */}
+      <QuoteCalculatorSection
+        onOpenLeadModal={onFormSuccess}
+      />
+
+      {/* 13. Case Studies & Proven Track Record */}
+      <CaseStudiesSection
+        onOpenQuote={onOpenQuote}
+      />
+
+      {/* 14. FAQ / AEO Knowledge Section */}
+      <FAQSection />
+
+      {/* 15. Logistics Insights & Supply Chain Articles */}
+      <BlogSection
+        onOpenQuote={onOpenQuote}
+      />
+
+      {/* 16. Consignment Track & Trace Bar */}
+      <TrackTraceBar />
+
+      {/* 17. Final CTA Section */}
+      <section className="py-14 lg:py-16 bg-[#03212D] text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative bg-gradient-to-r from-[#062B3A] via-[#0C4A60] to-[#062B3A] rounded-3xl overflow-hidden shadow-2xl p-8 sm:p-10 lg:p-14 border border-white/15">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,107,26,0.3),transparent_60%)] pointer-events-none" />
+
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-8 space-y-4">
+                <span className="inline-flex items-center space-x-2 px-3 py-1 bg-white/10 border border-white/20 rounded-full text-[10px] font-black text-[#FF7A00] tracking-widest uppercase backdrop-blur">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>READY TO MOVE YOUR FREIGHT?</span>
+                </span>
+
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight">
+                  Let our multimodal fleet drive your <br />
+                  <span className="text-[#FF7A00]">supply chain forward across India.</span>
+                </h2>
+
+                <p className="text-sm text-slate-200 leading-relaxed max-w-xl">
+                  Get customized tariffs from Mundra Port to any destination across India. Our logistics coordinators respond within 2 hours.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <button
+                    onClick={onOpenQuote}
+                    className="px-7 py-3.5 bg-gradient-to-r from-[#FF6B1A] to-[#FF8C2A] hover:from-[#E55A0D] hover:to-[#FF7A00] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-lg transition-all hover:-translate-y-0.5 cursor-pointer"
+                  >
+                    REQUEST FREE QUOTE →
+                  </button>
+                  <button
+                    onClick={() => onNavigateTo("contact")}
+                    className="px-7 py-3.5 bg-white/10 hover:bg-white/20 border border-white/30 text-white text-xs font-black uppercase tracking-wider rounded-xl backdrop-blur transition-all cursor-pointer"
+                  >
+                    CONTACT CLEARANCE DESK
+                  </button>
+                </div>
+              </div>
+
+              <div className="hidden lg:flex lg:col-span-4 items-center justify-center">
+                <div className="bg-white rounded-3xl p-6 shadow-2xl border-4 border-white/20">
+                  <ArrowlineLogo size="lg" showTagline />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+/* =====================================================
+   ARROWLINE LOGISTICS - PREMIUM DESIGN SYSTEM
+   Deep Navy:        #062B3A
+   Dark Navy:        #03212D
+   Arrowline Orange: #FF6B1A
+   Bright Orange:    #FF7A00
+   Soft Blue:        #EAF3F6
+   Light Background: #F5F8FA
+   White:            #FFFFFF
+   Text Primary:     #102A36
+   Text Secondary:   #4A6070
+   ===================================================== */
+
+:root {
+  --color-deep-navy: #062B3A;
+  --color-dark-navy: #03212D;
+  --color-arrowline-orange: #FF6B1A;
+  --color-bright-orange: #FF7A00;
+  --color-soft-blue: #EAF3F6;
+  --color-light-bg: #F5F8FA;
+  --color-text-primary: #102A36;
+}
+
+body {
+  background-color: #F5F8FA;
+  color: #102A36;
+  font-family: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: #FF6B1A;
+  color: #FFFFFF;
+}
+
+/* ----------------------------------------------------
+   LENIS SMOOTH SCROLL INTEGRATION UTILITIES
+   ---------------------------------------------------- */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------
+   PREMIUM LIGHT SCROLLBAR
+   ---------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F0F5FA;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #FF6B1A;
+}
+
+/* ----------------------------------------------------
+   SIGNATURE ROUTE LINE ANIMATIONS
+   ---------------------------------------------------- */
+@keyframes drawRouteX {
+  0%   { stroke-dashoffset: 600; opacity: 0.2; }
+  100% { stroke-dashoffset: 0;   opacity: 1; }
+}
+
+@keyframes pulseLocation {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%      { transform: scale(1.4); opacity: 0.7; }
+}
+
+@keyframes cargoMove {
+  0%   { offset-distance: 0%; }
+  100% { offset-distance: 100%; }
+}
+
+.animate-route-draw {
+  stroke-dasharray: 600;
+  animation: drawRouteX 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-location-dot {
+  animation: pulseLocation 2.4s ease-in-out infinite;
+}
+
+/* ----------------------------------------------------
+   HERO REVEAL & STAGGER ANIMATIONS
+   ---------------------------------------------------- */
+@keyframes fade-in-up {
+  0%   { opacity: 0; transform: translateY(28px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes hero-bg-scale {
+  0%   { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+.animate-hero-bg {
+  animation: hero-bg-scale 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes expand-line {
+  0%   { width: 0; opacity: 0; }
+  100% { width: 4.5rem; opacity: 1; }
+}
+.animate-expand-line {
+  animation: expand-line 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.4s;
+}
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+.animate-float {
+  animation: float-gentle 4s ease-in-out infinite;
+}
+
+/* WhatsApp pulse */
+@keyframes whatsapp-pulse {
+  0%, 100% {
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5),
+                0 0 0 0 rgba(37, 211, 102, 0.5);
+  }
+  50% {
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5),
+                0 0 0 10px rgba(37, 211, 102, 0);
+  }
+}
+.animate-whatsapp-pulse {
+  animation: whatsapp-pulse 2.4s ease-in-out infinite;
+}
+
+/* Custom size utility */
+.w-13 { width: 3.25rem; }
+.h-13 { height: 3.25rem; }
+
+/* Subtle grid pattern */
+.bg-grid-pattern {
+  background-image:
+    linear-gradient(rgba(6, 43, 58, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 43, 58, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.bg-grid-dark {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+/* No scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
