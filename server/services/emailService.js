@@ -10,6 +10,14 @@ function getResend() {
   return resendClient;
 }
 
+async function sendEmail(message) {
+  const { data, error } = await getResend().emails.send(message);
+  if (error) {
+    throw new Error(error.message || "Resend rejected the email");
+  }
+  return data;
+}
+
 function escape(str) {
   if (str == null) return "";
   return String(str)
@@ -162,7 +170,6 @@ function buildClientHtml(lead) {
 }
 
 export async function sendLeadNotifications(lead) {
-  const resend = getResend();
   const notifyList = (process.env.NOTIFY_EMAILS || "")
     .split(",")
     .map((s) => s.trim())
@@ -177,21 +184,36 @@ export async function sendLeadNotifications(lead) {
     throw new Error("FROM_EMAIL is not set in .env");
   }
 
-  // 1) Notify internal team
-  await resend.emails.send({
-    from,
-    to: notifyList,
-    subject: `🚛 New Inquiry ${lead.reference_number} — ${lead.company}`,
-    html: buildInternalHtml(lead),
-  });
+  const failures = [];
+  let ownerEmail;
+  let customerEmail;
 
-  // 2) Acknowledge the customer
-  await resend.emails.send({
-    from,
-    to: lead.email,
-    subject: `✅ We received your inquiry — Ref ${lead.reference_number}`,
-    html: buildClientHtml(lead),
-  });
+  try {
+    ownerEmail = await sendEmail({
+      from,
+      to: notifyList,
+      replyTo: lead.email,
+      subject: `🚛 New Inquiry ${lead.reference_number} — ${lead.company}`,
+      html: buildInternalHtml(lead),
+    });
+  } catch (error) {
+    failures.push(`owner notification: ${error.message}`);
+  }
 
-  return { ok: true };
+  try {
+    customerEmail = await sendEmail({
+      from,
+      to: lead.email,
+      subject: `✅ We received your inquiry — Ref ${lead.reference_number}`,
+      html: buildClientHtml(lead),
+    });
+  } catch (error) {
+    failures.push(`customer confirmation: ${error.message}`);
+  }
+
+  if (failures.length) {
+    throw new Error(failures.join("; "));
+  }
+
+  return { ownerEmail, customerEmail };
 }

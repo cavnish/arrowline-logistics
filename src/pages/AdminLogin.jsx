@@ -1,24 +1,26 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import adminApi from "../services/adminApi";
+import { useAdminAuth } from "../admin/AdminAuthProvider";
 import { Lock, Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
 
 export default function AdminLogin() {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { signIn, configured } = useAdminAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      await adminApi.post("/login", { password });
-      navigate("/arrowline-admin/dashboard");
+      await signIn(email, password);
+      navigate("/admin/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Please try again.");
+      setError(err.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -41,6 +43,23 @@ export default function AdminLogin() {
                 {error}
               </div>
             )}
+            {!configured && (
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg text-sm">
+                Supabase Auth needs its public URL and anon key configured before administrators can sign in.
+              </div>
+            )}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Admin Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-transparent outline-none transition"
+                placeholder="admin@company.com"
+              />
+            </div>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                 Admin Password
@@ -51,6 +70,7 @@ export default function AdminLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  autoComplete="current-password"
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1E3A8A] focus:border-transparent outline-none transition"
                   placeholder="Enter password"
                 />
@@ -65,7 +85,7 @@ export default function AdminLogin() {
             </div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !configured}
               className="w-full bg-[#1E3A8A] hover:bg-[#152d6b] text-white font-semibold py-3 rounded-lg transition flex items-center justify-center space-x-2 disabled:opacity-70"
             >
               {loading ? (

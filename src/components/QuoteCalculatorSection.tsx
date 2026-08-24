@@ -1,265 +1,474 @@
 import { useState } from "react";
-import { CLIENT_TESTIMONIALS } from "../data/logisticsData";
-import { Star, ChevronLeft, ChevronRight, ArrowRight, ShieldCheck, Check } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Star,
+  BadgeCheck,
+  Truck,
+  ShieldCheck,
+} from "lucide-react";
 
-interface QuoteCalculatorSectionProps {
-  onOpenLeadModal: (leadData: any) => void;
-}
+const testimonials = [
+  {
+    quote:
+      "Great service by the Arrowline dispatch team. Excellent communication and professional handling of our FTL cargo throughout the entire Mundra to Delhi corridor. Would strongly recommend.",
+    name: "Rahul Sharma",
+    role: "Operations Manager",
+    company: "Adani Exports",
+    time: "4 months ago",
+    initial: "R",
+  },
+  {
+    quote:
+      "Recovered my cargo delivery timeline after a shipping delay — good communication over the phone, arrived at the time that was advised. Highly recommend. The team was professional and reliable.",
+    name: "Priya Iyer",
+    role: "Supply Chain Director",
+    company: "Tata Chemicals",
+    time: "5 months ago",
+    initial: "P",
+  },
+  {
+    quote:
+      "Exceptional service and reliability. The team went above and beyond to ensure our shipment was delivered on time despite challenging circumstances during monsoon season.",
+    name: "Vikram Mehta",
+    role: "Logistics Coordinator",
+    company: "JSW Steel",
+    time: "5 months ago",
+    initial: "V",
+  },
+  {
+    quote:
+      "Professional coordination from pickup to final delivery. Arrowline kept our team informed throughout the movement and handled the shipment smoothly.",
+    name: "Amit Verma",
+    role: "Procurement Manager",
+    company: "Larsen & Toubro",
+    time: "6 months ago",
+    initial: "A",
+  },
+  {
+    quote:
+      "The transportation team was responsive, punctual and very professional. We received regular updates and the cargo reached safely as planned.",
+    name: "Neha Kapoor",
+    role: "Logistics Manager",
+    company: "Reliance Industries",
+    time: "7 months ago",
+    initial: "N",
+  },
+  {
+    quote:
+      "Excellent support for our heavy cargo movement. Route planning and execution were handled efficiently by the Arrowline team.",
+    name: "Sanjay Patel",
+    role: "Plant Operations Head",
+    company: "Tata Power",
+    time: "8 months ago",
+    initial: "S",
+  },
+];
 
-export default function QuoteCalculatorSection({ onOpenLeadModal }: QuoteCalculatorSectionProps) {
-  // Calculator state
-  const [origin, setOrigin] = useState("Mundra Port, Gujarat");
-  const [destination, setDestination] = useState("Delhi NCR");
-  const [weightTons, setWeightTons] = useState(18);
-  const [serviceType, setServiceType] = useState("Road Transportation (FTL)");
-  const [phoneOrEmail, setPhoneOrEmail] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false);
+export default function QuoteCalculatorSection() {
+  const [startIndex, setStartIndex] = useState(0);
 
-  // Testimonial state
-  const [testimonialIndex, setTestimonialIndex] = useState(0);
-  const activeTestimonial = CLIENT_TESTIMONIALS[testimonialIndex];
+  /*
+   * Desktop:
+   * 3 cards visible
+   *
+   * Mobile:
+   * 1 card visible
+   *
+   * The carousel itself remains horizontal and moves
+   * from left to right / right to left.
+   */
 
-  const handleNextTestimonial = () => {
-    setTestimonialIndex((prev) => (prev + 1) % CLIENT_TESTIMONIALS.length);
+  const maxIndex = testimonials.length - 3;
+
+  const next = () => {
+    setStartIndex((current) =>
+      current >= maxIndex ? 0 : current + 1
+    );
   };
 
-  const handlePrevTestimonial = () => {
-    setTestimonialIndex((prev) => (prev - 1 + CLIENT_TESTIMONIALS.length) % CLIENT_TESTIMONIALS.length);
-  };
-
-  const handleCalculateQuote = (e: React.FormEvent) => {
-    e.preventDefault();
-    const mockLead = {
-      name: "Quote Requestor",
-      email: phoneOrEmail.includes("@") ? phoneOrEmail : "inquiry@client.com",
-      phone: phoneOrEmail.includes("@") ? "+91 9021179108" : phoneOrEmail || "+91 9021179108",
-      service: serviceType,
-      origin,
-      destination,
-      weightTons,
-      cargoType: "Containerized Commercial Freight",
-      status: "Verified Request",
-      createdAt: new Date().toISOString()
-    };
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setIsSubmitted(false);
-      onOpenLeadModal(mockLead);
-    }, 600);
+  const previous = () => {
+    setStartIndex((current) =>
+      current <= 0 ? maxIndex : current - 1
+    );
   };
 
   return (
-    <section className="py-16 lg:py-24 bg-[#F0F5FA] text-[#062B3A] border-y border-slate-200/90 relative overflow-hidden">
-      {/* Background Graphic Grid */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none" />
+    <section className="w-full overflow-hidden bg-white py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* =====================================================
+            HEADER
+        ====================================================== */}
+        <div className="mb-8 flex flex-col gap-5 sm:mb-10 lg:flex-row lg:items-end lg:justify-between">
 
-        {/* 2-Column Split: Calculator on Left + Testimonials on Right (Matching Reference Image) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Title */}
+          <div>
+            <div className="mb-2 flex items-center gap-2">
+              <Truck className="h-5 w-5 text-slate-400 sm:h-6 sm:w-6" />
 
-          {/* Left Column: Quick Quote Calculator Box */}
-          <div className="lg:col-span-6 bg-gradient-to-br from-[#FF6B1A] via-[#FF7A00] to-[#FF8C2A] rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl text-white">
-            <div className="space-y-2 mb-6">
-              <span className="text-[10.5px] font-black uppercase tracking-widest bg-black/20 px-3 py-1 rounded-full inline-block">
-                Instant Freight Tariff Guide
+              <span className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                Client Experience
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black leading-tight">
-                Request A Quick Quote
-              </h2>
-              <p className="text-xs text-white/90">
-                Get estimated transit times and custom tariff calculation from our Mundra clearance desk.
-              </p>
             </div>
 
-            <form onSubmit={handleCalculateQuote} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 text-white/90">
-                    Pickup Location
-                  </label>
-                  <select
-                    value={origin}
-                    onChange={(e) => setOrigin(e.target.value)}
-                    className="w-full bg-white text-[#062B3A] text-xs font-semibold px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/30 shadow-inner"
-                  >
-                    <option value="Mundra Port, Gujarat">Mundra Port, Gujarat</option>
-                    <option value="Ahmedabad, Gujarat">Ahmedabad, Gujarat</option>
-                    <option value="Mumbai / JNPT">Mumbai / JNPT</option>
-                    <option value="Kandla Port, Gujarat">Kandla Port, Gujarat</option>
-                    <option value="Pipavav Port, Gujarat">Pipavav Port, Gujarat</option>
-                    <option value="Surat / Hazira">Surat / Hazira</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 text-white/90">
-                    Delivery Location
-                  </label>
-                  <select
-                    value={destination}
-                    onChange={(e) => setDestination(e.target.value)}
-                    className="w-full bg-white text-[#062B3A] text-xs font-semibold px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/30 shadow-inner"
-                  >
-                    <option value="Delhi NCR (Gurugram / Noida)">Delhi NCR</option>
-                    <option value="Jaipur, Rajasthan">Jaipur, Rajasthan</option>
-                    <option value="Bengaluru, Karnataka">Bengaluru, Karnataka</option>
-                    <option value="Chennai, Tamil Nadu">Chennai, Tamil Nadu</option>
-                    <option value="Hyderabad, Telangana">Hyderabad, Telangana</option>
-                    <option value="Indore, Madhya Pradesh">Indore, Madhya Pradesh</option>
-                    <option value="Kolkata, West Bengal">Kolkata, West Bengal</option>
-                    <option value="Ludhiana, Punjab">Ludhiana, Punjab</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Slider for Cargo Weight */}
-              <div>
-                <div className="flex justify-between text-xs font-bold mb-1">
-                  <span>Approximate Cargo Weight:</span>
-                  <span className="bg-black/20 px-2 py-0.5 rounded text-[11px]">{weightTons} Metric Tons</span>
-                </div>
-                <input
-                  type="range"
-                  min={1}
-                  max={120}
-                  value={weightTons}
-                  onChange={(e) => setWeightTons(Number(e.target.value))}
-                  className="w-full h-2 bg-white/40 rounded-lg appearance-none cursor-pointer accent-[#062B3A]"
-                />
-                <div className="flex justify-between text-[10px] text-white/75 mt-0.5">
-                  <span>1 Ton (Express)</span>
-                  <span>40T (Heavy FTL)</span>
-                  <span>120T (ODC Heavy Lift)</span>
-                </div>
-              </div>
-
-              {/* Service Selection */}
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 text-white/90">
-                  Logistics Service
-                </label>
-                <select
-                  value={serviceType}
-                  onChange={(e) => setServiceType(e.target.value)}
-                  className="w-full bg-white text-[#062B3A] text-xs font-semibold px-3 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/30"
-                >
-                  <option value="Road Transportation (FTL)">Road Transportation (FTL Container / Flatbed)</option>
-                  <option value="Shipping & Coastal Services">Shipping & Coastal Services</option>
-                  <option value="Rail & Multimodal Freight">Rail & Multimodal Logistics (CONCOR)</option>
-                  <option value="Project Logistics & ODC">Project Logistics & ODC Heavy Transport</option>
-                  <option value="Global Freight Forwarding">Global Freight Forwarding</option>
-                  <option value="Express Air Cargo">Express Air Cargo</option>
-                  <option value="Customs Clearance">Customs Clearance & Brokerage</option>
-                </select>
-              </div>
-
-              {/* Contact input */}
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider mb-1 text-white/90">
-                  Your Phone Number or Email
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Enter contact number or corporate email"
-                  value={phoneOrEmail}
-                  onChange={(e) => setPhoneOrEmail(e.target.value)}
-                  className="w-full bg-white text-[#062B3A] placeholder:text-slate-400 text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/30 font-medium"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3.5 bg-[#062B3A] hover:bg-[#03212D] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-xl transition-all hover:-translate-y-0.5 active:scale-98 flex items-center justify-center space-x-2 cursor-pointer mt-2"
-              >
-                {isSubmitted ? (
-                  <>
-                    <Check className="w-4 h-4 text-emerald-400" />
-                    <span>CALCULATING RATE...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>GET INSTANT ESTIMATE</span>
-                    <ArrowRight className="w-4 h-4 text-[#FF7A00]" />
-                  </>
-                )}
-              </button>
-            </form>
+            <h2 className="text-3xl font-black leading-tight tracking-tight text-[#24438F] sm:text-4xl lg:text-[46px]">
+              What Our{" "}
+              <span className="text-[#FF6B1A]">
+                Clients Say
+              </span>
+            </h2>
           </div>
 
-          {/* Right Column: What Our Clients Say (Clean White Card) */}
-          <div className="lg:col-span-6 space-y-6">
-            <div className="space-y-3">
-              <div className="inline-flex items-center space-x-2 px-3 py-1 bg-white border border-[#062B3A]/15 rounded-full text-[10px] font-black text-[#FF6B1A] tracking-widest uppercase shadow-sm">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>CLIENT VERIFIED EXPERIENCE</span>
+          {/* =================================================
+              SMALL GOOGLE RATING
+          ================================================== */}
+          <div className="flex items-center justify-between gap-4 sm:justify-end">
+
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
+
+              {/* Google G */}
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-50 text-lg font-black">
+                <span className="text-[#4285F4]">G</span>
               </div>
 
-              <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight text-[#062B3A]">
-                What Our Clients Say <br />
-                <span className="text-[#FF6B1A]">About Our Service</span>
-              </h2>
+              <div className="leading-none">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-lg font-black text-[#24438F]">
+                    4.8
+                  </span>
 
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Trusted by manufacturing corporations, renewable developers, and export-import houses for on-time delivery from Mundra Port across India.
-              </p>
-            </div>
-
-            {/* Testimonial Card */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-5 shadow-xl relative">
-              {/* Star Rating */}
-              <div className="flex items-center space-x-1 text-[#FF6B1A]">
-                {[...Array(activeTestimonial.rating)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" />
-                ))}
-                <span className="text-xs font-bold text-[#062B3A] ml-2">5.0 SLA Rating</span>
-              </div>
-
-              {/* Quote Text */}
-              <p className="text-sm sm:text-base text-slate-700 leading-relaxed italic">
-                "{activeTestimonial.comment}"
-              </p>
-
-              {/* Client Info */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <div className="flex items-center space-x-3.5">
-                  <img
-                    src={activeTestimonial.avatar}
-                    alt={activeTestimonial.clientName}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-[#FF6B1A]"
-                  />
-                  <div>
-                    <h3 className="text-sm font-bold text-[#062B3A]">{activeTestimonial.clientName}</h3>
-                    <span className="block text-[11px] text-[#FF6B1A] font-semibold">{activeTestimonial.role}, {activeTestimonial.company}</span>
-                    <span className="block text-[10px] text-slate-500">{activeTestimonial.location}</span>
+                  <div className="flex gap-[1px]">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        className="h-3.5 w-3.5 fill-[#FF8A00] text-[#FF8A00]"
+                      />
+                    ))}
                   </div>
                 </div>
 
-                {/* Pagination Controls */}
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={handlePrevTestimonial}
-                    className="w-8 h-8 rounded-full bg-[#F5F8FA] border border-slate-200 hover:bg-[#EAF3F6] flex items-center justify-center text-[#062B3A] transition-colors cursor-pointer"
-                    aria-label="Previous Testimonial"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={handleNextTestimonial}
-                    className="w-8 h-8 rounded-full bg-[#062B3A] hover:bg-[#03212D] flex items-center justify-center text-white transition-colors cursor-pointer"
-                    aria-label="Next Testimonial"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
+                <p className="mt-1 text-[10px] font-medium text-slate-500">
+                  Google Reviews
+                </p>
               </div>
             </div>
 
-          </div>
+            {/* Desktop arrows */}
+            <div className="hidden items-center gap-2 sm:flex">
+              <button
+                type="button"
+                onClick={previous}
+                aria-label="Previous reviews"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-[#24438F] shadow-sm transition-all hover:border-[#FF6B1A] hover:text-[#FF6B1A] active:scale-95"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
 
+              <button
+                type="button"
+                onClick={next}
+                aria-label="Next reviews"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-[#24438F] shadow-sm transition-all hover:border-[#FF6B1A] hover:text-[#FF6B1A] active:scale-95"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
         </div>
 
+        {/* =====================================================
+            TESTIMONIAL CAROUSEL
+        ====================================================== */}
+
+        <div className="relative">
+
+          {/* Desktop / Tablet carousel */}
+          <div className="hidden overflow-hidden md:block">
+
+            <div
+              className="flex gap-5 transition-transform duration-500 ease-out"
+              style={{
+                transform: `translateX(calc(-${startIndex} * (33.333333% + 6.67px)))`,
+              }}
+            >
+              {testimonials.map((testimonial, index) => (
+                <article
+                  key={index}
+                  className="group relative min-w-[calc(33.333333%-13.333px)] flex-[0_0_calc(33.333333%-13.333px)] rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg lg:p-7"
+                >
+
+                  {/* Quote icon */}
+                  <div className="absolute right-5 top-[-15px] flex h-12 w-12 items-center justify-center rounded-xl bg-[#FF6B1A] text-white shadow-lg">
+                    <span className="text-3xl font-black leading-none">
+                      "
+                    </span>
+                  </div>
+
+                  {/* Rating */}
+                  <div className="mb-7 flex items-center justify-between pr-8">
+                    <div className="flex gap-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className="h-4 w-4 fill-[#FF6B1A] text-[#FF6B1A]"
+                        />
+                      ))}
+                    </div>
+
+                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-600">
+                      <BadgeCheck className="h-3.5 w-3.5" />
+                      Verified
+                    </span>
+                  </div>
+
+                  {/* Quote */}
+                  <p className="min-h-[145px] text-sm leading-7 text-slate-600 lg:text-[15px]">
+                    "{testimonial.quote}"
+                  </p>
+
+                  {/* Divider */}
+                  <div className="my-6 h-px bg-slate-200" />
+
+                  {/* Customer */}
+                  <div className="flex items-center gap-3">
+
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#24438F] text-base font-black text-white">
+                      {testimonial.initial}
+                    </div>
+
+                    <div className="min-w-0">
+                      <h3 className="truncate text-base font-black text-[#24438F]">
+                        {testimonial.name}
+                      </h3>
+
+                      <p className="mt-1 text-xs text-slate-500">
+                        {testimonial.role}
+                        <span className="mx-1 text-slate-300">
+                          •
+                        </span>
+                        <span className="font-semibold text-[#FF6B1A]">
+                          {testimonial.company}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="mt-5 text-[11px] font-medium text-slate-400">
+                    {testimonial.time}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          {/* =================================================
+              MOBILE CAROUSEL
+          ================================================== */}
+
+          <div className="overflow-hidden md:hidden">
+
+            <div
+              className="flex transition-transform duration-500 ease-out"
+              style={{
+                transform: `translateX(-${startIndex * 100}%)`,
+              }}
+            >
+              {testimonials.map((testimonial, index) => (
+                <article
+                  key={index}
+                  className="relative min-w-full flex-[0_0_100%] px-1"
+                >
+                  <div className="relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+
+                    {/* Quote */}
+                    <div className="absolute right-5 top-[-12px] flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF6B1A] text-white shadow-md">
+                      <span className="text-2xl font-black">
+                        "
+                      </span>
+                    </div>
+
+                    {/* Rating */}
+                    <div className="mb-6 flex items-center justify-between pr-7">
+                      <div className="flex gap-1">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className="h-4 w-4 fill-[#FF6B1A] text-[#FF6B1A]"
+                          />
+                        ))}
+                      </div>
+
+                      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-[9px] font-bold text-emerald-600">
+                        <BadgeCheck className="h-3 w-3" />
+                        Verified
+                      </span>
+                    </div>
+
+                    {/* Quote */}
+                    <p className="min-h-[190px] text-sm leading-7 text-slate-600">
+                      "{testimonial.quote}"
+                    </p>
+
+                    <div className="my-6 h-px bg-slate-200" />
+
+                    {/* Customer */}
+                    <div className="flex items-center gap-3">
+
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#24438F] text-sm font-black text-white">
+                        {testimonial.initial}
+                      </div>
+
+                      <div className="min-w-0">
+                        <h3 className="truncate text-sm font-black text-[#24438F]">
+                          {testimonial.name}
+                        </h3>
+
+                        <p className="mt-1 text-[11px] leading-5 text-slate-500">
+                          {testimonial.role}
+                          <span className="mx-1 text-slate-300">
+                            •
+                          </span>
+                          <span className="font-semibold text-[#FF6B1A]">
+                            {testimonial.company}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <p className="mt-5 text-[10px] text-slate-400">
+                      {testimonial.time}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* =====================================================
+            MOBILE NAVIGATION
+        ====================================================== */}
+
+        <div className="mt-6 flex items-center justify-center gap-4 md:hidden">
+
+          <button
+            type="button"
+            onClick={previous}
+            aria-label="Previous review"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-[#24438F] shadow-sm active:scale-95"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+
+          {/* Dots */}
+          <div className="flex items-center gap-1.5">
+            {testimonials.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => setStartIndex(index)}
+                aria-label={`Show review ${index + 1}`}
+                className={`h-2 rounded-full transition-all ${
+                  startIndex === index
+                    ? "w-7 bg-[#FF6B1A]"
+                    : "w-2 bg-slate-300"
+                }`}
+              />
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={next}
+            aria-label="Next review"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-[#24438F] shadow-sm active:scale-95"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* =====================================================
+            BOTTOM TRUST STATS
+        ====================================================== */}
+
+        <div className="mx-auto mt-10 flex max-w-3xl flex-wrap items-center justify-center gap-6 border-t border-slate-100 pt-8 sm:gap-10">
+
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-50">
+              <Star className="h-5 w-5 fill-[#FF6B1A] text-[#FF6B1A]" />
+            </div>
+
+            <div>
+              <p className="text-lg font-black leading-none text-[#24438F]">
+                4.8/5
+              </p>
+              <p className="mt-1 text-[10px] font-medium text-slate-500">
+                Average Rating
+              </p>
+            </div>
+          </div>
+
+          <div className="hidden h-10 w-px bg-slate-200 sm:block" />
+
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50">
+              <BadgeCheck className="h-5 w-5 text-emerald-500" />
+            </div>
+
+            <div>
+              <p className="text-lg font-black leading-none text-[#24438F]">
+                284+
+              </p>
+              <p className="mt-1 text-[10px] font-medium text-slate-500">
+                Verified Reviews
+              </p>
+            </div>
+          </div>
+
+          <div className="hidden h-10 w-px bg-slate-200 sm:block" />
+
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
+              <ShieldCheck className="h-5 w-5 text-blue-500" />
+            </div>
+
+            <div>
+              <p className="text-lg font-black leading-none text-[#24438F]">
+                99%
+              </p>
+              <p className="mt-1 text-[10px] font-medium text-slate-500">
+                Client Satisfaction
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* =====================================================
+            SMALL GOOGLE REVIEW BADGE
+        ====================================================== */}
+
+        <div className="mt-7 flex justify-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm">
+
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#24438F]">
+              Excellent
+            </span>
+
+            <div className="flex gap-[1px]">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  className="h-3.5 w-3.5 fill-[#FF8A00] text-[#FF8A00]"
+                />
+              ))}
+            </div>
+
+            <span className="text-[10px] text-slate-500">
+              Google Reviews
+            </span>
+          </div>
+        </div>
       </div>
     </section>
   );

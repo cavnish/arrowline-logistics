@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowRight, Phone, ChevronDown, Truck, Anchor, Globe, ShieldCheck, Play } from "lucide-react";
+import { useSiteContent } from "../hooks/useSiteContent";
 
 interface HeroSectionProps {
   onOpenQuote: () => void;
@@ -28,6 +29,7 @@ function useCountUp(target: number, duration = 1800, start = false) {
 const SERVICES = ["Road Transport", "Freight Forwarding", "Multimodal Logistics", "Container Cargo", "Project Cargo", "Custom Clearance"];
 
 export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSectionProps) {
+  const content = useSiteContent();
   const [loaded, setLoaded] = useState(false);
   const [counting, setCounting] = useState(false);
   const [activeService, setActiveService] = useState(0);
@@ -116,13 +118,7 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
             {/* Headline */}
             <div style={anim(loaded, 120)}>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-[1.06] text-white tracking-tight">
-                <span className="block">Logistics &amp;</span>
-                <span className="block">Transportation</span>
-                <span className="block relative">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B1A] via-[#FF8C3A] to-[#FFAA5A]">
-                    Services Across India
-                  </span>
-                </span>
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B1A] via-[#FF8C3A] to-[#FFAA5A]">{content("hero_title", "Logistics & Transportation Services Across India")}</span>
               </h1>
             </div>
 
@@ -165,7 +161,7 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
                 className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#FF6B1A] hover:bg-[#E55A0D] text-white font-bold text-sm rounded-xl shadow-[0_8px_30px_rgba(255,107,26,0.45)] hover:shadow-[0_12px_40px_rgba(255,107,26,0.65)] hover:-translate-y-0.5 transition-all duration-200 overflow-hidden cursor-pointer"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[200%] transition-transform duration-700" />
-                Get a Free Quote
+                {content("hero_cta", "Get a Free Quote")}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
 

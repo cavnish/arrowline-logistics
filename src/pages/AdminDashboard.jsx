@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import adminApi from "../services/adminApi";
 import StatsCard from "../components/admin/StatsCard";
 import EnquiryTable from "../components/admin/EnquiryTable";
@@ -35,11 +35,11 @@ export default function AdminDashboard() {
   const cards = [
     { title: "Total Enquiries", value: stats.total, icon: Inbox, color: "bg-blue-100 text-[#1E3A8A]" },
     { title: "New", value: stats.new, icon: UserPlus, color: "bg-green-100 text-green-700" },
-    { title: "Today", value: stats.today, icon: Clock, color: "bg-orange-100 text-orange-700" },
-    { title: "Follow Ups", value: stats.follow_up, icon: PhoneCall, color: "bg-indigo-100 text-indigo-700" },
-    { title: "Quotations Sent", value: stats.quotation_sent, icon: CheckCircle, color: "bg-purple-100 text-purple-700" },
-    { title: "Won", value: stats.won, icon: CheckCircle, color: "bg-emerald-100 text-emerald-700" },
-    { title: "Lost", value: stats.lost, icon: XCircle, color: "bg-red-100 text-red-700" },
+    { title: "In Progress", value: stats.inProgress, icon: Clock, color: "bg-orange-100 text-orange-700" },
+    { title: "Completed", value: stats.completed, icon: CheckCircle, color: "bg-emerald-100 text-emerald-700" },
+    { title: "Email Sent", value: stats.emailSent, icon: CheckCircle, color: "bg-purple-100 text-purple-700" },
+    { title: "Email Pending", value: stats.emailPending, icon: XCircle, color: "bg-red-100 text-red-700" },
+    { title: "High Priority", value: stats.highPriority, icon: PhoneCall, color: "bg-indigo-100 text-indigo-700" },
   ];
 
   return (
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold text-slate-700">Recent Enquiries</h2>
-          <Link to="/arrowline-admin/enquiries" className="text-sm text-[#1E3A8A] hover:text-[#FF7A00] font-medium">
+          <Link to="/admin/enquiries" className="text-sm text-[#1E3A8A] hover:text-[#FF7A00] font-medium">
             View all
           </Link>
         </div>

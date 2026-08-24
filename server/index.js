@@ -4,6 +4,7 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import { createClient } from "@supabase/supabase-js";
 import { sendLeadNotifications } from "./services/emailService.js";
+import { createAdminRouter } from "./routes/admin.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -35,6 +36,17 @@ app.use(
     credentials: true,
   })
 );
+
+app.get("/api/content", async (_req, res) => {
+  const { data, error } = await supabase
+    .from("site_content")
+    .select("content_key, content_value")
+    .eq("is_published", true);
+  if (error) return res.status(503).json({ ok: false, error: "Content is unavailable" });
+  return res.json({ ok: true, data: data || [] });
+});
+
+app.use("/api/admin", createAdminRouter({ supabase }));
 
 const leadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
@@ -131,20 +143,26 @@ app.post("/api/lead", leadLimiter, async (req, res) => {
 
     if (insertError) throw insertError;
 
-    // 2. Send notification emails (fire-and-forget with status tracking)
+    // 2. Email delivery follows a successful database insert only.
     let emailSent = false;
     try {
       await sendLeadNotifications(lead);
       emailSent = true;
-      await supabase
-        .from("leads")
-        .update({
-          email_sent: true,
-          email_sent_at: new Date().toISOString(),
-        })
-        .eq("id", lead.id);
     } catch (mailErr) {
       console.error("⚠️  Email send failed:", mailErr.message);
+    }
+
+    const { error: emailStatusError } = await supabase
+      .from("leads")
+      .update(
+        emailSent
+          ? { email_sent: true, email_sent_at: new Date().toISOString() }
+          : { email_sent: false, email_sent_at: null }
+      )
+      .eq("id", lead.id);
+
+    if (emailStatusError) {
+      console.error("⚠️  Could not update email status:", emailStatusError.message);
     }
 
     return res.status(201).json({
@@ -152,6 +170,7 @@ app.post("/api/lead", leadLimiter, async (req, res) => {
       referenceNumber,
       storedInDatabase: true,
       emailSent,
+      emailStatus: emailSent ? "sent" : "failed",
       message: "Inquiry received. Our routing team will respond within 2 hours.",
     });
   } catch (err) {

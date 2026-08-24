@@ -1,36 +1,35 @@
-﻿import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import adminApi from "../services/adminApi";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AdminAuthProvider, useAdminAuth } from "./AdminAuthProvider";
 import AdminLogin from "../pages/AdminLogin";
 import AdminLayout from "../components/admin/AdminLayout";
 import AdminDashboard from "../pages/AdminDashboard";
 import AdminEnquiries from "../pages/AdminEnquiries";
 import AdminEnquiryDetail from "../pages/AdminEnquiryDetail";
+import AdminContent from "../pages/AdminContent";
 
 function RequireAuth({ children }) {
-  const [auth, setAuth] = useState(null);
-  useEffect(() => {
-    adminApi.get("/me")
-      .then(() => setAuth(true))
-      .catch(() => setAuth(false));
-  }, []);
+  const { loading, session, configured } = useAdminAuth();
 
-  if (auth === null) {
+  if (loading) {
     return <div className="p-8 text-center text-slate-500">Loading...</div>;
   }
-  if (!auth) {
-    return <Navigate to="/arrowline-admin" replace />;
+  if (!configured) {
+    return <div className="p-8 text-center text-red-600">Supabase Auth is not configured.</div>;
+  }
+  if (!session) {
+    return <Navigate to="/admin/login" replace />;
   }
   return children;
 }
 
 export default function AdminRouter() {
   return (
-    <BrowserRouter>
+    <AdminAuthProvider>
+    <HashRouter>
       <Routes>
-        <Route path="/arrowline-admin" element={<AdminLogin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route
-          path="/arrowline-admin"
+          path="/admin"
           element={
             <RequireAuth>
               <AdminLayout />
@@ -41,9 +40,11 @@ export default function AdminRouter() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="enquiries" element={<AdminEnquiries />} />
           <Route path="enquiries/:id" element={<AdminEnquiryDetail />} />
+          <Route path="content" element={<AdminContent />} />
         </Route>
-        <Route path="*" element={<Navigate to="/arrowline-admin" replace />} />
+        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
+    </AdminAuthProvider>
   );
 }

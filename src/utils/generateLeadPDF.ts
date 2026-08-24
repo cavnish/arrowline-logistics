@@ -1,3 +1,4 @@
+// src/utils/generateLeadPDF.ts
 import jsPDF from "jspdf";
 import { COMPANY_DETAILS } from "../data/logisticsData";
 
@@ -13,23 +14,97 @@ export interface LeadData {
 }
 
 /**
+ * Draw the Arrowline logo matching the React component exactly
+ */
+function drawLogo(
+  doc: jsPDF,
+  x: number,
+  y: number,
+) {
+  const navy: [number, number, number] = [30, 58, 138];
+  const orange: [number, number, number] = [255, 122, 0];
+  const white: [number, number, number] = [255, 255, 255];
+  const lightOrange: [number, number, number] = [255, 200, 150];
+
+  // ---- Wordmark ----
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.setTextColor(...white);
+  const wordmark = "ARROWLINE";
+  doc.text(wordmark, x, y);
+
+  // ---- Arrow chevron (simplified, clean shape) ----
+  // Position to the right of the wordmark
+  const textWidth = doc.getTextWidth(wordmark);
+  const arrowX = x + textWidth + 2; // Small gap after wordmark
+  const arrowY = y - 5; // Align with wordmark top
+  
+  // Draw a clean chevron arrow - simpler and more reliable than SVG path
+  doc.setFillColor(...orange);
+  
+  // Main chevron body - a right-pointing arrow shape
+  const arrowSize = 6;
+  const tipX = arrowX + arrowSize * 1.8;
+  const tipY = arrowY + arrowSize / 2;
+  
+  // Draw as polygon: left top, tip, left bottom
+  doc.triangle(
+    arrowX, arrowY,           // left top
+    tipX, tipY,               // tip (right point)
+    arrowX, arrowY + arrowSize, // left bottom
+    "F"
+  );
+  
+  // Small rectangular stem to make it look like the logo
+  doc.rect(
+    arrowX - 3,
+    arrowY + arrowSize * 0.3,
+    3,
+    arrowSize * 0.4,
+    "F"
+  );
+
+  // ---- "LOGISTICS" subline with dashes ----
+  const subY = y + 5.5;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(7);
+  doc.setTextColor(...lightOrange);
+  
+  // Dashes on both sides
+  const subText = "LOGISTICS";
+  const subWidth = doc.getTextWidth(subText);
+  const dashWidth = 3;
+  const gap = 2;
+  
+  // Left dash
+  doc.text("—", x, subY);
+  // LOGISTICS text
+  doc.text(subText, x + dashWidth + gap, subY);
+  // Right dash
+  doc.text("—", x + dashWidth + gap + subWidth + gap, subY);
+}
+
+/**
  * Generates a professional, brand-consistent PDF slip for a client inquiry
- * and downloads it. Uses jsPDF to draw the Arrowline logo, colored bands,
- * details table, terms and signature area.
+ * and downloads it.
  */
 export function generateLeadPDF(lead: LeadData) {
-  const refNo = lead.referenceNumber || `ALQ-${Math.floor(100000 + Math.random() * 900000)}`;
-  const date = lead.date || new Date().toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
+  const refNo =
+    lead.referenceNumber ||
+    `ALQ-${Math.floor(100000 + Math.random() * 900000)}`;
+  const date =
+    lead.date ||
+    new Date().toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
 
-  // Colors matching brand
-  const navy: [number, number, number] = [30, 58, 138];      // #1E3A8A
-  const orange: [number, number, number] = [255, 122, 0];    // #FF7A00
-  const cream: [number, number, number] = [254, 249, 240];   // #FEF9F0
-  const slate: [number, number, number] = [71, 85, 105];     // #475569
+  // Brand colours
+  const navy: [number, number, number] = [30, 58, 138];   // #1E3A8A
+  const orange: [number, number, number] = [255, 122, 0]; // #FF7A00
+  const cream: [number, number, number] = [254, 249, 240]; // #FEF9F0
+  const slate: [number, number, number] = [71, 85, 105];  // #475569
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
@@ -44,29 +119,8 @@ export function generateLeadPDF(lead: LeadData) {
   doc.setFillColor(...orange);
   doc.rect(0, 32, pageW, 2, "F");
 
-  // ---- Logo: "ARROWLINE" wordmark + orange arrow chevron ----
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.setTextColor(255, 255, 255);
-  doc.text("ARROWLINE", 15, 17);
-
-  // Orange arrow icon (pentagon shape mimicking logo)
-  const arrowX = 63;
-  const arrowY = 10;
-  doc.setFillColor(...orange);
-  doc.triangle(arrowX, arrowY, arrowX + 8, arrowY + 4, arrowX, arrowY + 8, "F");
-  doc.rect(arrowX - 6, arrowY + 2, 6, 4, "F");
-
-  // "LOGISTICS" subline with dashes
-  doc.setFontSize(7);
-  doc.setTextColor(255, 200, 150);
-  doc.text("— LOGISTICS —", 15, 23);
-
-  // Tagline
-  doc.setFont("helvetica", "italic");
-  doc.setFontSize(8);
-  doc.setTextColor(200, 210, 230);
-  doc.text("Moving Possibilities. Delivering Trust.", 15, 28);
+  // Draw the logo
+  drawLogo(doc, 15, 17);
 
   // Right side: "SHIPPING QUOTE INQUIRY" label
   doc.setFont("helvetica", "bold");
@@ -151,7 +205,6 @@ export function generateLeadPDF(lead: LeadData) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9.5);
     doc.setTextColor(...navy);
-    // Truncate long values to avoid overflow
     const displayVal = doc.splitTextToSize(value || "—", pageW - 90)[0];
     doc.text(displayVal, 75, y + 6);
     y += rowH;
@@ -164,7 +217,10 @@ export function generateLeadPDF(lead: LeadData) {
   drawRow("Service Interested", lead.service, false);
 
   // Message block (multi-line)
-  const msgLines = doc.splitTextToSize(lead.message || "No additional message provided.", pageW - 90);
+  const msgLines = doc.splitTextToSize(
+    lead.message || "No additional message provided.",
+    pageW - 90
+  );
   const msgRowH = Math.max(9, msgLines.length * 4.5 + 4);
   doc.setFillColor(255, 255, 255);
   doc.rect(15, y, pageW - 30, msgRowH, "F");

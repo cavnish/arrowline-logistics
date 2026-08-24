@@ -1,14 +1,17 @@
-﻿import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Inbox, LogOut } from "lucide-react";
 import adminApi from "../../services/adminApi";
+import { useAdminAuth } from "../../admin/AdminAuthProvider";
 
 const sidebarLinks = [
-  { to: "/arrowline-admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/arrowline-admin/enquiries", label: "Enquiries", icon: Inbox },
+  { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/admin/enquiries", label: "Enquiries", icon: Inbox },
+  { to: "/admin/content", label: "Content", icon: LayoutDashboard },
 ];
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const { signOut, user } = useAdminAuth();
 
   const handleLogout = async () => {
     try {
@@ -16,7 +19,8 @@ export default function AdminLayout() {
     } catch (e) {
       // ignore
     }
-    navigate("/arrowline-admin");
+    await signOut();
+    navigate("/admin/login");
   };
 
   return (
@@ -47,6 +51,7 @@ export default function AdminLayout() {
           ))}
         </nav>
         <div className="p-4 border-t border-blue-800/50">
+          <p className="px-4 pb-3 text-xs text-blue-100 truncate">{user?.email || "Administrator"}</p>
           <button
             onClick={handleLogout}
             className="w-full flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-white/10 transition"
