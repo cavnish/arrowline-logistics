@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { ArrowRight, Phone, ChevronDown, Truck, Anchor, Globe, ShieldCheck, Play } from "lucide-react";
+import { useState, useEffect, type CSSProperties } from "react";
+import { ArrowRight, Phone, ChevronDown, Play } from "lucide-react";
 import { useSiteContent } from "../hooks/useSiteContent";
 
 interface HeroSectionProps {
@@ -7,42 +7,18 @@ interface HeroSectionProps {
   onExploreServices: () => void;
 }
 
-/* ─── Animated counter hook ─── */
-function useCountUp(target: number, duration = 1800, start = false) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    if (!start) return;
-    let frame: number;
-    const startTime = performance.now();
-    const tick = (now: number) => {
-      const progress = Math.min((now - startTime) / duration, 1);
-      const ease = 1 - Math.pow(1 - progress, 3);
-      setVal(Math.floor(ease * target));
-      if (progress < 1) frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [start, target, duration]);
-  return val;
-}
-
 const SERVICES = ["Road Transport", "Freight Forwarding", "Multimodal Logistics", "Container Cargo", "Project Cargo", "Custom Clearance"];
 
 export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSectionProps) {
   const content = useSiteContent();
   const [loaded, setLoaded] = useState(false);
-  const [counting, setCounting] = useState(false);
   const [activeService, setActiveService] = useState(0);
   const [videoModal, setVideoModal] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
 
-  const cities = useCountUp(500, 2000, counting);
-  const fleet = useCountUp(250, 1800, counting);
-  const delivery = useCountUp(994, 2200, counting);
 
   /* Stagger-in on mount */
   useEffect(() => {
-    const t = setTimeout(() => { setLoaded(true); setCounting(true); }, 120);
+    const t = setTimeout(() => setLoaded(true), 120);
     return () => clearTimeout(t);
   }, []);
 
@@ -60,7 +36,6 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
 
   return (
     <section
-      ref={sectionRef}
       className="relative w-full min-h-screen flex flex-col overflow-hidden"
       style={{ minHeight: "100svh" }}
     >
@@ -102,10 +77,10 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
 
       {/* ── MAIN CONTENT ── */}
       <div className="relative z-10 flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 lg:pt-36 pb-6 flex flex-col justify-center">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-6 items-center">
+        <div className="w-full flex items-center">
 
           {/* ── LEFT: Text ── */}
-          <div className="lg:col-span-7 xl:col-span-7 space-y-6">
+          <div className="w-full max-w-4xl space-y-6">
 
             {/* Eyebrow pill */}
             <div style={anim(loaded, 0)}>
@@ -135,8 +110,7 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
             {/* Description */}
             <div style={anim(loaded, 300)}>
               <p className="text-sm sm:text-base text-white/65 leading-relaxed max-w-lg">
-                Arrowline provides reliable road transportation, freight, multimodal logistics and
-                specialized cargo solutions for businesses across India — all anchored at Mundra Port, Gujarat.
+                Arrowline Logistics provides FTL transportation, container transportation, multimodal logistics, project cargo and customs clearance services from Mundra, Gujarat, serving businesses across India.
               </p>
             </div>
 
@@ -176,7 +150,7 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
               </button>
             </div>
 
-            {/* Contact row */}
+            {/* Contact row
             <div style={anim(loaded, 510)} className="flex flex-col sm:flex-row gap-4 pt-1">
               <a
                 href="tel:+919021179108"
@@ -192,98 +166,9 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
               >
                 mundra@arrowlinelogistics.in
               </a>
-            </div>
+            </div> */}
           </div>
 
-          {/* ── RIGHT: Stats + Badge card ── */}
-          <div className="lg:col-span-5 xl:col-span-5 flex flex-col gap-4" style={anim(loaded, 200)}>
-
-            {/* Top card — HQ Badge */}
-            <div className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF6B1A]/20 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-
-              <div className="relative flex items-start gap-4 mb-5">
-                <div className="w-12 h-12 rounded-2xl bg-[#FF6B1A] flex items-center justify-center text-white font-black text-sm flex-shrink-0 shadow-lg shadow-[#FF6B1A]/40">
-                  HQ
-                </div>
-                <div>
-                  <p className="text-white font-black text-lg leading-tight">Mundra Port</p>
-                  <p className="text-[#FF6B1A] text-xs font-semibold mt-0.5">Deendayal Port, Gujarat, India</p>
-                </div>
-                <span className="ml-auto flex items-center gap-1.5 text-emerald-400 text-xs font-bold bg-emerald-400/10 border border-emerald-400/30 px-2.5 py-1 rounded-full flex-shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Live
-                </span>
-              </div>
-
-              {/* Animated route line */}
-              <div className="flex items-center gap-2 mb-5">
-                <div className="flex flex-col items-center gap-0.5">
-                  <div className="relative w-3 h-3">
-                    <span className="absolute inset-0 rounded-full bg-[#FF6B1A] animate-ping opacity-50" />
-                    <span className="relative block w-3 h-3 rounded-full bg-[#FF6B1A]" />
-                  </div>
-                  <span className="text-[8px] text-white/60 font-bold mt-1">MUNDRA</span>
-                </div>
-                <div className="flex-1 h-0.5 bg-white/10 relative overflow-hidden rounded-full">
-                  <div className="absolute top-0 left-0 h-full w-1/2 bg-gradient-to-r from-[#FF6B1A] via-white to-[#FF6B1A] rounded-full"
-                    style={{ animation: "routeSlide 2s linear infinite" }} />
-                </div>
-                <div className="flex flex-col items-center gap-0.5">
-                  <div className="w-3 h-3 rounded-full bg-[#00C2CB]" />
-                  <span className="text-[8px] text-white/60 font-bold mt-1">PAN-INDIA</span>
-                </div>
-                <div className="flex-1 h-0.5 bg-white/10 relative overflow-hidden rounded-full">
-                  <div className="absolute top-0 left-0 h-full w-1/2 bg-gradient-to-r from-[#00C2CB] via-white to-[#00C2CB] rounded-full"
-                    style={{ animation: "routeSlide 2s linear infinite 1s" }} />
-                </div>
-                <div className="flex flex-col items-center gap-0.5">
-                  <div className="w-3 h-3 rounded-full bg-[#FF6B1A]" />
-                  <span className="text-[8px] text-white/60 font-bold mt-1">DEST.</span>
-                </div>
-              </div>
-
-              {/* Stats row */}
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { value: cities, suffix: "+", label: "Cities" },
-                  { value: fleet, suffix: "+", label: "Fleet" },
-                  { value: delivery / 10, suffix: "%", label: "On-Time", fixed: 1 },
-                ].map((s, i) => (
-                  <div key={i} className="bg-white/8 border border-white/10 rounded-2xl p-3 text-center">
-                    <span className="block text-2xl font-black text-white leading-none">
-                      {s.fixed ? s.value.toFixed(1) : s.value}{s.suffix}
-                    </span>
-                    <span className="block text-[10px] text-white/50 mt-1">{s.label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Bottom floating service icons */}
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { icon: Truck, label: "Road Transport", sub: "FTL / PTL" },
-                { icon: Anchor, label: "Port Logistics", sub: "Mundra Hub" },
-                { icon: Globe, label: "Multimodal", sub: "All Modes" },
-                { icon: ShieldCheck, label: "Safe Delivery", sub: "Insured Cargo" },
-              ].map(({ icon: Icon, label, sub }, i) => (
-                <div
-                  key={i}
-                  className="group bg-white/8 hover:bg-white/15 backdrop-blur-md border border-white/15 hover:border-[#FF6B1A]/40 rounded-2xl p-4 flex items-center gap-3 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
-                  style={{ animationDelay: `${i * 80}ms` }}
-                >
-                  <div className="w-9 h-9 rounded-xl bg-[#FF6B1A]/20 group-hover:bg-[#FF6B1A]/30 flex items-center justify-center flex-shrink-0 transition-colors">
-                    <Icon className="w-4.5 h-4.5 text-[#FF6B1A]" />
-                  </div>
-                  <div className="min-w-0">
-                    <span className="block text-xs font-bold text-white truncate">{label}</span>
-                    <span className="block text-[10px] text-white/40 mt-0.5">{sub}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 
@@ -329,10 +214,6 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        @keyframes routeSlide {
-          from { transform: translateX(-200%); }
-          to   { transform: translateX(400%); }
-        }
         @keyframes bounceDown {
           0%, 100% { transform: translateY(0); }
           50%      { transform: translateY(5px); }
@@ -343,7 +224,7 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
 }
 
 /* Helper: stagger-in style */
-function anim(loaded: boolean, delay: number): React.CSSProperties {
+function anim(loaded: boolean, delay: number): CSSProperties {
   return {
     opacity: loaded ? 1 : 0,
     transform: loaded ? "translateY(0)" : "translateY(22px)",

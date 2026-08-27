@@ -1,134 +1,428 @@
-import { CORE_VALUES } from "../data/logisticsData";
-import { ShieldCheck, TrendingDown, Activity, Workflow, ArrowRight } from "lucide-react";
+import React from "react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  MapPin,
+  ShieldCheck,
+  Truck,
+  Zap,
+} from "lucide-react";
 
-interface WhyChooseUsSectionProps {
-  onOpenQuote: () => void;
-}
+const projects = [
+  {
+    image: "/images/project-road.jpg",
+    title: "Road Transportation",
+    location: "Pan-India",
+  },
+  {
+    image: "/images/project-port.jpg",
+    title: "Mundra Port Logistics",
+    location: "Gujarat",
+  },
+  {
+    image: "/images/project-warehouse.jpg",
+    title: "Warehouse & Cargo",
+    location: "India",
+  },
+];
 
-export default function WhyChooseUsSection({ onOpenQuote }: WhyChooseUsSectionProps) {
-  const getIcon = (iconName: string) => {
-    switch (iconName) {
-      case "ShieldCheck": return <ShieldCheck className="w-5 h-5 text-[#FF6B1A]" />;
-      case "TrendingDown": return <TrendingDown className="w-5 h-5 text-[#FF6B1A]" />;
-      case "Activity": return <Activity className="w-5 h-5 text-[#FF6B1A]" />;
-      case "Workflow": return <Workflow className="w-5 h-5 text-[#FF6B1A]" />;
-      default: return <ShieldCheck className="w-5 h-5 text-[#FF6B1A]" />;
-    }
-  };
+const advantages = [
+  {
+    icon: Truck,
+    title: "Multimodal Network",
+    text: "Road, rail, sea & air",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Safe & Secure",
+    text: "GPS tracked cargo",
+  },
+  {
+    icon: MapPin,
+    title: "Mundra Advantage",
+    text: "Strong port access",
+  },
+  {
+    icon: Zap,
+    title: "Smart Logistics",
+    text: "Live shipment updates",
+  },
+];
 
+export default function CoreAdvantages() {
   return (
-    <section className="py-16 lg:py-24 bg-white relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section
+      id="advantages"
+      className="relative overflow-hidden bg-[#071C27] py-14 sm:py-16 lg:py-20"
+    >
+      {/* Background glow */}
+      <div className="pointer-events-none absolute -left-40 top-0 h-96 w-96 rounded-full bg-[#FF6B1A]/10 blur-[100px]" />
 
-        {/* Main Grid: Left Arched Visual + Right Connected Nodes */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+      <div className="pointer-events-none absolute -right-40 bottom-0 h-96 w-96 rounded-full bg-[#00C2CB]/5 blur-[100px]" />
 
-          {/* Left Column: Semicircular / Arched Graphic Composition */}
-          <div className="lg:col-span-6 relative">
-            <div className="relative mx-auto max-w-md lg:max-w-none">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-              {/* Arched Background Shape */}
-              <div className="relative rounded-t-[140px] sm:rounded-t-[200px] rounded-b-3xl overflow-hidden shadow-2xl border-4 border-slate-100 bg-[#062B3A] aspect-[4/4.5]">
-                <img
-                  src="/images/hero-trucks-city.jpg"
-                  alt="Arrowline Logistics fleet and multimodal transport infrastructure"
-                  className="w-full h-full object-cover object-center opacity-90 hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#062B3A] via-[#062B3A]/40 to-transparent" />
+        {/* ───────────────── TOP ───────────────── */}
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-8">
 
-                {/* Overlay Text Inside Arch */}
-                <div className="absolute bottom-6 left-6 right-6 text-white space-y-1.5">
-                  <span className="text-[11px] font-black uppercase tracking-widest text-[#FF7A00] block">
-                    Multimodal Precision
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-black">
-                    Synchronized Sea, Road & Rail Networks
-                  </h3>
-                  <p className="text-xs text-slate-300">
-                    Eliminating bottlenecks across India's premier freight corridors.
-                  </p>
-                </div>
-              </div>
+          {/* LEFT CONTENT */}
+          <div className="lg:col-span-5">
 
-              {/* Floating Pulse Node */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white rounded-full p-2.5 shadow-xl border border-slate-200 flex items-center space-x-2">
-                <span className="w-3 h-3 rounded-full bg-[#FF6B1A] animate-ping" />
-                <span className="text-xs font-bold text-[#062B3A] pr-2">Port to Inland Gate</span>
-              </div>
+            {/* Label */}
+            <div
+              className="mb-4 flex items-center gap-2"
+              style={{
+                animation: "fadeUp 0.7s ease-out both",
+              }}
+            >
+              <span className="h-[2px] w-7 bg-[#FF6B1A]" />
 
-            </div>
-          </div>
-
-          {/* Right Column: Heading & Connected Feature Nodes */}
-          <div className="lg:col-span-6 space-y-6">
-            <div className="space-y-3">
-              <div className="inline-flex items-center space-x-2 px-3 py-1 bg-[#EAF3F6] border border-[#062B3A]/15 rounded-full text-[11px] font-extrabold text-[#062B3A] tracking-wider uppercase">
-                <span>OUR CORE ADVANTAGES</span>
-              </div>
-
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight leading-tight">
-                Why Corporate India <br />
-                <span className="text-[#FF6B1A]">Chooses Arrowline</span>
-              </h2>
-
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                Logistics in India demands local port leverage, vetted highway capacity, and total operational transparency. We integrate these factors into high-efficiency supply chain loops.
-              </p>
+              <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#FF6B1A]">
+                Our Core Advantages
+              </span>
             </div>
 
-            {/* Connected Route Nodes List */}
-            <div className="space-y-4 pt-2 relative">
-              {/* Vertical connecting line */}
-              <div className="absolute top-6 bottom-6 left-6 w-0.5 bg-slate-200 -translate-x-1/2 z-0 hidden sm:block" />
+            {/* Heading */}
+            <h2
+              className="max-w-lg text-3xl font-black leading-[1.08] tracking-tight text-white sm:text-4xl lg:text-5xl"
+              style={{
+                animation: "fadeUp 0.7s ease-out 100ms both",
+              }}
+            >
+              Why Corporate India
+              <span className="block text-[#FF6B1A]">
+                Chooses Arrowline
+              </span>
+            </h2>
 
-              {CORE_VALUES.map((item, idx) => (
+            {/* Description */}
+            <p
+              className="mt-5 max-w-md text-sm leading-6 text-white/55 sm:text-base"
+              style={{
+                animation: "fadeUp 0.7s ease-out 200ms both",
+              }}
+            >
+              Strong port access, reliable transport and complete
+              shipment visibility — built for modern Indian businesses.
+            </p>
+
+            {/* CTA */}
+            <button
+              className="
+                group mt-6
+                inline-flex items-center gap-2
+                rounded-lg
+                bg-[#FF6B1A]
+                px-5 py-2.5
+                text-xs font-bold text-white
+                shadow-[0_8px_25px_rgba(255,107,26,0.25)]
+                transition-all duration-300
+                hover:-translate-y-1
+                hover:bg-[#ff7a32]
+              "
+              style={{
+                animation: "fadeUp 0.7s ease-out 300ms both",
+              }}
+            >
+              Explore Our Network
+
+              <ArrowRight
+                className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
+              />
+            </button>
+
+            {/* PROJECT IMAGES */}
+            <div
+              className="mt-10 grid grid-cols-3 gap-2 sm:gap-3"
+              style={{
+                animation: "fadeUp 0.8s ease-out 400ms both",
+              }}
+            >
+              {projects.map((project, index) => (
                 <div
-                  key={idx}
-                  className="relative z-10 bg-[#F5F8FA] border border-slate-200 hover:border-[#FF6B1A]/40 rounded-2xl p-4 sm:p-5 flex items-start space-x-4 transition-all duration-200 hover:shadow-md hover:bg-white group"
+                  key={project.title}
+                  className="group relative aspect-[1.25/1] overflow-hidden rounded-lg border border-white/10"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 group-hover:border-[#FF6B1A]/40 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-                    {getIcon(item.icon)}
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-[#062B3A] group-hover:text-[#FF6B1A] transition-colors leading-snug">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-                      {item.desc}
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="
+                      h-full w-full
+                      object-cover
+                      transition-transform duration-700
+                      group-hover:scale-110
+                    "
+                  />
+
+                  {/* Image overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                  {/* Location */}
+                  <div className="absolute bottom-2 left-2 right-2">
+                    <p className="text-[8px] font-bold uppercase tracking-wide text-white sm:text-[9px]">
+                      {project.title}
+                    </p>
+
+                    <p className="mt-0.5 text-[7px] text-white/60 sm:text-[8px]">
+                      {project.location}
                     </p>
                   </div>
                 </div>
               ))}
             </div>
-
           </div>
 
-        </div>
-
-        {/* Orange Callout Banner (Matching Reference Image) */}
-        <div className="mt-14 lg:mt-16 bg-gradient-to-r from-[#FF6B1A] via-[#FF7A00] to-[#FF8C2A] rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl text-white flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 text-center md:text-left">
-            <span className="text-[11px] font-black uppercase tracking-widest bg-black/15 px-3 py-1 rounded-full inline-block">
-              Immediate Cargo Solution
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-black leading-tight">
-              Need reliable freight movement from Mundra Port?
-            </h3>
-            <p className="text-xs sm:text-sm text-white/90 max-w-xl">
-              Talk directly with our transport dispatchers for dedicated trailers, rail rakes, and prompt customs brokerage.
-            </p>
-          </div>
-
-          <button
-            onClick={onOpenQuote}
-            className="px-8 py-4 bg-[#03212D] hover:bg-[#062B3A] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-xl hover:-translate-y-0.5 active:scale-98 transition-all flex items-center space-x-2 cursor-pointer flex-shrink-0"
+          {/* ───────────────── CENTER MAP ───────────────── */}
+          <div
+            className="relative flex min-h-[320px] items-center justify-center lg:col-span-4"
+            style={{
+              animation: "mapReveal 1s ease-out 300ms both",
+            }}
           >
-            <span>TALK TO OUR EXPERTS</span>
-            <ArrowRight className="w-4 h-4 text-[#FF7A00]" />
-          </button>
+            {/* Map glow */}
+            <div className="absolute h-56 w-56 rounded-full bg-[#FF6B1A]/10 blur-3xl" />
+
+            {/* India Map */}
+            <div className="relative w-[210px] sm:w-[240px] lg:w-[260px]">
+
+              <img
+                src="/images/india-map.svg"
+                alt="Arrowline Logistics India network"
+                className="
+                  relative z-10
+                  w-full
+                  opacity-80
+                  drop-shadow-[0_0_20px_rgba(255,107,26,0.15)]
+                "
+              />
+
+              {/* LOCATION DOTS */}
+
+              <span className="map-dot left-[47%] top-[22%]" />
+              <span className="map-dot left-[55%] top-[30%]" />
+              <span className="map-dot left-[42%] top-[40%]" />
+              <span className="map-dot left-[49%] top-[50%]" />
+              <span className="map-dot left-[38%] top-[59%]" />
+              <span className="map-dot left-[55%] top-[68%]" />
+              <span className="map-dot left-[48%] top-[78%]" />
+
+              {/* Mundra highlight */}
+              <div className="absolute left-[30%] top-[38%] z-20">
+                <span className="absolute -inset-2 animate-ping rounded-full bg-[#FF6B1A]/30" />
+
+                <span className="relative block h-3 w-3 rounded-full border-2 border-white bg-[#FF6B1A]" />
+
+                <div className="absolute left-5 top-[-5px] whitespace-nowrap">
+                  <span className="text-[8px] font-bold uppercase tracking-wider text-[#FF6B1A]">
+                    Mundra Hub
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Floating network label */}
+            <div
+              className="
+                absolute bottom-5
+                rounded-full
+                border border-white/10
+                bg-white/5
+                px-4 py-2
+                backdrop-blur-md
+              "
+            >
+              <span className="text-[9px] font-semibold uppercase tracking-widest text-white/60">
+                Pan-India Network
+              </span>
+            </div>
+          </div>
+
+          {/* ───────────────── RIGHT ADVANTAGES ───────────────── */}
+          <div className="lg:col-span-3">
+
+            <div className="mb-5 flex items-center gap-2">
+              <span className="h-px w-6 bg-[#FF6B1A]" />
+
+              <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/40">
+                Why Arrowline
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {advantages.map((item, index) => {
+                const Icon = item.icon;
+
+                return (
+                  <div
+                    key={item.title}
+                    className="
+                      group
+                      flex items-center gap-3
+                      rounded-xl
+                      border border-white/8
+                      bg-white/[0.035]
+                      p-3
+                      transition-all duration-300
+                      hover:-translate-x-1
+                      hover:border-[#FF6B1A]/30
+                      hover:bg-white/[0.07]
+                    "
+                    style={{
+                      animation: `slideRight 0.6s ease-out ${
+                        200 + index * 100
+                      }ms both`,
+                    }}
+                  >
+                    {/* Icon */}
+                    <div
+                      className="
+                        flex h-9 w-9 shrink-0
+                        items-center justify-center
+                        rounded-lg
+                        bg-[#FF6B1A]/10
+                        text-[#FF6B1A]
+                        transition-all duration-300
+                        group-hover:bg-[#FF6B1A]
+                        group-hover:text-white
+                      "
+                    >
+                      <Icon className="h-4 w-4" />
+                    </div>
+
+                    {/* Text */}
+                    <div className="min-w-0">
+                      <h3 className="text-[11px] font-bold text-white">
+                        {item.title}
+                      </h3>
+
+                      <p className="mt-0.5 text-[9px] text-white/40">
+                        {item.text}
+                      </p>
+                    </div>
+
+                    <ArrowRight
+                      className="
+                        ml-auto
+                        h-3 w-3
+                        shrink-0
+                        text-white/20
+                        transition-all duration-300
+                        group-hover:translate-x-1
+                        group-hover:text-[#FF6B1A]
+                      "
+                    />
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Small stats */}
+            <div
+              className="
+                mt-5
+                grid grid-cols-2
+                gap-2
+              "
+            >
+              <div className="rounded-xl border border-white/10 bg-white/[0.035] p-3">
+                <p className="text-xl font-black text-white">
+                  500<span className="text-[#FF6B1A]">+</span>
+                </p>
+
+                <p className="text-[8px] uppercase tracking-wider text-white/40">
+                  Cities
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-white/[0.035] p-3">
+                <p className="text-xl font-black text-white">
+                  99<span className="text-[#FF6B1A]">%</span>
+                </p>
+
+                <p className="text-[8px] uppercase tracking-wider text-white/40">
+                  On-Time
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
+        {/* Bottom line */}
+        <div className="mt-10 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
       </div>
+
+      {/* ───────────────── STYLES ───────────────── */}
+      <style>{`
+        .map-dot {
+          position: absolute;
+          z-index: 20;
+          width: 6px;
+          height: 6px;
+          border-radius: 999px;
+          background: #FF6B1A;
+          box-shadow: 0 0 0 3px rgba(255,107,26,0.12);
+          animation: dotPulse 2.2s ease-in-out infinite;
+        }
+
+        @keyframes fadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(22px);
+          }
+
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes slideRight {
+          from {
+            opacity: 0;
+            transform: translateX(25px);
+          }
+
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes mapReveal {
+          from {
+            opacity: 0;
+            transform: scale(0.88);
+          }
+
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes dotPulse {
+          0%,
+          100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 3px rgba(255,107,26,0.12);
+          }
+
+          50% {
+            transform: scale(1.35);
+            box-shadow: 0 0 0 7px rgba(255,107,26,0.03);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          *,
+          *::before,
+          *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

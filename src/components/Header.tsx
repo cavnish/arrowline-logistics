@@ -48,44 +48,124 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
       {/* Top Micro-Bar (Light Crisp Theme) */}
-      <div className={cn(
-        "bg-[#F0F5FA] text-[#062B3A] text-xs py-2 px-4 sm:px-6 lg:px-8 transition-all duration-300 flex justify-between items-center overflow-hidden border-b border-slate-200/80",
-        isScrolled ? "h-0 py-0 opacity-0" : "h-auto opacity-100"
-      )}>
-        <div className="flex items-center space-x-6">
-          <a
-            href={buildMailto({ to: COMPANY_DETAILS.primaryEmail, context: "general" })}
-            className="flex items-center space-x-1.5 hover:text-[#FF6B1A] transition-colors font-medium text-slate-700 hover:text-[#FF6B1A]"
-            aria-label={`Send email to ${COMPANY_DETAILS.primaryEmail}`}
-          >
-            <Mail className="w-3.5 h-3.5 text-[#FF6B1A]" />
-            <span className="hidden sm:inline font-semibold text-[#062B3A]">Mundra Base: </span>
-            <span>{COMPANY_DETAILS.primaryEmail}</span>
-          </a>
-          <a
-            href={buildMailto({ to: COMPANY_DETAILS.secondaryEmail, context: "general" })}
-            className="hidden md:flex items-center space-x-1.5 hover:text-[#FF6B1A] transition-colors font-medium text-slate-700 hover:text-[#FF6B1A]"
-            aria-label={`Send email to ${COMPANY_DETAILS.secondaryEmail}`}
-          >
-            <Mail className="w-3.5 h-3.5 text-[#FF6B1A]" />
-            <span>Planning: {COMPANY_DETAILS.secondaryEmail}</span>
-          </a>
-        </div>
-        <div className="flex items-center space-x-4">
-          <a
-            href={buildTel(COMPANY_DETAILS.phone)}
-            className="flex items-center space-x-1.5 hover:text-[#FF6B1A] transition-colors font-bold text-[#062B3A]"
-            aria-label={`Call ${COMPANY_DETAILS.phone}`}
-          >
-            <Phone className="w-3.5 h-3.5 text-[#FF6B1A]" />
-            <span>{COMPANY_DETAILS.phone}</span>
-          </a>
-          <span className="hidden lg:flex items-center space-x-1 text-[#062B3A] font-bold text-[10.5px] tracking-wider uppercase border-l border-slate-300 pl-4">
-            <Anchor className="w-3 h-3 text-[#FF6B1A]" />
-            <span>Mundra Port → Pan-India</span>
-          </span>
-        </div>
+{/* ── TOP INFO BAR ── */}
+<div
+  className={cn(
+    "relative z-50 bg-[#F0F5FA] text-[#062B3A] border-b border-slate-200/80",
+    "transition-all duration-500 ease-in-out overflow-hidden",
+    isScrolled
+      ? "h-0 py-0 opacity-0"
+      : "h-7 sm:h-8 py-0 opacity-100"
+  )}
+>
+  <div className="h-full max-w-[1400px] mx-auto px-2.5 sm:px-4 lg:px-6 flex items-center justify-between">
+
+    {/* LEFT — Mundra Port → Pan-India */}
+    <div className="flex items-center min-w-0">
+      <span className="flex items-center gap-1 text-[8px] sm:text-[9px] md:text-[10px] font-bold tracking-wide uppercase whitespace-nowrap">
+        <Anchor
+          className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#FF6B1A] shrink-0"
+        />
+
+        <span>Mundra Port</span>
+
+        <span className="text-[#FF6B1A] mx-0.5">→</span>
+
+        <span>Pan-India</span>
+      </span>
+    </div>
+
+    {/* RIGHT */}
+    <div className="flex items-center min-w-0">
+
+      {/* EMAIL — SHOW ON MOBILE + DESKTOP */}
+      <a
+        href={buildMailto({
+          to: COMPANY_DETAILS.primaryEmail,
+          context: "general",
+        })}
+        className="
+          flex items-center gap-1
+          text-[8px] sm:text-[9px] md:text-[10px]
+          font-medium text-[#062B3A]
+          hover:text-[#FF6B1A]
+          transition-colors
+          max-w-[125px] sm:max-w-none
+          truncate
+        "
+        aria-label={`Send email to ${COMPANY_DETAILS.primaryEmail}`}
+      >
+        <Mail className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#FF6B1A] shrink-0" />
+
+        {/* Mobile: only email */}
+        <span className="sm:hidden truncate">
+          {COMPANY_DETAILS.primaryEmail}
+        </span>
+
+        {/* Desktop: Mundra Base + email */}
+        <span className="hidden sm:inline">
+          <span className="font-semibold">Mundra Base:</span>{" "}
+          {COMPANY_DETAILS.primaryEmail}
+        </span>
+      </a>
+
+      {/* PHONE — DESKTOP/TABLET ONLY */}
+      <div className="hidden sm:flex items-center">
+
+        <span className="mx-2 md:mx-3 h-3 w-px bg-slate-300" />
+
+        <a
+          href={buildTel(COMPANY_DETAILS.phone)}
+          className="
+            flex items-center gap-1
+            text-[9px] md:text-[10px]
+            font-bold text-[#062B3A]
+            hover:text-[#FF6B1A]
+            transition-colors
+            whitespace-nowrap
+          "
+          aria-label={`Call ${COMPANY_DETAILS.phone}`}
+        >
+          <Phone className="w-3 h-3 text-[#FF6B1A]" />
+          <span>{COMPANY_DETAILS.phone}</span>
+        </a>
+
       </div>
+    </div>
+  </div>
+
+  {/* Small animated orange line */}
+  <div
+    className="absolute bottom-0 left-0 h-[1px] w-16 sm:w-24 bg-[#FF6B1A]/70"
+    style={{
+      animation: !isScrolled
+        ? "topBarLine 3s ease-in-out infinite"
+        : "none",
+    }}
+  />
+
+  <style>{`
+    @keyframes topBarLine {
+      0% {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+
+      30% {
+        opacity: 1;
+      }
+
+      70% {
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateX(700%);
+        opacity: 0;
+      }
+    }
+  `}</style>
+</div>
 
       {/* Main Nav (Pure White Theme) */}
       <nav className={cn(

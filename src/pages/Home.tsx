@@ -6,7 +6,7 @@ import ServicesSection from "../components/ServicesSection";
 import WhyChooseUsSection from "../components/WhyChooseUsSection";
 import ProcessSection from "../components/ProcessSection";
 import IndustriesPreviewBar from "../components/IndustriesPreviewBar";
-import InteractiveMap from "../components/InteractiveMap";
+// import InteractiveMap from "../components/InteractiveMap";
 import TestimonialsSection from "../components/TestimonialsSection";
 import FAQSection from "../components/FAQSection";
 import TrackTraceBar from "../components/TrackTraceBar";
@@ -78,7 +78,7 @@ export default function Home({
       {/* 8. India Coverage Map */}
       <section className="py-12 sm:py-16 lg:py-20 bg-[#F5F8FA] border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <InteractiveMap />
+          {/* <InteractiveMap /> */}
         </div>
       </section>
 
