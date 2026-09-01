@@ -28,13 +28,22 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
           </p>
         </div>
 
-        {/* 3-Column Service Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {CORE_SERVICES.map((service) => (
+        {/* Responsive four-column desktop grid */}
+        <div className="services-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-5 items-stretch">
+          {CORE_SERVICES.slice(0, 4).map((service, index) => (
             <div
               key={service.id}
               onClick={() => onSelectService(service.slug)}
-              className="group bg-white border border-slate-200 hover:border-[#FF6B1A]/40 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between cursor-pointer hover:-translate-y-1.5"
+              className="service-card group bg-white border border-slate-200 hover:border-[#FF6B1A]/40 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 flex h-full flex-col justify-between cursor-pointer hover:-translate-y-1.5 focus-within:ring-2 focus-within:ring-[#FF6B1A] focus-within:ring-offset-2"
+              style={{ "--service-delay": `${index * 100}ms` } as React.CSSProperties}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onSelectService(service.slug);
+                }
+              }}
             >
               {/* Image Frame */}
               <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
@@ -57,7 +66,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
               </div>
 
               {/* Card Body */}
-              <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
                 <div className="space-y-2.5">
                   <h3 className="text-lg sm:text-xl font-bold text-[#062B3A] group-hover:text-[#FF6B1A] transition-colors leading-snug">
                     {service.title}

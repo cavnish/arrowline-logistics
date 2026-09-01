@@ -2,7 +2,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import adminApi from "../services/adminApi";
 import { StatusBadge, PriorityBadge } from "../components/admin/StatusBadge";
-import { Phone, Mail, Copy, Trash2, Loader2, Save, Plus } from "lucide-react";
+import { Phone, Mail, Trash2, Loader2, Save, Plus } from "lucide-react";
 
 export default function AdminEnquiryDetail() {
   const { id } = useParams();

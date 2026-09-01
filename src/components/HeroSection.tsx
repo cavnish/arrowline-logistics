@@ -42,7 +42,7 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
       {/* ── BG photo + overlays ── */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/images/hero-logistics.jpg"
+          src={content("hero_image", "/images/hero-logistics.jpg")}
           alt="Arrowline Logistics — India's premier multimodal network"
           className="w-full h-full object-cover object-center"
           style={{

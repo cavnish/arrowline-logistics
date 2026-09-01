@@ -17,8 +17,14 @@ export default function AdminLogin() {
     setLoading(true);
     setError("");
     try {
-      await signIn(email, password);
-      navigate("/admin/dashboard");
+      const result = await signIn(email, password);
+
+      if (!result.success) {
+        setError(result.message || "Login failed. Please try again.");
+        return;
+      }
+
+      navigate("/arrowline-admin/dashboard");
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");
     } finally {
@@ -45,7 +51,7 @@ export default function AdminLogin() {
             )}
             {!configured && (
               <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg text-sm">
-                Supabase Auth needs its public URL and anon key configured before administrators can sign in.
+                Administrator API authentication is not configured.
               </div>
             )}
             <div>

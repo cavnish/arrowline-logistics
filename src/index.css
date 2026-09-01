@@ -101,6 +101,15 @@ html.lenis, html.lenis body {
   animation: pulseLocation 2.4s ease-in-out infinite;
 }
 
+@keyframes map-sway {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-5px) scale(1.015); }
+}
+
+.map-sway {
+  animation: map-sway 6s ease-in-out infinite;
+}
+
 /* ----------------------------------------------------
    HERO REVEAL & STAGGER ANIMATIONS
    ---------------------------------------------------- */
@@ -110,6 +119,27 @@ html.lenis, html.lenis body {
 }
 .animate-fade-in-up {
   animation: fade-in-up 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes service-card-in {
+  0% { opacity: 0; transform: translateY(22px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.service-card {
+  animation: service-card-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--service-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card {
+    animation: none;
+  }
+  .map-sway,
+  .animate-route-draw,
+  .animate-location-dot {
+    animation: none;
+  }
 }
 
 @keyframes hero-bg-scale {

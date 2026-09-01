@@ -2,8 +2,10 @@ import { useState } from "react";
 import { REGIONAL_HUBS, HubDetail } from "../data/logisticsData";
 import { MapPin, Globe, ArrowRight, Anchor, Truck, Train, Plane } from "lucide-react";
 import { cn } from "../utils/cn";
+import { useSiteContent } from "../hooks/useSiteContent";
 
 export default function InteractiveMap() {
+  const content = useSiteContent();
   const [selectedHub, setSelectedHub] = useState<HubDetail>(REGIONAL_HUBS[0]);
   const [hoveredHub, setHoveredHub] = useState<HubDetail | null>(null);
 
@@ -105,15 +107,12 @@ export default function InteractiveMap() {
           <div className="relative w-full max-w-[500px] aspect-[4/5] bg-gradient-to-br from-[#F5F8FA] via-white to-[#EAF3F6] rounded-3xl border border-slate-200 p-4 flex items-center justify-center shadow-inner">
             <div className="absolute inset-0 bg-grid-pattern opacity-60 rounded-3xl pointer-events-none" />
 
-            <svg viewBox="0 0 350 400" className="w-full h-full max-h-[440px] select-none filter drop-shadow-lg" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M 120 40 L 150 20 L 170 30 L 180 50 L 195 40 L 210 50 L 205 70 L 210 90 L 240 100 L 270 95 L 290 110 L 320 110 L 330 130 L 310 140 L 290 145 L 270 140 L 260 160 L 280 180 L 295 180 L 290 200 L 270 195 L 255 180 L 240 190 L 235 210 L 245 225 L 235 240 L 215 240 L 200 220 L 190 230 L 195 250 L 180 270 L 190 290 L 190 320 L 185 340 L 175 365 L 165 385 L 155 350 L 140 310 L 125 270 L 115 230 L 105 190 L 95 170 L 75 160 L 60 180 L 40 190 L 20 185 L 25 155 L 45 150 L 75 155 L 90 135 L 75 110 L 95 95 L 115 110 L 125 90 L 115 70 Z"
-                fill="#D8E8EE"
-                stroke="#062B3A"
-                strokeWidth="2.5"
-                strokeLinejoin="round"
-                opacity="0.8"
-              />
+            <img
+              src={content("coverage_map_image", "/images/india-map.svg")}
+              alt="Map of India showing Arrowline logistics hubs"
+              className="absolute inset-6 w-[calc(100%-3rem)] h-[calc(100%-3rem)] object-contain opacity-25 drop-shadow-lg map-sway"
+            />
+            <svg viewBox="0 0 350 400" className="relative z-10 w-full h-full max-h-[440px] select-none" xmlns="http://www.w3.org/2000/svg">
 
               {REGIONAL_HUBS.map((hub) => {
                 if (hub.id === "hub-mundra") return null;
@@ -127,6 +126,7 @@ export default function InteractiveMap() {
                 return (
                   <g key={`line-${hub.id}`}>
                     <line
+                      className="animate-route-draw"
                       x1={startX} y1={startY} x2={targetX} y2={targetY}
                       stroke={isTargetSelected || isTargetHovered ? "#FF6B1A" : "#94A3B8"}
                       strokeWidth={isTargetSelected || isTargetHovered ? "2.5" : "1.2"}

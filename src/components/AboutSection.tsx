@@ -1,12 +1,14 @@
 import { CheckCircle2, ArrowRight, Phone, Award } from "lucide-react";
 import { COMPANY_DETAILS } from "../data/logisticsData";
 import { buildTel } from "../utils/contactLinks";
+import { useSiteContent } from "../hooks/useSiteContent";
 
 interface AboutSectionProps {
   onNavigateToAbout: () => void;
 }
 
 export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
+  const content = useSiteContent();
   const benefits = [
     "Multimodal Connectivity (Sea, Road, Rail & Air)",
     "Pan-India Reach across 500+ Cities & Industrial Zones",
@@ -92,7 +94,7 @@ export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
               {/* Primary Large Image (Port & Container Crane) */}
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100 aspect-[4/3] sm:aspect-[16/11]">
                 <img
-                  src="/images/hero-logistics.jpg"
+                  src={content("about_image", "/images/hero-logistics.jpg")}
                   alt="Mundra port container logistics crane and ship operations"
                   className="w-full h-full object-cover object-center"
                 />

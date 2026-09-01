@@ -25,9 +25,7 @@
             key={p}
             onClick={() => onPageChange(p)}
             className={`px-3 py-1 rounded border text-sm ${
-              p === page
-                ? "bg-[#1E3A8A] text-white border-[#1E3A8A]"
-                : "border-slate-300 hover:bg-slate-50"
+              p === page ? "bg-[#1E3A8A] text-white border-[#1E3A8A]" : "border-slate-300 hover:bg-slate-50"
             }`}
           >
             {p}
