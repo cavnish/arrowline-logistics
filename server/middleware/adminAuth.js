@@ -1,20 +1,22 @@
-﻿import "dotenv/config";
+import "dotenv/config";
 import jwt from "jsonwebtoken";
 
-function getJwtSecret() {
-  return process.env.ADMIN_API_KEY;
-}
+const JWT_SECRET = process.env.ADMIN_API_KEY;
 
-if (!getJwtSecret()) {
+if (!JWT_SECRET) {
   console.error("❌ ADMIN_API_KEY is missing in .env");
   process.exit(1);
 }
 
 export function generateAdminToken() {
   return jwt.sign(
-    { role: "admin" },
-    getJwtSecret(),
-    { expiresIn: "1d" }
+    {
+      role: "admin",
+    },
+    JWT_SECRET,
+    {
+      expiresIn: "1d",
+    }
   );
 }
 
@@ -29,10 +31,7 @@ export function requireAdmin(req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(
-      token,
-      getJwtSecret()
-    );
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     if (decoded?.role !== "admin") {
       return res.status(401).json({
@@ -44,10 +43,7 @@ export function requireAdmin(req, res, next) {
     req.admin = true;
     next();
   } catch (error) {
-    console.error(
-      "Admin authentication error:",
-      error.message
-    );
+    console.error("Admin authentication error:", error.message);
 
     return res.status(401).json({
       success: false,

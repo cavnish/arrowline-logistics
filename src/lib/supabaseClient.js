@@ -1,9 +1,28 @@
 import { createClient } from "@supabase/supabase-js";
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl =
+  import.meta.env.VITE_SUPABASE_URL;
 
-export const isSupabaseAuthConfigured = Boolean(url && anonKey);
-export const supabase = isSupabaseAuthConfigured
-  ? createClient(url, anonKey, { auth: { persistSession: true, autoRefreshToken: true } })
-  : null;
+const supabaseAnonKey =
+  import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+export const isSupabaseAuthConfigured =
+  Boolean(
+    supabaseUrl &&
+      supabaseAnonKey
+  );
+
+export const supabase =
+  isSupabaseAuthConfigured
+    ? createClient(
+        supabaseUrl,
+        supabaseAnonKey,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+          },
+        }
+      )
+    : null;
