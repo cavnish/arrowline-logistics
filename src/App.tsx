@@ -18,7 +18,7 @@ import Industries from "./pages/Industries";
 import Gallery from "./pages/Gallery";
 import Contact from "./pages/Contact";
 
-import ServiceDetailView from "./components/ServiceDetailView";
+import ServiceRouteView from "./components/services/ServiceRouteView";
 
 import {
   Phone,
@@ -199,18 +199,12 @@ export default function App() {
           setActivePage("contact");
         } else if (
           hash.startsWith(
-            "#/services/"
+            "#/services"
           )
         ) {
-          const slug =
-            hash.replace(
-              "#/services/",
-              ""
-            );
-
-          setActivePage(
-            `services/${slug}`
-          );
+          const raw = hash.replace("#/services", "");
+          const clean = raw.startsWith("/") ? raw.slice(1) : raw;
+          setActivePage(clean ? `services/${clean}` : "services/road-transportation");
         } else {
           setActivePage("home");
         }
@@ -330,37 +324,27 @@ export default function App() {
       if (
         activePage.startsWith(
           "services/"
-        )
+        ) ||
+        activePage === "services"
       ) {
         const slug =
-          activePage.replace(
-            "services/",
-            ""
-          );
+          activePage.startsWith("services/")
+            ? activePage.replace("services/", "")
+            : "road-transportation";
 
-        const matchedService =
-          CORE_SERVICES.find(
-            (srv) =>
-              srv.slug ===
-              slug
-          );
-
-        if (
-          matchedService
-        ) {
-          return (
-            <ServiceDetailView
-              service={
-                matchedService
-              }
-              onOpenQuote={() =>
-                setIsGlobalQuoteOpen(
-                  true
-                )
-              }
-            />
-          );
-        }
+        return (
+          <ServiceRouteView
+            slug={slug}
+            onOpenQuote={() =>
+              setIsGlobalQuoteOpen(
+                true
+              )
+            }
+            onNavigateTo={
+              handlePageChange
+            }
+          />
+        );
       }
 
       switch (
@@ -445,27 +429,24 @@ export default function App() {
 
       <main
         className={`flex-grow ${
-          activePage ===
-            "home" ||
-          activePage ===
-            "industries"
+          activePage === "home" ||
+          activePage === "industries" ||
+          activePage.startsWith("services")
             ? "pt-0"
             : "pt-24 sm:pt-28"
         } ${
-          activePage ===
-            "home" ||
-          activePage ===
-            "industries"
+          activePage === "home" ||
+          activePage === "industries" ||
+          activePage.startsWith("services")
             ? ""
             : "pb-12 sm:pb-16"
         } relative z-10`}
       >
         <div
           className={
-            activePage ===
-              "home" ||
-            activePage ===
-              "industries"
+            activePage === "home" ||
+            activePage === "industries" ||
+            activePage.startsWith("services")
               ? "w-full"
               : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
           }

@@ -220,10 +220,9 @@ app.get("/api/content", async (_req, res) => {
 app.get("/api/services", async (_req, res) => {
   const { data, error } = await supabase
     .from("services")
-    .select("id, slug, title, short_description, full_description, icon, hero_image, cta_text, cta_url")
+    .select("*")
     .eq("is_published", true)
-    .order("display_order", { ascending: true })
-    .order("title", { ascending: true });
+    .order("display_order", { ascending: true });
 
   if (error) {
     console.error("Public services error:", error);
@@ -232,6 +231,66 @@ app.get("/api/services", async (_req, res) => {
 
   return res.json({ success: true, data: data || [] });
 });
+
+app.get("/api/services/:slug", async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { data: service, error } = await supabase
+      .from("services")
+      .select("*")
+      .eq("slug", slug)
+      .eq("is_published", true)
+      .maybeSingle();
+
+    if (error || !service) {
+      return res.status(404).json({ success: false, message: "Service not found" });
+    }
+
+    const { data: subItems } = await supabase
+      .from("service_items")
+      .select("*")
+      .eq("service_id", service.id)
+      .eq("is_published", true)
+      .order("display_order", { ascending: true });
+
+    return res.json({ success: true, data: { ...service, subServices: subItems || [] } });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+app.get("/api/services/:serviceSlug/:subSlug", async (req, res) => {
+  try {
+    const { serviceSlug, subSlug } = req.params;
+    const { data: service } = await supabase
+      .from("services")
+      .select("id, slug, title")
+      .eq("slug", serviceSlug)
+      .eq("is_published", true)
+      .maybeSingle();
+
+    if (!service) {
+      return res.status(404).json({ success: false, message: "Parent service not found" });
+    }
+
+    const { data: subItem, error } = await supabase
+      .from("service_items")
+      .select("*")
+      .eq("service_id", service.id)
+      .eq("slug", subSlug)
+      .eq("is_published", true)
+      .maybeSingle();
+
+    if (error || !subItem) {
+      return res.status(404).json({ success: false, message: "Sub-service not found" });
+    }
+
+    return res.json({ success: true, data: { ...subItem, parentService: service } });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 
 app.get("/api/industries", async (_req, res) => {
   const { data, error } = await supabase

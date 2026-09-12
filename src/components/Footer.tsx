@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Mail, Phone, MapPin, Send, CheckCircle2, ShieldCheck } from "lucide-react";
-import { COMPANY_DETAILS, CORE_SERVICES, REGIONAL_HUBS } from "../data/logisticsData";
+import { COMPANY_DETAILS, REGIONAL_HUBS } from "../data/logisticsData";
+import { getAllMainServices } from "../data/servicesData";
 import ArrowlineLogo from "./ArrowlineLogo";
 import { buildMailto, buildTel } from "../utils/contactLinks";
 
@@ -67,10 +68,10 @@ export default function Footer({ setActivePage, openQuoteForm }: FooterProps) {
           <div className="lg:col-span-3 space-y-4">
             <h3 className="text-xs font-black text-white uppercase tracking-wider border-b border-white/15 pb-2.5 flex items-center justify-between">
               <span>Multimodal Services</span>
-              <span className="text-[#FF7A00]">7 Verticals</span>
+              <span className="text-[#FF7A00]">4 Verticals</span>
             </h3>
             <ul className="space-y-2 text-xs">
-              {CORE_SERVICES.map((srv) => (
+              {getAllMainServices().map((srv) => (
                 <li key={srv.id}>
                   <button
                     onClick={() => handleServiceClick(srv.slug)}

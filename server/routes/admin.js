@@ -2,6 +2,7 @@ import "dotenv/config";
 
 import express from "express";
 import cookieParser from "cookie-parser";
+import multer from "multer";
 import { createClient } from "@supabase/supabase-js";
 
 import {
@@ -12,6 +13,11 @@ import {
 const router = express.Router();
 
 router.use(cookieParser());
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 },
+});
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceRoleKey =
@@ -710,8 +716,308 @@ router.delete(
   }
 );
 
+// =====================================================
+// SERVICES CRUD
+// =====================================================
+
+// GET /api/admin/services
+router.get("/services", requireAdmin, async (_req, res) => {
+  try {
+    const { data: services, error } = await supabase
+      .from("services")
+      .select("*, service_items(count)")
+      .order("display_order", { ascending: true });
+
+    if (error) {
+      console.error("Admin get services error:", error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+
+    const formatted = (services || []).map((srv) => ({
+      ...srv,
+      sub_services_count: srv.service_items?.[0]?.count || 0,
+    }));
+
+    return res.json({ success: true, data: formatted });
+  } catch (err) {
+    console.error("Admin get services exception:", err);
+    return res.status(500).json({ success: false, message: "Failed to load services" });
+  }
+});
+
+// POST /api/admin/services
+router.post("/services", requireAdmin, async (req, res) => {
+  try {
+    const body = { ...req.body };
+    delete body.sub_services_count;
+    delete body.service_items;
+
+    const { data, error } = await supabase
+      .from("services")
+      .insert([body])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Admin create service error:", error);
+      return res.status(400).json({ success: false, message: error.message });
+    }
+    return res.status(201).json({ success: true, data });
+  } catch (err) {
+    console.error("Admin create service exception:", err);
+    return res.status(500).json({ success: false, message: "Failed to create service" });
+  }
+});
+
+// PATCH /api/admin/services/:id
+router.patch("/services/:id", requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = { ...req.body };
+    delete body.id;
+    delete body.sub_services_count;
+    delete body.service_items;
+    body.updated_at = new Date().toISOString();
+
+    const { data, error } = await supabase
+      .from("services")
+      .update(body)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Admin update service error:", error);
+      return res.status(400).json({ success: false, message: error.message });
+    }
+    return res.json({ success: true, data });
+  } catch (err) {
+    console.error("Admin update service exception:", err);
+    return res.status(500).json({ success: false, message: "Failed to update service" });
+  }
+});
+
+// DELETE /api/admin/services/:id
+router.delete("/services/:id", requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { error } = await supabase.from("services").delete().eq("id", id);
+    if (error) {
+      console.error("Admin delete service error:", error);
+      return res.status(400).json({ success: false, message: error.message });
+    }
+    return res.json({ success: true, message: "Service deleted successfully" });
+  } catch (err) {
+    console.error("Admin delete service exception:", err);
+    return res.status(500).json({ success: false, message: "Failed to delete service" });
+  }
+});
+
+// =====================================================
+// SUB-SERVICES (SERVICE ITEMS) CRUD
+// =====================================================
+
+// GET /api/admin/service-items
+router.get("/service-items", requireAdmin, async (req, res) => {
+  try {
+    const { service_id, parent_slug } = req.query;
+    let query = supabase
+      .from("service_items")
+      .select("*")
+      .order("display_order", { ascending: true });
+
+    if (service_id) query = query.eq("service_id", service_id);
+    if (parent_slug) query = query.eq("parent_slug", parent_slug);
+
+    const { data, error } = await query;
+    if (error) {
+      console.error("Admin get service items error:", error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+    return res.json({ success: true, data: data || [] });
+  } catch (err) {
+    console.error("Admin get service items exception:", err);
+    return res.status(500).json({ success: false, message: "Failed to load sub-services" });
+  }
+});
+
+// POST /api/admin/service-items
+router.post("/service-items", requireAdmin, async (req, res) => {
+  try {
+    const body = { ...req.body };
+    const { data, error } = await supabase
+      .from("service_items")
+      .insert([body])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Admin create service item error:", error);
+      return res.status(400).json({ success: false, message: error.message });
+    }
+    return res.status(201).json({ success: true, data });
+  } catch (err) {
+    console.error("Admin create service item exception:", err);
+    return res.status(500).json({ success: false, message: "Failed to create sub-service" });
+  }
+});
+
+// PATCH /api/admin/service-items/:id
+router.patch("/service-items/:id", requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = { ...req.body };
+    delete body.id;
+    body.updated_at = new Date().toISOString();
+
+    const { data, error } = await supabase
+      .from("service_items")
+      .update(body)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Admin update service item error:", error);
+      return res.status(400).json({ success: false, message: error.message });
+    }
+    return res.json({ success: true, data });
+  } catch (err) {
+    console.error("Admin update service item exception:", err);
+    return res.status(500).json({ success: false, message: "Failed to update sub-service" });
+  }
+});
+
+// DELETE /api/admin/service-items/:id
+router.delete("/service-items/:id", requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { error } = await supabase.from("service_items").delete().eq("id", id);
+    if (error) {
+      console.error("Admin delete service item error:", error);
+      return res.status(400).json({ success: false, message: error.message });
+    }
+    return res.json({ success: true, message: "Sub-service deleted successfully" });
+  } catch (err) {
+    console.error("Admin delete service item exception:", err);
+    return res.status(500).json({ success: false, message: "Failed to delete sub-service" });
+  }
+});
+
+// =====================================================
+// MEDIA MANAGEMENT (UPLOAD, LIST, DELETE)
+// =====================================================
+
+// POST /api/admin/media
+router.post("/media", requireAdmin, upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No file provided" });
+    }
+
+    const folder = req.body.folder || "general";
+    const sanitizedName = req.file.originalname
+      .replace(/[^a-zA-Z0-9.-]/g, "_")
+      .toLowerCase();
+    const filePath = `${folder}/${Date.now()}-${sanitizedName}`;
+
+    const bucket = "website-media";
+    const { error: uploadError } = await supabase.storage
+      .from(bucket)
+      .upload(filePath, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("Storage upload error:", uploadError);
+      return res.status(500).json({ success: false, message: uploadError.message });
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(filePath);
+
+    return res.status(201).json({
+      success: true,
+      data: {
+        path: filePath,
+        url: publicUrlData.publicUrl,
+        name: req.file.originalname,
+        size: req.file.size,
+        type: req.file.mimetype,
+      },
+    });
+  } catch (err) {
+    console.error("Media upload exception:", err);
+    return res.status(500).json({ success: false, message: "Upload failed" });
+  }
+});
+
+// GET /api/admin/media/list
+router.get("/media/list", requireAdmin, async (req, res) => {
+  try {
+    const bucket = "website-media";
+    const folder = req.query.folder || "";
+    const { data, error } = await supabase.storage.from(bucket).list(folder, {
+      limit: 100,
+      offset: 0,
+      sortBy: { column: "created_at", order: "desc" },
+    });
+
+    if (error) {
+      console.error("Media list error:", error);
+      return res.json({ success: true, data: [] });
+    }
+
+    const files = (data || [])
+      .filter((item) => item.name !== ".emptyFolderPlaceholder")
+      .map((item) => {
+        const fullPath = folder ? `${folder}/${item.name}` : item.name;
+        const { data: publicUrlData } = supabase.storage
+          .from(bucket)
+          .getPublicUrl(fullPath);
+
+        return {
+          id: item.id || item.name,
+          name: item.name,
+          path: fullPath,
+          url: publicUrlData.publicUrl,
+          size: item.metadata?.size || 0,
+          type: item.metadata?.mimetype || "image/jpeg",
+          created_at: item.created_at,
+        };
+      });
+
+    return res.json({ success: true, data: files });
+  } catch (err) {
+    console.error("Media list exception:", err);
+    return res.json({ success: true, data: [] });
+  }
+});
+
+// DELETE /api/admin/media
+router.delete("/media", requireAdmin, async (req, res) => {
+  try {
+    const path = req.query.path;
+    if (!path) {
+      return res.status(400).json({ success: false, message: "Path required" });
+    }
+    const bucket = "website-media";
+    const { error } = await supabase.storage.from(bucket).remove([path]);
+    if (error) {
+      console.error("Media delete error:", error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+    return res.json({ success: true, message: "Media deleted successfully" });
+  } catch (err) {
+    console.error("Media delete exception:", err);
+    return res.status(500).json({ success: false, message: "Deletion failed" });
+  }
+});
+
 export function createAdminRouter() {
   return router;
 }
 
-export default router;
+export default router;

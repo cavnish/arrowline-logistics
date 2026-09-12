@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Phone, Mail, ChevronDown, Globe, Anchor } from "lucide-react";
-import { COMPANY_DETAILS, CORE_SERVICES } from "../data/logisticsData";
+import { COMPANY_DETAILS } from "../data/logisticsData";
+import { getAllMainServices } from "../data/servicesData";
 import ArrowlineLogo from "./ArrowlineLogo";
 import { buildMailto, buildTel } from "../utils/contactLinks";
 import { cn } from "../utils/cn";
@@ -214,9 +215,9 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                     )}>
                       <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 py-1.5 border-b border-slate-100 mb-2 flex items-center justify-between">
                         <span>Multimodal Solutions</span>
-                        <span className="text-[#FF6B1A]">7 Verticals</span>
+                        <span className="text-[#FF6B1A]">4 Verticals</span>
                       </div>
-                      {CORE_SERVICES.map((srv) => (
+                      {getAllMainServices().map((srv) => (
                         <button
                           key={srv.id}
                           onClick={() => handleServiceClick(srv.slug)}
@@ -324,7 +325,7 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                 <span>Multimodal Services:</span>
               </div>
               <div className="pl-4 grid grid-cols-1 gap-2.5 border-l border-slate-200">
-                {CORE_SERVICES.map((srv) => (
+                {getAllMainServices().map((srv) => (
                   <button
                     key={srv.id}
                     onClick={() => handleServiceClick(srv.slug)}

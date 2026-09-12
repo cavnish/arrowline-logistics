@@ -1,11 +1,66 @@
-import { CORE_SERVICES } from "../data/logisticsData";
+import { useEffect, useState } from "react";
 import { ArrowRight, ChevronRight } from "lucide-react";
+import { contentService } from "../services/contentService";
+import { getAllMainServices, MainServiceData } from "../data/servicesData";
 
 interface ServicesSectionProps {
   onSelectService: (slug: string) => void;
 }
 
+interface DisplayService {
+  id: string;
+  slug: string;
+  title: string;
+  shortDesc: string;
+  image: string;
+  category: string;
+  keyCapability: string;
+}
+
 export default function ServicesSection({ onSelectService }: ServicesSectionProps) {
+  const [services, setServices] = useState<DisplayService[]>(() => {
+    // Default to the 4 approved main services
+    return getAllMainServices().map((s) => ({
+      id: s.id,
+      slug: s.slug,
+      title: s.title,
+      shortDesc: s.shortDesc,
+      image: s.heroImage || s.aboutImage || "/images/road-transport.jpg",
+      category: s.category || "CORE LOGISTICS VERTICAL",
+      keyCapability: s.keyCapability || s.highlights?.[0] || "Pan-India Freight",
+    }));
+  });
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function fetchDynamicServices() {
+      try {
+        const dbServices = await contentService.getServices();
+        if (mounted && dbServices && dbServices.length > 0) {
+          const mapped: DisplayService[] = dbServices.map((item) => ({
+            id: item.id,
+            slug: item.slug,
+            title: item.title,
+            shortDesc: item.short_description || "",
+            image: item.hero_image || item.about_image || "/images/road-transport.jpg",
+            category: item.category || "LOGISTICS VERTICAL",
+            keyCapability: item.key_capability || "Verified Fleet",
+          }));
+          setServices(mapped);
+        }
+      } catch (err) {
+        console.warn("[ServicesSection] Dynamic fetch fallback to static dataset:", err);
+      }
+    }
+
+    fetchDynamicServices();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <section id="services-section" className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden">
       {/* Background Decorative Pattern & Directional Arrows */}
@@ -24,15 +79,15 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
           </h2>
 
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-            From single container highway dispatches to multimodal rail rakes and complex heavy-lift engineering movements, we provide end-to-end supply chain integration.
+            From single container highway dispatches to multimodal rail rakes, specialized heavy-lift engineering, and modern industrial warehousing, we provide end-to-end supply chain integration.
           </p>
         </div>
 
         {/* Responsive four-column desktop grid */}
         <div className="services-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-5 items-stretch">
-          {CORE_SERVICES.slice(0, 4).map((service, index) => (
+          {services.map((service, index) => (
             <div
-              key={service.id}
+              key={service.id || service.slug}
               onClick={() => onSelectService(service.slug)}
               className="service-card group bg-white border border-slate-200 hover:border-[#FF6B1A]/40 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 flex h-full flex-col justify-between cursor-pointer hover:-translate-y-1.5 focus-within:ring-2 focus-within:ring-[#FF6B1A] focus-within:ring-offset-2"
               style={{ "--service-delay": `${index * 100}ms` } as React.CSSProperties}
