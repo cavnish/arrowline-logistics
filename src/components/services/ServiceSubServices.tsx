@@ -1,6 +1,7 @@
-import { ArrowRight, ChevronRight, Check } from "lucide-react";
+import { ChevronRight, Check } from "lucide-react";
 import Reveal from "../Reveal";
 import { SubServiceData } from "../../data/servicesData";
+import { getOptimizedImageUrl, buildImageAlt } from "../../utils/imageUrl";
 
 interface ServiceSubServicesProps {
   isSubServicePage?: boolean;
@@ -123,20 +124,14 @@ export default function ServiceSubServices({
                   {/* Image Frame */}
                   <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                     <img
-                      src={sub.heroImage || sub.aboutImage || "/images/road-transport.jpg"}
-                      alt={sub.title}
+                      src={getOptimizedImageUrl(sub.heroImage || sub.aboutImage || "/images/road-transport.jpg", { width: 800 })}
+                      alt={sub.imageAlt || buildImageAlt(sub.title, sub.parentName)}
                       loading="lazy"
+                      width={800}
+                      height={500}
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#062B3A]/60 via-transparent to-transparent" />
-
-                    <span className="absolute top-3.5 left-3.5 bg-[#062B3A]/90 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border border-white/20">
-                      0{index + 1} • {sub.parentName || "Service"}
-                    </span>
-
-                    <div className="absolute bottom-3.5 right-3.5 w-10 h-10 rounded-full bg-[#FF6B1A] text-white flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#FF7A00] transition-all">
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                    </div>
                   </div>
 
                   {/* Body */}
@@ -150,12 +145,8 @@ export default function ServiceSubServices({
                       </p>
                     </div>
 
-                    {/* Bottom action link */}
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-[#062B3A] bg-[#EAF3F6] px-2.5 py-1 rounded-lg">
-                        Dedicated Fleet
-                      </span>
-
+                    {/* Explore CTA */}
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-end">
                       <span className="text-xs font-black uppercase text-[#FF6B1A] group-hover:text-[#FF7A00] flex items-center space-x-1">
                         <span>EXPLORE SERVICE</span>
                         <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

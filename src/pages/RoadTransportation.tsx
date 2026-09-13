@@ -8,13 +8,11 @@ import {
   ShieldCheck, 
   MapPin, 
   Clock, 
-  Package, 
   ChevronDown,
-  Phone,
-  FileCheck2
+  Phone
 } from "lucide-react";
 import { COMPANY_DETAILS } from "../data/logisticsData";
-import { buildMailto, buildTel } from "../utils/contactLinks";
+import { buildTel } from "../utils/contactLinks";
 
 interface RoadTransportationProps {
   onOpenQuote: () => void;
@@ -306,45 +304,6 @@ export default function RoadTransportation({ onOpenQuote, onNavigateTo }: RoadTr
                 </div>
               </Reveal>
             ))}
-          </div>
-        </div>
-      </section>
-
-      SECTION 7: Network Map (Visual Placeholder)
-      <section className="py-20 sm:py-28 bg-white border-t border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <Reveal>
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-[#FF6B1A] mb-3"> Strategic Hubs</p>
-                <h2 className="text-3xl sm:text-4xl font-black text-[#062B3A] leading-tight mb-6">India Transportation Network</h2>
-                <p className="text-sm text-slate-600 leading-relaxed mb-8">
-                  Our logistics engine is optimized for rapid movement from Mundra Port to every major industrial cluster. 
-                  We maintain strategic partnerships at key hubs to ensure zero-bottleneck transit.
-                </p>
-                <div className="grid grid-cols-2 gap-4">
-                  {["Mundra", "Mumbai", "Delhi NCR", "Pune", "Hyderabad", "Bengaluru", "Chennai", "Kolkata"].map(city => (
-                    <div key={city} className="flex items-center gap-2 p-2 rounded-lg bg-[#F8FAFC] border border-slate-100">
-                      <div className="w-2 h-2 rounded-full bg-[#FF6B1A]" />
-                      <span className="text-xs font-bold text-[#062B3A]">{city}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
-            <Reveal direction="right">
-              <div className="relative rounded-[2rem] bg-[#062B3A] p-4 shadow-2xl aspect-video flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-0 bg-grid-dark opacity-30" />
-                <div className="relative z-10 text-center">
-                  <p className="text-white font-black text-xl uppercase tracking-widest">Network Map Visual</p>
-                  <p className="text-slate-400 text-xs">Mundra → Pan India</p>
-                </div>
-                {/* Simplified visual network elements */}
-                <div className="absolute top-1/4 left-1/3 w-3 h-3 bg-[#FF6B1A] rounded-full animate-ping" />
-                <div className="absolute top-1/2 right-1/4 w-3 h-3 bg-[#FF6B1A] rounded-full animate-ping" />
-                <div className="absolute bottom-1/4 left-1/2 w-3 h-3 bg-[#FF6B1A] rounded-full animate-ping" />
-              </div>
-            </Reveal>
           </div>
         </div>
       </section>

@@ -65,6 +65,8 @@ export default function VideoShowcase({
             <img
               src={posterImage}
               alt="Arrowline Logistics fleet in motion — video preview"
+              loading="lazy"
+              decoding="async"
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 opacity-80"
             />
 

@@ -21,7 +21,6 @@ function drawLogo(
   x: number,
   y: number,
 ) {
-  const navy: [number, number, number] = [30, 58, 138];
   const orange: [number, number, number] = [255, 122, 0];
   const white: [number, number, number] = [255, 255, 255];
   const lightOrange: [number, number, number] = [255, 200, 150];

@@ -1,8 +1,9 @@
+import 'dotenv/config';
 import pg from 'pg';
 const { Client } = pg;
 
-const password = 'Arrowline@1234';
-const projectRef = 'vsbircholpdlhyznlrgi';
+const password = process.env.SUPABASE_DB_PASSWORD || '';
+const projectRef = process.env.SUPABASE_PROJECT_REF || 'vsbircholpdlhyznlrgi';
 
 const regions = [
   'ap-south-1', 'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1', 'ap-northeast-2',
@@ -12,6 +13,10 @@ const regions = [
 ];
 
 async function main() {
+  if (!password) {
+    console.error('SUPABASE_DB_PASSWORD is not set in server/.env');
+    process.exit(1);
+  }
   for (const region of regions) {
     const host = `aws-0-${region}.pooler.supabase.com`;
     const connStr = `postgresql://postgres.${projectRef}:${encodeURIComponent(password)}@${host}:6543/postgres`;

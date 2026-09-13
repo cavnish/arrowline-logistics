@@ -1,8 +1,9 @@
+import 'dotenv/config';
 import pg from 'pg';
 const { Client } = pg;
 
-const password = 'Arrowline@1234';
-const projectRef = 'vsbircholpdlhyznlrgi';
+const password = process.env.SUPABASE_DB_PASSWORD || '';
+const projectRef = process.env.SUPABASE_PROJECT_REF || 'vsbircholpdlhyznlrgi';
 
 const connectionStrings = [
   `postgresql://postgres:${encodeURIComponent(password)}@db.${projectRef}.supabase.co:5432/postgres`,

@@ -52,6 +52,8 @@ export default function ServiceVideo({ serviceName, videoUrl, posterImage }: Ser
                 <img
                   src={posterImage || "/images/hero-logistics.jpg"}
                   alt={`${serviceName} video cover`}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-[#062B3A]/60 flex items-center justify-center transition-colors group-hover:bg-[#062B3A]/40">

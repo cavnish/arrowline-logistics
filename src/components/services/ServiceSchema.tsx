@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { MainServiceData, SubServiceData } from "../../data/servicesData";
 import { COMPANY_DETAILS } from "../../data/logisticsData";
 
@@ -189,7 +189,7 @@ export default function ServiceSchema({
       document.head.appendChild(scriptTag);
     }
 
-    const schemasToInject = [organizationSchema, serviceSchema, breadcrumbSchema];
+    const schemasToInject: object[] = [organizationSchema, serviceSchema, breadcrumbSchema];
     if (faqSchema) {
       schemasToInject.push(faqSchema);
     }

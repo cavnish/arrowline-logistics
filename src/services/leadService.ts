@@ -1,16 +1,9 @@
 /**
  * Lead submission service.
  *
- * Auto-detects where to send inquiries:
- *
- *   1. If VITE_API_URL is set → uses that (e.g. https://api.arrowlinelogistics.in)
- *   2. Otherwise → uses same-origin /api/lead
- *      (this "just works" on Vercel where the /api folder becomes serverless
- *      functions at the same domain)
- *   3. If both fail → gracefully falls back to a client-side mock so the UX
- *      is never blocked during development.
- *
- * See SETUP_MONGODB.md for full deployment instructions.
+ * Uses the configured backend URL when VITE_API_URL is set. In production,
+ * it uses same-origin /api/lead when no explicit URL is configured. Failures
+ * are returned to the caller; inquiries are never reported as stored locally.
  */
 
 export interface LeadPayload {
@@ -30,112 +23,93 @@ export interface LeadResponse {
   message?: string;
 }
 
-/**
- * Resolves the endpoint URL for a given API path.
- * If VITE_API_URL is empty, uses same-origin (Vercel-friendly).
- */
 function apiUrl(path: string): string {
-  const base = (import.meta as any).env?.VITE_API_URL || "";
+  const base = ((import.meta as any).env?.VITE_API_URL || "").trim();
   if (base) return `${base.replace(/\/$/, "")}${path}`;
-  return path; // relative → resolved against current origin
+  return path;
+}
+
+function shouldAttemptBackend(): boolean {
+  return Boolean(((import.meta as any).env?.VITE_API_URL || "").trim()) ||
+    (import.meta as any).env?.PROD === true;
 }
 
 function generateReferenceNumber(): string {
   return `ALQ-${Math.floor(100000 + Math.random() * 900000)}`;
 }
 
-/**
- * Whether the backend appears to be configured (either explicit URL or
- * we can attempt same-origin requests).
- */
-function isBackendConfigurable(): boolean {
-  const explicit = (import.meta as any).env?.VITE_API_URL;
-  if (explicit) return true;
-  // In dev, same-origin will just be Vite's dev server which doesn't have /api.
-  // Only attempt same-origin when running in production (built site).
-  return (import.meta as any).env?.PROD === true;
+async function readError(response: Response): Promise<string> {
+  const body = await response.json().catch(() => null);
+  return body?.error || body?.message || `Backend request failed (${response.status})`;
 }
 
 /**
- * Submits a customer inquiry.
- * Attempts the live backend first, then gracefully falls back to a mock.
+ * Submits a customer inquiry to the configured backend.
+ * A failed request is never represented as a successful local submission.
  */
 export async function submitLead(payload: LeadPayload): Promise<LeadResponse> {
-  if (isBackendConfigurable()) {
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 12000);
-
-      const response = await fetch(apiUrl("/api/lead"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeout);
-
-      if (response.ok) {
-        const data = await response.json();
-        return {
-          ok: true,
-          referenceNumber: data.referenceNumber || generateReferenceNumber(),
-          storedInDatabase: data.storedInDatabase ?? true,
-          emailSent: data.emailSent ?? true,
-          message: data.message,
-        };
-      }
-
-      const errText = await response.text().catch(() => "");
-      console.warn(
-        `[leadService] Backend responded with ${response.status}. Falling back to mock. ${errText}`
-      );
-    } catch (err) {
-      console.warn("[leadService] Backend unreachable, using mock:", err);
-    }
+  if (!shouldAttemptBackend()) {
+    throw new Error("Backend is not configured for this environment");
   }
 
-  // Mock fallback (simulate ~1.2s latency)
-  await new Promise((res) => setTimeout(res, 1200));
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
 
-  return {
-    ok: true,
-    referenceNumber: generateReferenceNumber(),
-    storedInDatabase: false,
-    emailSent: false,
-    message:
-      "Simulated success — backend not reachable. See SETUP_MONGODB.md to enable MongoDB & email.",
-  };
+  try {
+    const response = await fetch(apiUrl("/api/lead"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(await readError(response));
+    }
+
+    const data = await response.json();
+    return {
+      ok: true,
+      referenceNumber: data.referenceNumber || generateReferenceNumber(),
+      storedInDatabase: data.storedInDatabase === true,
+      emailSent: data.emailSent === true,
+      message: data.message,
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 /**
  * Optional health-check for the admin/status badge.
- * Returns null if the backend cannot be reached.
  */
 export async function checkBackendHealth(): Promise<{
   ok: boolean;
-  mongo: string;
-  smtp: string;
+  supabase: string;
+  resend: string;
+  cloudinary: string;
+  admin: string;
 } | null> {
-  if (!isBackendConfigurable()) return null;
+  if (!shouldAttemptBackend()) return null;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
     const response = await fetch(apiUrl("/api/health"), { signal: controller.signal });
-    clearTimeout(timeout);
     if (!response.ok) return null;
     const data = await response.json();
-    // Handle both response formats:
-    //   Express server:  { ok, checks: { mongo, smtp } }
-    //   Vercel function: { ok, checks: { mongo, smtp } }
-    //   Legacy:          { ok, mongo, smtp }
     const checks = data.checks || {};
     return {
       ok: data.ok === true,
-      mongo: checks.mongo || data.mongo || "unknown",
-      smtp: checks.smtp || data.smtp || "unknown",
+      supabase: checks.supabase || "unknown",
+      resend: checks.resend || "unknown",
+      cloudinary: checks.cloudinary || "unknown",
+      admin: checks.admin || "unknown",
     };
   } catch {
     return null;
+  } finally {
+    clearTimeout(timeout);
   }
 }

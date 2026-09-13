@@ -3,21 +3,51 @@ import "dotenv/config";
 import express from "express";
 import cookieParser from "cookie-parser";
 import multer from "multer";
+import jwt from "jsonwebtoken";
 import { createClient } from "@supabase/supabase-js";
+import CloudinaryService from "../services/cloudinaryService.js";
 
 import {
   requireAdmin,
+  revokeSession,
   generateAdminToken,
+  isAllowedAdminEmail,
 } from "../middleware/adminAuth.js";
 
 const router = express.Router();
 
 router.use(cookieParser());
 
+const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/avif",
+];
+
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 50 * 1024 * 1024 },
+  limits: { fileSize: 15 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.mimetype)) {
+      return cb(new Error("Only image uploads (JPEG, PNG, WEBP, GIF, AVIF) are allowed"));
+    }
+    cb(null, true);
+  },
 });
+
+// Normalizes multer rejection into a clean 400 response instead of a 500.
+function handleUploadError(err, _req, res, next) {
+  if (!err) return next();
+  const message =
+    err instanceof multer.MulterError
+      ? err.code === "LIMIT_FILE_SIZE"
+        ? "File is too large (max 15 MB)"
+        : err.message
+      : err.message || "Upload failed";
+  return res.status(400).json({ success: false, message });
+}
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceRoleKey =
@@ -30,6 +60,22 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
   process.exit(1);
 }
 
+// Dedicated clients to keep roles isolated:
+// - authClient: only used for Supabase Auth sign-in. Its in-memory session is
+//   REPLACED by the signed-in user's JWT after login, so it must never be used
+//   for database writes.
+// - supabase: always the server-side service-role client (bypasses RLS) for all
+//   admin_sessions / CRUD / media operations.
+const authClient = createClient(
+  supabaseUrl,
+  supabaseServiceRoleKey,
+  {
+    auth: {
+      persistSession: false,
+    },
+  }
+);
+
 const supabase = createClient(
   supabaseUrl,
   supabaseServiceRoleKey,
@@ -40,34 +86,128 @@ const supabase = createClient(
   }
 );
 
+// Optional Cloudinary-backed media pipeline. Falls back to the existing
+// Supabase storage bucket when credentials are absent or the upload fails.
+const cloudinaryService =
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET
+    ? new CloudinaryService(
+        process.env.CLOUDINARY_CLOUD_NAME,
+        process.env.CLOUDINARY_API_KEY,
+        process.env.CLOUDINARY_API_SECRET
+      )
+    : null;
+
+// Admin UI payloads use camelCase keys; DB columns are snake_case.
+function toSnakeCaseKeys(body = {}) {
+  const out = {};
+  for (const [key, value] of Object.entries(body)) {
+    out[key.replace(/[A-Z]/g, (ch) => `_${ch.toLowerCase()}`)] = value;
+  }
+  return out;
+}
+
+// Best-effort cleanup of an orphaned Cloudinary asset. Never fails the request.
+async function destroyCloudinaryAsset(publicId) {
+  if (!cloudinaryService || !publicId) return;
+  try {
+    await cloudinaryService.destroy(publicId);
+  } catch (err) {
+    console.warn("Cloudinary cleanup skipped:", err?.message || err);
+  }
+}
+
 // =====================================================
 // LOGIN
 // POST /api/admin/login
+// Flow: validate input -> allowlist check -> Supabase Auth
+// signInWithPassword -> issue JWT -> register admin_sessions
+// record -> set secure httpOnly cookie.
 // =====================================================
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   try {
-    const { password } = req.body || {};
+    const { email, password } = req.body || {};
 
+    // 1. Validate input
     if (
-      !password ||
-      password !== process.env.ADMIN_API_KEY
+      typeof email !== "string" ||
+      !email.trim() ||
+      typeof password !== "string" ||
+      !password
     ) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
-        message: "Invalid password",
+        message: "Email and password are required",
       });
     }
 
-    const token = generateAdminToken();
+    const cleanEmail = email.trim().toLowerCase();
 
+    // 2. Server-side allowlist check
+    if (!isAllowedAdminEmail(cleanEmail)) {
+      return res.status(403).json({
+        success: false,
+        message: "This email is not authorized for admin access",
+      });
+    }
+
+    // 3. Supabase Auth email/password verification.
+    //    Signed in on authClient ONLY so the service-role client (supabase)
+    //    below never inherits the user's session and always bypasses RLS.
+    const { data: authUser, error: authError } =
+      await authClient.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
+
+    if (authError || !authUser?.user) {
+      console.error("Admin Auth sign-in error:", authError?.message || "unknown");
+      // Identical message for missing user vs wrong password — no account enumeration.
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    // 4. Issue JWT carrying role/email/jti
+    const { token, jti, expiresAt } = generateAdminToken(cleanEmail);
+
+    // 5. Register server-side session
+    const { error: sessionError } = await supabase
+      .from("admin_sessions")
+      .insert({
+        jti,
+        user_id: authUser.user.id,
+        email: cleanEmail,
+        expires_at: expiresAt.toISOString(),
+      });
+
+    if (sessionError) {
+      console.error("Admin session insert error:", sessionError.message);
+      try {
+        const roleRef = process.env.SUPABASE_SERVICE_ROLE_KEY
+          ? JSON.parse(Buffer.from(process.env.SUPABASE_SERVICE_ROLE_KEY.split(".")[1], "base64").toString())
+          : null;
+        console.error(
+          "Admin session insert DETAIL:",
+          JSON.stringify({ code: sessionError.code, statusText: sessionError.statusText, details: sessionError.details, hint: sessionError.hint, role: roleRef?.role, ref: roleRef?.ref })
+        );
+      } catch (diagErr) {
+        console.error("Admin session insert DETAIL (diag failed):", diagErr.message);
+      }
+      return res.status(500).json({
+        success: false,
+        message: "Unable to create admin session",
+      });
+    }
+
+    // 6. Set secure httpOnly cookie
     res.cookie("admin_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite:
-        process.env.NODE_ENV === "production"
-          ? "none"
-          : "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000,
       path: "/",
     });
@@ -91,14 +231,27 @@ router.post("/login", (req, res) => {
 // POST /api/admin/logout
 // =====================================================
 
-router.post("/logout", (_req, res) => {
+router.post("/logout", async (req, res) => {
+  try {
+    const token = req.cookies?.admin_token;
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.ADMIN_API_KEY);
+        if (decoded?.jti) {
+          await revokeSession(decoded.jti);
+        }
+      } catch (_err) {
+        // Token already invalid — nothing to revoke server-side.
+      }
+    }
+  } catch (_err) {
+    // Never fail the logout response because of housekeeping.
+  }
+
   res.clearCookie("admin_token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite:
-      process.env.NODE_ENV === "production"
-        ? "none"
-        : "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     path: "/",
   });
 
@@ -430,7 +583,7 @@ router.get(
         .from("leads")
         .select("*")
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         throw error;
@@ -537,10 +690,17 @@ router.patch(
         .update(updates)
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         throw error;
+      }
+
+      if (!data) {
+        return res.status(404).json({
+          success: false,
+          message: "Enquiry not found",
+        });
       }
 
       return res.json({
@@ -748,7 +908,7 @@ router.get("/services", requireAdmin, async (_req, res) => {
 // POST /api/admin/services
 router.post("/services", requireAdmin, async (req, res) => {
   try {
-    const body = { ...req.body };
+    const body = toSnakeCaseKeys(req.body);
     delete body.sub_services_count;
     delete body.service_items;
 
@@ -773,7 +933,13 @@ router.post("/services", requireAdmin, async (req, res) => {
 router.patch("/services/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const body = { ...req.body };
+    const { data: existing } = await supabase
+      .from("services")
+      .select("image_public_id")
+      .eq("id", id)
+      .maybeSingle();
+
+    const body = toSnakeCaseKeys(req.body);
     delete body.id;
     delete body.sub_services_count;
     delete body.service_items;
@@ -784,12 +950,21 @@ router.patch("/services/:id", requireAdmin, async (req, res) => {
       .update(body)
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("Admin update service error:", error);
       return res.status(400).json({ success: false, message: error.message });
     }
+
+    if (!data) {
+      return res.status(404).json({ success: false, message: "Service not found" });
+    }
+
+    if (existing?.image_public_id && existing.image_public_id !== (body.image_public_id || null)) {
+      await destroyCloudinaryAsset(existing.image_public_id);
+    }
+
     return res.json({ success: true, data });
   } catch (err) {
     console.error("Admin update service exception:", err);
@@ -801,11 +976,20 @@ router.patch("/services/:id", requireAdmin, async (req, res) => {
 router.delete("/services/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
+    const { data: existing } = await supabase
+      .from("services")
+      .select("image_public_id")
+      .eq("id", id)
+      .maybeSingle();
+
     const { error } = await supabase.from("services").delete().eq("id", id);
     if (error) {
       console.error("Admin delete service error:", error);
       return res.status(400).json({ success: false, message: error.message });
     }
+
+    await destroyCloudinaryAsset(existing?.image_public_id);
+
     return res.json({ success: true, message: "Service deleted successfully" });
   } catch (err) {
     console.error("Admin delete service exception:", err);
@@ -844,7 +1028,7 @@ router.get("/service-items", requireAdmin, async (req, res) => {
 // POST /api/admin/service-items
 router.post("/service-items", requireAdmin, async (req, res) => {
   try {
-    const body = { ...req.body };
+    const body = toSnakeCaseKeys(req.body);
     const { data, error } = await supabase
       .from("service_items")
       .insert([body])
@@ -866,7 +1050,13 @@ router.post("/service-items", requireAdmin, async (req, res) => {
 router.patch("/service-items/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const body = { ...req.body };
+    const { data: existing } = await supabase
+      .from("service_items")
+      .select("image_public_id")
+      .eq("id", id)
+      .maybeSingle();
+
+    const body = toSnakeCaseKeys(req.body);
     delete body.id;
     body.updated_at = new Date().toISOString();
 
@@ -875,12 +1065,21 @@ router.patch("/service-items/:id", requireAdmin, async (req, res) => {
       .update(body)
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error("Admin update service item error:", error);
       return res.status(400).json({ success: false, message: error.message });
     }
+
+    if (!data) {
+      return res.status(404).json({ success: false, message: "Sub-service not found" });
+    }
+
+    if (existing?.image_public_id && existing.image_public_id !== (body.image_public_id || null)) {
+      await destroyCloudinaryAsset(existing.image_public_id);
+    }
+
     return res.json({ success: true, data });
   } catch (err) {
     console.error("Admin update service item exception:", err);
@@ -892,11 +1091,20 @@ router.patch("/service-items/:id", requireAdmin, async (req, res) => {
 router.delete("/service-items/:id", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
+    const { data: existing } = await supabase
+      .from("service_items")
+      .select("image_public_id")
+      .eq("id", id)
+      .maybeSingle();
+
     const { error } = await supabase.from("service_items").delete().eq("id", id);
     if (error) {
       console.error("Admin delete service item error:", error);
       return res.status(400).json({ success: false, message: error.message });
     }
+
+    await destroyCloudinaryAsset(existing?.image_public_id);
+
     return res.json({ success: true, message: "Sub-service deleted successfully" });
   } catch (err) {
     console.error("Admin delete service item exception:", err);
@@ -909,19 +1117,53 @@ router.delete("/service-items/:id", requireAdmin, async (req, res) => {
 // =====================================================
 
 // POST /api/admin/media
-router.post("/media", requireAdmin, upload.single("file"), async (req, res) => {
+router.post("/media", requireAdmin, upload.single("file"), handleUploadError, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: "No file provided" });
     }
 
-    const folder = req.body.folder || "general";
+    const rawFolder = req.body.folder || "general";
+    const slug = String(req.body.slug || "").trim().replace(/[^a-z0-9-]/gi, "").toLowerCase();
+    const sanitizeFolder = (name) => String(name || "").replace(/[^a-zA-Z0-9-_/]/g, "").replace(/\/+$/, "");
+
+    let folder = "arrowline/general";
+    if (rawFolder === "services") folder = slug ? `arrowline/services/${slug}` : "arrowline/services";
+    else if (rawFolder === "sub-services") folder = slug ? `arrowline/services/${slug}` : "arrowline/sub-services";
+    else if (rawFolder === "gallery") folder = "arrowline/gallery";
+    else folder = `arrowline/${sanitizeFolder(rawFolder)}`;
+
+    // Preferred path: Cloudinary. Falls back to the existing Supabase storage
+    // bucket whenever Cloudinary is not configured or the upload fails.
+    if (cloudinaryService) {
+      try {
+        const result = await cloudinaryService.upload(req.file.buffer, { folder });
+        return res.status(201).json({
+          success: true,
+          data: {
+            path: result.public_id,
+            public_id: result.public_id,
+            url: result.secure_url || result.url,
+            name: req.file.originalname,
+            size: req.file.size,
+            type: "image",
+            width: result.width,
+            height: result.height,
+            format: result.format,
+            provider: "cloudinary",
+          },
+        });
+      } catch (err) {
+        console.warn("Cloudinary upload failed, falling back to Supabase storage:", err?.message || err);
+      }
+    }
+
+    const bucket = "website-media";
     const sanitizedName = req.file.originalname
       .replace(/[^a-zA-Z0-9.-]/g, "_")
       .toLowerCase();
-    const filePath = `${folder}/${Date.now()}-${sanitizedName}`;
+    const filePath = `${rawFolder}/${Date.now()}-${sanitizedName}`;
 
-    const bucket = "website-media";
     const { error: uploadError } = await supabase.storage
       .from(bucket)
       .upload(filePath, req.file.buffer, {
@@ -942,10 +1184,12 @@ router.post("/media", requireAdmin, upload.single("file"), async (req, res) => {
       success: true,
       data: {
         path: filePath,
+        public_id: null,
         url: publicUrlData.publicUrl,
         name: req.file.originalname,
         size: req.file.size,
         type: req.file.mimetype,
+        provider: "supabase",
       },
     });
   } catch (err) {
@@ -959,49 +1203,176 @@ router.get("/media/list", requireAdmin, async (req, res) => {
   try {
     const bucket = "website-media";
     const folder = req.query.folder || "";
+    const searchQuery = String(req.query.search || "").trim().toLowerCase();
+    const files = [];
+
+    // 1) Cloudinary assets when configured (source of truth for managed media).
+    if (cloudinaryService) {
+      try {
+        const cloudinaryFiles = await cloudinaryService.list({ folder: "all", maxResults: 200 });
+        for (const f of cloudinaryFiles) {
+          files.push({
+            id: f.public_id,
+            name: f.name,
+            path: f.public_id,
+            public_id: f.public_id,
+            url: f.url,
+            size: f.bytes || 0,
+            type: (f.format && `image/${f.format}`) || "image/jpeg",
+            width: f.width,
+            height: f.height,
+            folder: f.folder || "arrowline",
+            created_at: f.created_at,
+            provider: "cloudinary",
+          });
+        }
+      } catch (err) {
+        console.warn("Cloudinary media list failed (continuing with storage):", err?.message || err);
+      }
+    }
+
+    // 2) Supabase storage bucket assets.
     const { data, error } = await supabase.storage.from(bucket).list(folder, {
-      limit: 100,
+      limit: 200,
       offset: 0,
       sortBy: { column: "created_at", order: "desc" },
     });
-
     if (error) {
       console.error("Media list error:", error);
-      return res.json({ success: true, data: [] });
-    }
-
-    const files = (data || [])
-      .filter((item) => item.name !== ".emptyFolderPlaceholder")
-      .map((item) => {
+    } else {
+      for (const item of data || []) {
+        if (item.name === ".emptyFolderPlaceholder") continue;
         const fullPath = folder ? `${folder}/${item.name}` : item.name;
         const { data: publicUrlData } = supabase.storage
           .from(bucket)
           .getPublicUrl(fullPath);
-
-        return {
+        files.push({
           id: item.id || item.name,
           name: item.name,
           path: fullPath,
           url: publicUrlData.publicUrl,
           size: item.metadata?.size || 0,
           type: item.metadata?.mimetype || "image/jpeg",
+          width: null,
+          height: null,
+          folder: item.metadata?.folder || folder || "website-media",
           created_at: item.created_at,
-        };
-      });
+          provider: "supabase",
+        });
+      }
+    }
 
-    return res.json({ success: true, data: files });
+    // 3) Search/filter by filename or folder.
+    const filtered = searchQuery
+      ? files.filter(
+          (f) =>
+            (f.name || "").toLowerCase().includes(searchQuery) ||
+            (f.path || "").toLowerCase().includes(searchQuery) ||
+            (f.folder || "").toLowerCase().includes(searchQuery)
+        )
+      : files;
+
+    return res.json({ success: true, data: filtered });
   } catch (err) {
     console.error("Media list exception:", err);
     return res.json({ success: true, data: [] });
   }
 });
 
+// GET /api/admin/image-usage?url=...|public_id=...
+// Returns every CMS entity currently referencing the same image (for
+// duplicate-assignment warnings in the Admin UI).
+router.get("/image-usage", requireAdmin, async (req, res) => {
+  try {
+    const targetUrl = String(req.query.url || "").trim();
+    const targetPublicId = String(req.query.public_id || "").trim();
+    if (!targetUrl && !targetPublicId) {
+      return res.status(400).json({ success: false, message: "url or public_id is required" });
+    }
+    const norm = (s) => String(s || "").trim().replace(/[;?#].*$/, "").replace(/\/+$/, "");
+    const needle = norm(targetUrl);
+
+    const matches = [];
+    const push = (entity, label, row, field, value) => {
+      matches.push({
+        entity,
+        entityLabel: label,
+        id: row.id,
+        title: row.title || row.name || row.client_name || row.content_key || row.slug || "Untitled",
+        slug: row.slug || "",
+        field,
+        url: value,
+      });
+    };
+
+    const scan = async (table, entityLabel, columns) => {
+      const { data, error } = await supabase.from(table).select("*");
+      if (error) return;
+      for (const row of data || []) {
+        for (const [col, kind] of Object.entries(columns)) {
+          const val = row[col];
+          if (!val) continue;
+          if (kind === "array") {
+            const arr = Array.isArray(val) ? val : [];
+            if (arr.some((item) => item && norm(item.url || item) === needle)) {
+              push(table, entityLabel, row, col, val);
+            }
+          } else {
+            const matched = norm(val) === needle;
+            const pidMatched =
+              targetPublicId && row.image_public_id && row.image_public_id === targetPublicId;
+            if (matched || pidMatched) push(table, entityLabel, row, col, val);
+          }
+        }
+      }
+    };
+
+    await scan("services", "Service", { hero_image: "text", image_public_id: "text" });
+    await scan("service_items", "Sub-Service", { hero_image: "text" });
+    await scan("industries", "Industry", { image: "text" });
+    await scan("clients", "Client", { logo: "text" });
+    await scan("case_studies", "Case Study", { featured_image: "text", images: "array" });
+    await scan("gallery_items", "Gallery", { image: "text" });
+    await scan("locations", "Location", { image: "text" });
+    await scan("testimonials", "Testimonial", { photo: "text" });
+    await scan("blog_posts", "Blog Post", { featured_image: "text" });
+    await scan("social_videos", "Social Video", { thumbnail: "text" });
+    await scan("trusted_network", "Trusted Network", { logo: "text" });
+
+    // site_content image entries
+    const { data: blocks, error: err2 } = await supabase
+      .from("site_content")
+      .select("id,content_key,content_value,content_type")
+      .eq("content_type", "image");
+    if (!err2) {
+      for (const b of blocks || []) {
+        if (norm(b.content_value) === needle) push("site_content", "Website Content", b, "content_value", b.content_value);
+      }
+    }
+
+    return res.json({ success: true, data: matches });
+  } catch (err) {
+    console.error("Image usage exception:", err);
+    return res.status(500).json({ success: false, message: "Failed to check image usage" });
+  }
+});
+
 // DELETE /api/admin/media
 router.delete("/media", requireAdmin, async (req, res) => {
   try {
+    const publicId = req.query.public_id;
     const path = req.query.path;
+
+    if (publicId) {
+      if (!cloudinaryService) {
+        return res.status(400).json({ success: false, message: "Cloudinary is not configured" });
+      }
+      const result = await cloudinaryService.destroy(publicId);
+      return res.json({ success: true, data: result });
+    }
+
     if (!path) {
-      return res.status(400).json({ success: false, message: "Path required" });
+      return res.status(400).json({ success: false, message: "Path or public_id required" });
     }
     const bucket = "website-media";
     const { error } = await supabase.storage.from(bucket).remove([path]);
@@ -1013,6 +1384,175 @@ router.delete("/media", requireAdmin, async (req, res) => {
   } catch (err) {
     console.error("Media delete exception:", err);
     return res.status(500).json({ success: false, message: "Deletion failed" });
+  }
+});
+
+// =====================================================
+// SITE CONTENT (CMS text overrides)
+// =====================================================
+
+router.get("/content", requireAdmin, async (_req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("site_content")
+      .select("*")
+      .order("content_key", { ascending: true });
+    if (error) throw error;
+    return res.json({ success: true, data: data || [] });
+  } catch (e) {
+    console.error("Admin get content:", e.message);
+    return res.status(500).json({ success: false, message: "Failed to load content" });
+  }
+});
+
+router.put("/content/:key", requireAdmin, async (req, res) => {
+  try {
+    const key = req.params.key;
+    const allowed = ["content_value", "content_type", "section", "is_published"];
+    const body = {};
+    for (const k of allowed) if (req.body?.[k] !== undefined) body[k] = req.body[k];
+    body.updated_at = new Date().toISOString();
+    let { data, error } = await supabase
+      .from("site_content")
+      .update(body)
+      .eq("content_key", key)
+      .select()
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) {
+      const ins = await supabase
+        .from("site_content")
+        .insert([{ content_key: key, content_value: body.content_value || "", content_type: body.content_type || "text", section: body.section || null, is_published: body.is_published ?? true, updated_at: body.updated_at }])
+        .select()
+        .single();
+      if (ins.error) throw ins.error;
+      data = ins.data;
+    }
+    return res.json({ success: true, data });
+  } catch (e) {
+    console.error("Admin put content:", e.message);
+    return res.status(400).json({ success: false, message: e.message });
+  }
+});
+
+// =====================================================
+// GENERIC COLLECTION CRUD
+//适用于 AdminCollection.jsx resource pages
+// =====================================================
+
+const COLLECTION_TABLE = {
+  industries: "industries",
+  clients: "clients",
+  "case-studies": "case_studies",
+  gallery: "gallery_items",
+  locations: "locations",
+  faqs: "faqs",
+  testimonials: "testimonials",
+  "blog-categories": "blog_categories",
+  "blog-posts": "blog_posts",
+  "social-videos": "social_videos",
+  statistics: "statistics",
+  "site-settings": "site_settings",
+};
+
+const COLLECTION_COLUMNS = {
+  industries: ["slug","title","description","icon","cargo_types","image","is_published","display_order"],
+  clients: ["name","logo","category","website","is_featured","is_published","display_order"],
+  "case-studies": ["slug","client_name","title","industry","location","description","challenge","solution","results","featured_image","images","meta_title","meta_description","is_published","display_order"],
+  gallery: ["title","description","category","image","alt_text","is_published","display_order"],
+  locations: ["slug","name","state","city","description","address","image","map_url","meta_title","meta_description","is_published","display_order"],
+  faqs: ["question","answer","category","is_published","display_order"],
+  testimonials: ["customer_name","company","position","testimonial","photo","rating","is_published","display_order"],
+  "blog-categories": ["name","slug","description","is_published"],
+  "blog-posts": ["title","slug","category_id","author","featured_image","excerpt","content","meta_title","meta_description","keywords","published_at","is_published"],
+  "social-videos": ["title","video_url","embed_url","thumbnail","description","platform","is_published","display_order"],
+  statistics: ["value","label","description","icon","is_published","display_order"],
+  "site-settings": ["setting_key","setting_value","setting_type","is_public"],
+};
+
+function pickColumns(body, allowed) {
+  const out = {};
+  for (const k of allowed) if (body[k] !== undefined) out[k] = body[k];
+  return out;
+}
+
+router.get("/:resource", requireAdmin, async (req, res) => {
+  try {
+    const { resource } = req.params;
+    const table = COLLECTION_TABLE[resource];
+    if (!table) return res.status(404).json({ success: false, message: `Unknown collection: ${resource}` });
+
+    let query = supabase.from(table).select("*");
+
+    const search = String(req.query.search || "").trim();
+    if (search) {
+      const textCols = (COLLECTION_COLUMNS[resource] || [])
+        .filter((c) => !/^(is_|images|cargo_types|display_order|updated_at|created_at|published_at|category_id|is_public)$/.test(c));
+      if (textCols.length) query = query.or(textCols.map((c) => `${c}.ilike.%${search}%`).join(","));
+    }
+
+    const statusFilter = String(req.query.status || "").trim();
+    if (statusFilter === "published") query = query.eq("is_published", true);
+    else if (statusFilter === "draft") query = query.eq("is_published", false);
+
+    query = query.order("display_order", { ascending: true, nullsFirst: true }).order("created_at", { ascending: false, nullsFirst: true });
+
+    const limitNum = Math.min(Math.max(parseInt(req.query.limit, 10) || 200, 1), 500);
+    const pageNum = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    query = query.range((pageNum - 1) * limitNum, pageNum * limitNum - 1);
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return res.json({ success: true, data: data || [] });
+  } catch (e) {
+    console.error(`GET /${req.params.resource}:`, e.message);
+    return res.status(500).json({ success: false, message: `Unable to load ${req.params.resource}` });
+  }
+});
+
+router.post("/:resource", requireAdmin, async (req, res) => {
+  try {
+    const { resource } = req.params;
+    const table = COLLECTION_TABLE[resource];
+    if (!table) return res.status(404).json({ success: false, message: `Unknown collection: ${resource}` });
+    const body = pickColumns(toSnakeCaseKeys(req.body), COLLECTION_COLUMNS[resource]);
+    const { data, error } = await supabase.from(table).insert([body]).select().single();
+    if (error) throw error;
+    return res.status(201).json({ success: true, data });
+  } catch (e) {
+    console.error(`POST /${req.params.resource}:`, e.message);
+    return res.status(400).json({ success: false, message: e.message });
+  }
+});
+
+router.patch("/:resource/:id", requireAdmin, async (req, res) => {
+  try {
+    const { resource, id } = req.params;
+    const table = COLLECTION_TABLE[resource];
+    if (!table) return res.status(404).json({ success: false, message: `Unknown collection: ${resource}` });
+    const body = pickColumns(toSnakeCaseKeys(req.body), COLLECTION_COLUMNS[resource]);
+    body.updated_at = new Date().toISOString();
+    const { data, error } = await supabase.from(table).update(body).eq("id", id).select().maybeSingle();
+    if (error) throw error;
+    if (!data) return res.status(404).json({ success: false, message: "Record not found" });
+    return res.json({ success: true, data });
+  } catch (e) {
+    console.error(`PATCH /${req.params.resource}:`, e.message);
+    return res.status(400).json({ success: false, message: e.message });
+  }
+});
+
+router.delete("/:resource/:id", requireAdmin, async (req, res) => {
+  try {
+    const { resource, id } = req.params;
+    const table = COLLECTION_TABLE[resource];
+    if (!table) return res.status(404).json({ success: false, message: `Unknown collection: ${resource}` });
+    const { error } = await supabase.from(table).delete().eq("id", id);
+    if (error) throw error;
+    return res.json({ success: true });
+  } catch (e) {
+    console.error(`DELETE /${req.params.resource}:`, e.message);
+    return res.status(400).json({ success: false, message: e.message });
   }
 });
 

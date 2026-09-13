@@ -1,5 +1,5 @@
 import { useState, useEffect, type CSSProperties } from "react";
-import { ArrowRight, Phone, ChevronDown, Play } from "lucide-react";
+import { ArrowRight, ChevronDown, Play } from "lucide-react";
 import { useSiteContent } from "../hooks/useSiteContent";
 
 interface HeroSectionProps {

@@ -1,9 +1,14 @@
+import 'dotenv/config';
 import pg from 'pg';
 const { Client } = pg;
 
-const connStr = 'postgresql://postgres.vsbircholpdlhyznlrgi:Arrowline%401234@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres';
+const connStr = process.env.DATABASE_URL || '';
 
 async function runMigration() {
+  if (!connStr) {
+    console.error('DATABASE_URL is not set in server/.env');
+    process.exit(1);
+  }
   console.log('Connecting to Supabase PostgreSQL...');
   const client = new Client({
     connectionString: connStr,

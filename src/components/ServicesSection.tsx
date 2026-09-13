@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { contentService } from "../services/contentService";
-import { getAllMainServices, MainServiceData } from "../data/servicesData";
+import { getAllMainServices } from "../data/servicesData";
+import { getOptimizedImageUrl, buildImageAlt } from "../utils/imageUrl";
 
 interface ServicesSectionProps {
   onSelectService: (slug: string) => void;
@@ -13,8 +14,7 @@ interface DisplayService {
   title: string;
   shortDesc: string;
   image: string;
-  category: string;
-  keyCapability: string;
+  imageAlt: string;
 }
 
 export default function ServicesSection({ onSelectService }: ServicesSectionProps) {
@@ -26,8 +26,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
       title: s.title,
       shortDesc: s.shortDesc,
       image: s.heroImage || s.aboutImage || "/images/road-transport.jpg",
-      category: s.category || "CORE LOGISTICS VERTICAL",
-      keyCapability: s.keyCapability || s.highlights?.[0] || "Pan-India Freight",
+      imageAlt: s.imageAlt || buildImageAlt(s.title),
     }));
   });
 
@@ -44,8 +43,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
             title: item.title,
             shortDesc: item.short_description || "",
             image: item.hero_image || item.about_image || "/images/road-transport.jpg",
-            category: item.category || "LOGISTICS VERTICAL",
-            keyCapability: item.key_capability || "Verified Fleet",
+            imageAlt: item.image_alt || buildImageAlt(item.title),
           }));
           setServices(mapped);
         }
@@ -63,13 +61,13 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
 
   return (
     <section id="services-section" className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden">
-      {/* Background Decorative Pattern & Directional Arrows */}
+      {/* Background Decorative Pattern */}
       <div className="absolute inset-0 bg-grid-pattern opacity-50 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 lg:mb-16">
+        <div className="text-center max-w-3xl mx-auto space-y-3 mb-10 lg:mb-14">
           <div className="inline-flex items-center space-x-2 px-3.5 py-1 bg-white border border-[#062B3A]/15 rounded-full text-xs font-bold text-[#FF6B1A] tracking-widest uppercase shadow-sm">
             <span>OUR SERVICES</span>
           </div>
@@ -83,68 +81,54 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
           </p>
         </div>
 
-        {/* Responsive four-column desktop grid */}
-        <div className="services-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-5 items-stretch">
-          {services.map((service, index) => (
-            <div
+        {/* Service cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 min-[1200px]:grid-cols-4 gap-5 lg:gap-6 items-stretch">
+          {services.map((service) => (
+            <a
               key={service.id || service.slug}
-              onClick={() => onSelectService(service.slug)}
-              className="service-card group bg-white border border-slate-200 hover:border-[#FF6B1A]/40 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 flex h-full flex-col justify-between cursor-pointer hover:-translate-y-1.5 focus-within:ring-2 focus-within:ring-[#FF6B1A] focus-within:ring-offset-2"
-              style={{ "--service-delay": `${index * 100}ms` } as React.CSSProperties}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  onSelectService(service.slug);
-                }
+              href={`#/services/${service.slug}`}
+              onClick={(event) => {
+                event.preventDefault();
+                onSelectService(service.slug);
               }}
+              aria-label={`Explore ${service.title}`}
+              className="group block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2 motion-reduce:transition-none"
             >
-              {/* Image Frame */}
-              <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-                <img
-                  src={service.image}
-                  alt={service.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                />
+              <article className="flex h-full flex-col overflow-hidden bg-white border border-slate-200 rounded-lg shadow-sm transition-all duration-200 group-hover:-translate-y-1 group-hover:border-[#FF6B1A]/50 group-hover:shadow-lg motion-reduce:transform-none motion-reduce:transition-none">
 
-                {/* Category Badge */}
-                <span className="absolute top-3.5 left-3.5 bg-[#062B3A]/90 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-white/20">
-                  {service.category}
-                </span>
-
-                {/* Floating Orange Icon Disc */}
-                <div className="absolute bottom-3.5 right-3.5 w-10 h-10 rounded-full bg-[#FF6B1A] text-white flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#FF7A00] transition-all">
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+                {/* Image Frame */}
+                <div className="relative aspect-video overflow-hidden bg-slate-100">
+                  <img
+                    src={getOptimizedImageUrl(service.image, { width: 800 })}
+                    alt={service.imageAlt || `Arrowline ${service.title}`}
+                    loading="lazy"
+                    decoding="async"
+                    width={800}
+                    height={450}
+                    className="h-full w-full object-cover object-center transition-transform duration-200 group-hover:scale-[1.02] motion-reduce:transform-none"
+                  />
                 </div>
-              </div>
 
-              {/* Card Body */}
-              <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
-                <div className="space-y-2.5">
-                  <h3 className="text-lg sm:text-xl font-bold text-[#062B3A] group-hover:text-[#FF6B1A] transition-colors leading-snug">
+                {/* Card Body */}
+                <div className="flex flex-1 flex-col p-5">
+                  <h3 className="text-base sm:text-lg font-bold leading-snug text-[#062B3A] transition-colors duration-200 group-hover:text-[#FF6B1A]">
                     {service.title}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-3">
+                  <p className="mt-2 flex-1 text-xs sm:text-[13px] leading-relaxed text-slate-600">
                     {service.shortDesc}
                   </p>
-                </div>
 
-                {/* Key Capability Tag */}
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-[#062B3A] bg-[#EAF3F6] px-2.5 py-1 rounded-lg">
-                    {service.keyCapability}
-                  </span>
-
-                  <span className="text-xs font-black uppercase text-[#FF6B1A] group-hover:text-[#FF7A00] flex items-center space-x-1">
-                    <span>EXPLORE</span>
-                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </span>
+                  {/* Explore CTA */}
+                  <div className="mt-4 border-t border-slate-100 pt-3">
+                    <span className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-[#FF6B1A]">
+                      <span>Explore Service</span>
+                      <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </article>
+            </a>
           ))}
         </div>
 

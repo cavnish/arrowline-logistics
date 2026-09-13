@@ -1,6 +1,7 @@
 import { ArrowRight, ChevronRight, Layers } from "lucide-react";
 import { MainServiceData, SubServiceData } from "../../data/servicesData";
 import Reveal from "../Reveal";
+import { getOptimizedImageUrl, buildImageAlt } from "../../utils/imageUrl";
 
 interface ServiceRelatedProps {
   currentSlug: string;
@@ -12,7 +13,6 @@ interface ServiceRelatedProps {
 }
 
 export default function ServiceRelated({
-  currentSlug,
   isSubService = false,
   parentService,
   siblingSubServices = [],
@@ -119,9 +119,11 @@ export default function ServiceRelated({
                       >
                         <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                           <img
-                            src={main.heroImage || "/images/hero-logistics.jpg"}
-                            alt={main.title}
+                            src={getOptimizedImageUrl(main.heroImage || "/images/hero-logistics.jpg", { width: 800 })}
+                            alt={main.imageAlt || buildImageAlt(main.title)}
                             loading="lazy"
+                            width={800}
+                            height={500}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-[#062B3A]/70 via-transparent to-transparent" />
@@ -166,18 +168,14 @@ export default function ServiceRelated({
                   >
                     <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                       <img
-                        src={main.heroImage || "/images/hero-logistics.jpg"}
-                        alt={main.title}
+                        src={getOptimizedImageUrl(main.heroImage || "/images/hero-logistics.jpg", { width: 800 })}
+                        alt={main.imageAlt || buildImageAlt(main.title)}
                         loading="lazy"
+                        width={800}
+                        height={500}
                         className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#062B3A]/70 via-transparent to-transparent" />
-                      <span className="absolute top-3.5 left-3.5 bg-[#062B3A]/90 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-white/20">
-                        Main Vertical
-                      </span>
-                      <div className="absolute bottom-3.5 right-3.5 w-10 h-10 rounded-full bg-[#FF6B1A] text-white flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-[#FF7A00] transition-all">
-                        <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                      </div>
                     </div>
 
                     <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
@@ -190,10 +188,7 @@ export default function ServiceRelated({
                         </p>
                       </div>
 
-                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-[11px] font-bold text-[#062B3A] bg-[#EAF3F6] px-2.5 py-1 rounded-lg">
-                          {main.subServices?.length || 0} Sub-Services
-                        </span>
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-end">
                         <span className="text-xs font-black uppercase text-[#FF6B1A] group-hover:text-[#FF7A00] flex items-center space-x-1">
                           <span>EXPLORE</span>
                           <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

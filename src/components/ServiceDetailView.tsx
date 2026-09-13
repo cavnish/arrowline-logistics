@@ -57,14 +57,6 @@ export default function ServiceDetailView({ service, onOpenQuote }: ServiceDetai
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-12 lg:px-8 lg:py-20">
           <div className="lg:col-span-7">
             <Reveal>
-              <nav className="mb-7 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-300">
-                <a href="#/" className="hover:text-[#FF7A00]">Home</a>
-                <span>/</span>
-                <a href="#/services" className="hover:text-[#FF7A00]">Services</a>
-                <span>/</span>
-                <span className="text-[#FF7A00]">{service.title}</span>
-              </nav>
-              <span className="inline-flex rounded-full border border-[#FF7A00]/50 bg-[#FF7A00]/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-[#FF9A5B]">{service.category}</span>
               <h1 className="mt-5 max-w-3xl text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">{heroHeadline}</h1>
               <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg">{heroSubheadline}</p>
               <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-300">{service.shortDesc}</p>
@@ -76,7 +68,7 @@ export default function ServiceDetailView({ service, onOpenQuote }: ServiceDetai
           </div>
           <Reveal direction="right" delay={150} className="lg:col-span-5">
             <div className="relative overflow-hidden rounded-[2rem] border border-white/15 bg-white/10 p-2 shadow-2xl">
-              <img src={service.image} alt={service.title} className="aspect-[4/3] w-full rounded-[1.5rem] object-cover" />
+              <img src={service.image} alt={service.title} loading="lazy" decoding="async" className="aspect-[4/3] w-full rounded-[1.5rem] object-cover" />
               <div className="absolute bottom-6 left-6 rounded-2xl border border-white/20 bg-[#062B3A]/85 p-4 backdrop-blur-md">
                 <p className="text-[10px] font-black uppercase tracking-widest text-[#FF9A5B]">Arrowline network</p>
                 <p className="mt-1 text-sm font-bold">{service.keyCapability}</p>

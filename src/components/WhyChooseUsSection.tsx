@@ -1,7 +1,5 @@
-import React from "react";
 import {
   ArrowRight,
-  CheckCircle2,
   MapPin,
   ShieldCheck,
   Truck,
@@ -138,7 +136,7 @@ export default function CoreAdvantages() {
                 animation: "fadeUp 0.8s ease-out 400ms both",
               }}
             >
-              {projects.map((project, index) => (
+              {projects.map((project) => (
                 <div
                   key={project.title}
                   className="group relative aspect-[1.25/1] overflow-hidden rounded-lg border border-white/10"
@@ -146,6 +144,8 @@ export default function CoreAdvantages() {
                   <img
                     src={project.image}
                     alt={project.title}
+                    loading="lazy"
+                    decoding="async"
                     className="
                       h-full w-full
                       object-cover
@@ -188,6 +188,8 @@ export default function CoreAdvantages() {
               <img
                 src="/images/india-map.svg"
                 alt="Arrowline Logistics India network"
+                loading="lazy"
+                decoding="async"
                 className="
                   relative z-10
                   w-full

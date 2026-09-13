@@ -1,13 +1,18 @@
+import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://vsbircholpdlhyznlrgi.supabase.co';
-const supabaseServiceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzYmlyY2hvbHBkbGh5em5scmdpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NzQ5NDU3MSwiZXhwIjoyMTAzMDcwNTcxfQ.q2Usht9aYcuqQIGBSgJQlyeYercJTZ-Y-xJcY6zfxaQ';
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
   auth: { persistSession: false }
 });
 
 async function main() {
+  if (!supabaseUrl || !supabaseServiceRoleKey) {
+    console.error('SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are not set in server/.env');
+    process.exit(1);
+  }
   console.log('=== SUPABASE CONNECTION TEST ===');
   console.log('Project:', supabaseUrl);
 
@@ -16,7 +21,8 @@ async function main() {
     'service_industries', 'service_item_industries',
     'industries', 'site_content', 'leads', 'lead_notes',
     'case_studies', 'gallery_items', 'locations', 'faqs', 'testimonials',
-    'blog_categories', 'blog_posts', 'social_videos', 'statistics', 'site_settings'
+    'blog_categories', 'blog_posts', 'social_videos', 'statistics', 'site_settings',
+    'clients', 'admin_sessions', 'trusted_network'
   ];
 
   console.log('\n=== TABLE EXISTENCE CHECK ===');

@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { MainServiceData, SubServiceData } from "../../data/servicesData";
 import ServiceHero from "./ServiceHero";
-import ServiceHighlights from "./ServiceHighlights";
 import ServiceAbout from "./ServiceAbout";
 import ServiceSubServices from "./ServiceSubServices";
 import ServiceApplications from "./ServiceApplications";
@@ -18,9 +17,7 @@ import TrustStrip from "../TrustStrip";
 import WhyChooseUsSection from "../WhyChooseUsSection";
 import ProcessSection from "../ProcessSection";
 import IndustriesPreviewBar from "../IndustriesPreviewBar";
-import InteractiveMap from "../InteractiveMap";
 import TestimonialsSection from "../TestimonialsSection";
-import Reveal from "../Reveal";
 
 interface ServicePageTemplateProps {
   service: MainServiceData | SubServiceData;
@@ -54,23 +51,6 @@ export default function ServicePageTemplate({
     }
   }, [service]);
 
-  // Breadcrumb creation
-  const breadcrumbItems = isSubService
-    ? [
-        { label: "Home", href: "#/" },
-        { label: "Services", href: "#/services" },
-        {
-          label: parentService?.title || (service as SubServiceData).parentName || "Service",
-          href: `#/services/${parentService?.slug || (service as SubServiceData).parentSlug}`,
-        },
-        { label: service.title, isCurrent: true },
-      ]
-    : [
-        { label: "Home", href: "#/" },
-        { label: "Services", href: "#/services" },
-        { label: service.title, isCurrent: true },
-      ];
-
   const subServiceData = isSubService ? (service as SubServiceData) : null;
   const mainServiceData = !isSubService ? (service as MainServiceData) : null;
 
@@ -93,11 +73,10 @@ export default function ServicePageTemplate({
         }
         headline={service.heroHeadline || service.title}
         subheadline={service.heroSubheadline}
-        description={service.heroDescription || service.heroSubheadline || service.shortDesc}
+        description={(service as any).heroDescription || service.heroSubheadline || service.shortDesc}
         image={service.heroImage || service.aboutImage || "/images/hero-logistics.jpg"}
         videoUrl={service.heroVideo || service.videoUrl}
         fallbackImage={service.heroFallbackImage || service.aboutImage}
-        breadcrumbItems={breadcrumbItems}
         onOpenQuote={onOpenQuote}
       />
 
@@ -157,15 +136,6 @@ export default function ServicePageTemplate({
         </>
       ) : (
         <>
-          {/* Trust / Service Highlights (4 compact cards) */}
-          <ServiceHighlights
-            highlights={
-              mainServiceData?.highlights ||
-              (service as any).highlights ||
-              []
-            }
-          />
-
           {/* About / Introduction */}
           <ServiceAbout
             badge={mainServiceData?.aboutBadge || `${service.title.toUpperCase()}`}
@@ -242,16 +212,7 @@ export default function ServicePageTemplate({
         }}
       />
 
-      {/* 6. PAN-INDIA CONNECTIVITY MAP */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-[#F5F8FA] border-t border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal direction="scale">
-            <InteractiveMap />
-          </Reveal>
-        </div>
-      </section>
-
-      {/* 7. WHAT OUR CLIENTS SAY — Testimonials */}
+      {/* 6. WHAT OUR CLIENTS SAY — Testimonials */}
       <TestimonialsSection />
 
       {/* 8. SERVICE-SPECIFIC FAQ */}

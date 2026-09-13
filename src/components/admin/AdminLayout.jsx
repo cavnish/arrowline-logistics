@@ -18,6 +18,7 @@ import {
   Video,
   BarChart3,
   Settings,
+  Users,
   LogOut,
 } from "lucide-react";
 
@@ -57,6 +58,7 @@ const sidebarLinks = [
   { to: "/arrowline-admin/case-studies", label: "Case Studies", icon: Files },
   { to: "/arrowline-admin/gallery", label: "Gallery", icon: Images },
   { to: "/arrowline-admin/locations", label: "Locations", icon: MapPin },
+  { to: "/arrowline-admin/clients", label: "Clients", icon: Users },
   { to: "/arrowline-admin/faqs", label: "FAQs", icon: HelpCircle },
   { to: "/arrowline-admin/testimonials", label: "Testimonials", icon: MessageSquare },
   { to: "/arrowline-admin/blog-posts", label: "Blog Posts", icon: Newspaper },

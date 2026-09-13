@@ -196,6 +196,7 @@ export default function AdminRouter() {
           <Route path="case-studies" element={<AdminCollection resource="case-studies" title="Case Studies" />} />
           <Route path="gallery" element={<AdminCollection resource="gallery" title="Gallery" />} />
           <Route path="locations" element={<AdminCollection resource="locations" title="Locations" />} />
+          <Route path="clients" element={<AdminCollection resource="clients" title="Clients" />} />
           <Route path="faqs" element={<AdminCollection resource="faqs" title="FAQs" />} />
           <Route path="testimonials" element={<AdminCollection resource="testimonials" title="Testimonials" />} />
           <Route path="blog-posts" element={<AdminCollection resource="blog-posts" title="Blog Posts" />} />

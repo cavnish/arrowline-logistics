@@ -1,13 +1,12 @@
-import { supabase } from '../lib/supabaseClient';
 import {
   getMainServiceBySlug as getStaticMainServiceBySlug,
   getSubServiceBySlug as getStaticSubServiceBySlug,
-  getAllMainServices as getStaticAllMainServices,
   MainServiceData,
   SubServiceData,
 } from '../data/servicesData';
 
-// Types for our service data
+// Types for our service data (mirrors the Express public API, which is the
+// single source of truth for the browser — no direct Supabase reads).
 export interface Service {
   id: string;
   slug: string;
@@ -17,6 +16,8 @@ export interface Service {
   hero_image: string | null;
   hero_video: string | null;
   hero_fallback_image: string | null;
+  image_alt?: string | null;
+  image_public_id?: string | null;
   is_published: boolean;
   display_order: number;
   meta_title: string | null;
@@ -65,6 +66,8 @@ export interface ServiceItem {
   hero_image: string | null;
   hero_video: string | null;
   hero_fallback_image: string | null;
+  image_alt?: string | null;
+  image_public_id?: string | null;
   is_published: boolean;
   display_order: number;
   meta_title: string | null;
@@ -141,276 +144,123 @@ export interface Industry {
   updated_at: string;
 }
 
+const API_URL = String((import.meta as any).env?.VITE_API_URL || "").trim().replace(/\/$/, "");
+
+// Single API helper for all public reads. Same-origin in production when
+// VITE_API_URL is unset (frontend is served by the same Express process).
+async function apiGet(path: string): Promise<any> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  try {
+    const response = await fetch(`${API_URL}${path}`, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`API request failed (${response.status})`);
+    }
+    const body = await response.json();
+    return body?.data ?? null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // Normalizes alias slugs like rail-multimodal-logistics -> rail-transportation
 function normalizeSlug(slug: string): string {
   if (slug === 'rail-multimodal-logistics') return 'rail-transportation';
   return slug;
 }
 
+// DB columns default to empty arrays/strings which are truthy and would
+// otherwise suppress the static fallback content. Treat empty values as absent.
+function pickValue(value: any, fallback: any): any {
+  if (value === null || value === undefined || value === '') return fallback;
+  if (Array.isArray(value) && value.length === 0) return fallback;
+  return value;
+}
+
+// The public API attaches the parent service to sub-service responses.
+function toParent(partial: any): { slug: string; title: string } {
+  return { slug: partial?.slug || '', title: partial?.title || '' };
+}
+
 class ContentService {
   // Services
   async getServices(): Promise<Service[]> {
-    if (!supabase) {
-      console.warn('[ContentService] Supabase not configured, returning empty services array');
-      return [];
-    }
-
     try {
-      const { data, error } = await supabase
-        .from('services')
-        .select('*')
-        .eq('is_published', true)
-        .order('display_order');
-
-      if (error) {
-        console.error('[ContentService] getServices error:', error);
-        throw error;
-      }
-      return data || [];
+      const data = await apiGet('/api/services');
+      return Array.isArray(data) ? (data as Service[]) : [];
     } catch (err) {
-      console.error('[ContentService] getServices catch:', err);
+      console.error('[ContentService] getServices error:', err);
       return [];
     }
   }
 
   async getServiceBySlug(slug: string): Promise<Service | null> {
-    if (!supabase) return null;
-
     const targetSlug = normalizeSlug(slug);
-
     try {
-      const { data, error } = await supabase
-        .from('services')
-        .select('*')
-        .eq('slug', targetSlug)
-        .eq('is_published', true)
-        .maybeSingle();
-
-      if (error) {
-        console.error(`[ContentService] getServiceBySlug(${slug}) error:`, error);
-        return null;
-      }
-      return data || null;
+      const data = await apiGet(`/api/services/${encodeURIComponent(targetSlug)}`);
+      return data ? (data as Service) : null;
     } catch (err) {
-      console.error(`[ContentService] getServiceBySlug(${slug}) catch:`, err);
+      console.error(`[ContentService] getServiceBySlug(${slug}) error:`, err);
       return null;
     }
   }
 
   // Service Items (Sub-services)
   async getServiceItems(): Promise<ServiceItem[]> {
-    if (!supabase) return [];
-
     try {
-      const { data, error } = await supabase
-        .from('service_items')
-        .select('*')
-        .eq('is_published', true)
-        .order('display_order');
-
-      if (error) throw error;
-      return data || [];
+      const data = await apiGet('/api/service-items');
+      return Array.isArray(data) ? (data as ServiceItem[]) : [];
     } catch (err) {
-      console.error('[ContentService] getServiceItems catch:', err);
+      console.error('[ContentService] getServiceItems error:', err);
       return [];
     }
   }
 
   async getServiceItemsByServiceSlug(serviceSlug: string): Promise<ServiceItem[]> {
-    if (!supabase) return [];
-
     try {
-      const service = await this.getServiceBySlug(serviceSlug);
-      if (!service) return [];
-
-      const { data, error } = await supabase
-        .from('service_items')
-        .select('*')
-        .eq('is_published', true)
-        .eq('service_id', service.id)
-        .order('display_order');
-
-      if (error) throw error;
-      return data || [];
+      // /api/services/:slug embeds its published sub-services.
+      const data = await apiGet(`/api/services/${encodeURIComponent(normalizeSlug(serviceSlug))}`);
+      if (!data) return [];
+      const subItems = (data as any).subServices;
+      return Array.isArray(subItems) ? (subItems as ServiceItem[]) : [];
     } catch (err) {
-      console.error(`[ContentService] getServiceItemsByServiceSlug(${serviceSlug}) catch:`, err);
+      console.error(`[ContentService] getServiceItemsByServiceSlug(${serviceSlug}) error:`, err);
       return [];
     }
   }
 
   async getServiceItemBySlug(serviceSlug: string, itemSlug: string): Promise<ServiceItem | null> {
-    if (!supabase) return null;
-
     try {
-      const service = await this.getServiceBySlug(serviceSlug);
-      if (!service) return null;
-
-      const { data, error } = await supabase
-        .from('service_items')
-        .select('*')
-        .eq('slug', itemSlug)
-        .eq('service_id', service.id)
-        .eq('is_published', true)
-        .maybeSingle();
-
-      if (error) throw error;
-      return data || null;
+      const data = await apiGet(
+        `/api/services/${encodeURIComponent(normalizeSlug(serviceSlug))}/${encodeURIComponent(itemSlug)}`
+      );
+      if (!data) return null;
+      const item = { ...data } as ServiceItem;
+      item.parent_slug = toParent(data.parentService).slug;
+      item.parent_name = toParent(data.parentService).title;
+      return item;
     } catch (err) {
-      console.error(`[ContentService] getServiceItemBySlug(${serviceSlug}, ${itemSlug}) catch:`, err);
+      console.error(`[ContentService] getServiceItemBySlug(${serviceSlug}, ${itemSlug}) error:`, err);
       return null;
-    }
-  }
-
-  // FAQs
-  async getServiceFAQs(serviceSlug: string): Promise<ServiceFAQ[]> {
-    if (!supabase) return [];
-
-    try {
-      const service = await this.getServiceBySlug(serviceSlug);
-      if (!service) return [];
-
-      const { data, error } = await supabase
-        .from('service_faqs')
-        .select('*')
-        .eq('is_published', true)
-        .eq('service_id', service.id)
-        .order('display_order');
-
-      if (error) throw error;
-      return data || [];
-    } catch (err) {
-      console.error(`[ContentService] getServiceFAQs(${serviceSlug}) catch:`, err);
-      return [];
-    }
-  }
-
-  async getServiceItemFAQs(serviceSlug: string, itemSlug: string): Promise<ServiceFAQ[]> {
-    if (!supabase) return [];
-
-    try {
-      const item = await this.getServiceItemBySlug(serviceSlug, itemSlug);
-      if (!item) return [];
-
-      const { data, error } = await supabase
-        .from('service_faqs')
-        .select('*')
-        .eq('is_published', true)
-        .eq('service_item_id', item.id)
-        .order('display_order');
-
-      if (error) throw error;
-      return data || [];
-    } catch (err) {
-      console.error(`[ContentService] getServiceItemFAQs(${serviceSlug}, ${itemSlug}) catch:`, err);
-      return [];
-    }
-  }
-
-  // Process Steps
-  async getServiceProcessSteps(serviceSlug: string): Promise<ServiceProcessStep[]> {
-    if (!supabase) return [];
-
-    try {
-      const service = await this.getServiceBySlug(serviceSlug);
-      if (!service) return [];
-
-      const { data, error } = await supabase
-        .from('service_process_steps')
-        .select('*')
-        .eq('is_published', true)
-        .eq('service_id', service.id)
-        .order('display_order');
-
-      if (error) throw error;
-      return data || [];
-    } catch (err) {
-      console.error(`[ContentService] getServiceProcessSteps(${serviceSlug}) catch:`, err);
-      return [];
-    }
-  }
-
-  async getServiceItemProcessSteps(serviceSlug: string, itemSlug: string): Promise<ServiceProcessStep[]> {
-    if (!supabase) return [];
-
-    try {
-      const item = await this.getServiceItemBySlug(serviceSlug, itemSlug);
-      if (!item) return [];
-
-      const { data, error } = await supabase
-        .from('service_process_steps')
-        .select('*')
-        .eq('is_published', true)
-        .eq('service_item_id', item.id)
-        .order('display_order');
-
-      if (error) throw error;
-      return data || [];
-    } catch (err) {
-      console.error(`[ContentService] getServiceItemProcessSteps(${serviceSlug}, ${itemSlug}) catch:`, err);
-      return [];
     }
   }
 
   // Industries
   async getIndustries(): Promise<Industry[]> {
-    if (!supabase) return [];
-
     try {
-      const { data, error } = await supabase
-        .from('industries')
-        .select('*')
-        .eq('is_published', true)
-        .order('display_order');
-
-      if (error) throw error;
-      return data || [];
+      const data = await apiGet('/api/industries');
+      return Array.isArray(data) ? (data as Industry[]) : [];
     } catch (err) {
-      console.error('[ContentService] getIndustries catch:', err);
+      console.error('[ContentService] getIndustries error:', err);
       return [];
     }
   }
 
-  async getServiceIndustries(serviceSlug: string): Promise<Industry[]> {
-    if (!supabase) return [];
-
-    try {
-      const service = await this.getServiceBySlug(serviceSlug);
-      if (!service) return [];
-
-      const { data, error } = await supabase
-        .from('service_industries')
-        .select('industry_id, industries(*)')
-        .eq('service_id', service.id);
-
-      if (error) throw error;
-      return data?.map((item: any) => item.industries).filter(Boolean) || [];
-    } catch (err) {
-      console.error(`[ContentService] getServiceIndustries(${serviceSlug}) catch:`, err);
-      return [];
-    }
-  }
-
-  async getServiceItemIndustries(serviceSlug: string, itemSlug: string): Promise<Industry[]> {
-    if (!supabase) return [];
-
-    try {
-      const item = await this.getServiceItemBySlug(serviceSlug, itemSlug);
-      if (!item) return [];
-
-      const { data, error } = await supabase
-        .from('service_item_industries')
-        .select('industry_id, industries(*)')
-        .eq('service_item_id', item.id);
-
-      if (error) throw error;
-      return data?.map((item: any) => item.industries).filter(Boolean) || [];
-    } catch (err) {
-      console.error(`[ContentService] getServiceItemIndustries(${serviceSlug}, ${itemSlug}) catch:`, err);
-      return [];
-    }
-  }
-
-  // Transforms a Supabase service record into MainServiceData format with static fallback
+  // Transforms a service record into MainServiceData format with static fallback
   async getServiceDetail(slug: string): Promise<MainServiceData | null> {
     const staticFallback = getStaticMainServiceBySlug(slug) || getStaticMainServiceBySlug(normalizeSlug(slug));
 
@@ -418,10 +268,8 @@ class ContentService {
       const service = await this.getServiceBySlug(slug);
       if (!service) return staticFallback || null;
 
-      const subItems = await this.getServiceItemsByServiceSlug(service.slug);
-
-      // Convert sub-service items to SubServiceData
-      const subServices: SubServiceData[] = subItems.map(item => this.mapItemToSubServiceData(item, service));
+      const subItems: ServiceItem[] = (service as any).subServices || [];
+      const subServices: SubServiceData[] = subItems.map(item => this.mapItemToSubServiceData(item, toParent(service)));
 
       return {
         id: service.id,
@@ -437,19 +285,20 @@ class ContentService {
         heroImage: service.hero_image || staticFallback?.heroImage || '/images/hero-logistics.jpg',
         heroVideo: service.hero_video || staticFallback?.heroVideo,
         heroFallbackImage: service.hero_fallback_image || staticFallback?.heroFallbackImage,
-        highlights: service.highlights || staticFallback?.highlights || [],
+        imageAlt: service.image_alt || staticFallback?.imageAlt || '',
+        highlights: pickValue(service.highlights, staticFallback?.highlights) || [],
         aboutBadge: service.about_badge || staticFallback?.aboutBadge || 'ABOUT THIS SERVICE',
         aboutHeading: service.about_heading || staticFallback?.aboutHeading || `${service.title} Excellence`,
         aboutDescription: service.about_description || service.full_description || staticFallback?.aboutDescription || '',
-        aboutBulletPoints: service.about_bullet_points || staticFallback?.aboutBulletPoints || [],
+        aboutBulletPoints: pickValue(service.about_bullet_points, staticFallback?.aboutBulletPoints) || [],
         aboutImage: service.about_image || staticFallback?.aboutImage || service.hero_image || '/images/hero-logistics.jpg',
-        whyArrowline: service.why_arrowline || staticFallback?.whyArrowline || [],
-        processSteps: service.process_steps || staticFallback?.processSteps || [],
-        applications: service.applications || staticFallback?.applications || [],
-        industries: service.industries || staticFallback?.industries || [],
+        whyArrowline: pickValue(service.why_arrowline, staticFallback?.whyArrowline) || [],
+        processSteps: pickValue(service.process_steps, staticFallback?.processSteps) || [],
+        applications: pickValue(service.applications, staticFallback?.applications) || [],
+        industries: pickValue(service.industries, staticFallback?.industries) || [],
         networkDescription: service.network_description || staticFallback?.networkDescription || '',
-        faqs: service.faqs || staticFallback?.faqs || [],
-        gallery: service.gallery || staticFallback?.gallery || [],
+        faqs: pickValue(service.faqs, staticFallback?.faqs) || [],
+        gallery: pickValue(service.gallery, staticFallback?.gallery) || [],
         videoUrl: service.video_url || staticFallback?.videoUrl,
         videoPoster: service.video_poster || staticFallback?.videoPoster,
         ctaHeadline: service.cta_headline || staticFallback?.ctaHeadline || "Ready to Streamline Your Freight?",
@@ -466,60 +315,55 @@ class ContentService {
     }
   }
 
-  // Transforms a Supabase service_item record into SubServiceData format with static fallback
+  // Transforms a service_item record into SubServiceData format with static fallback
   async getServiceItemDetail(serviceSlug: string, itemSlug: string): Promise<SubServiceData | null> {
     const staticFallback = getStaticSubServiceBySlug(serviceSlug, itemSlug) || getStaticSubServiceBySlug(normalizeSlug(serviceSlug), itemSlug);
 
     try {
-      const service = await this.getServiceBySlug(serviceSlug);
-      if (!service) return staticFallback || null;
-
-      const item = await this.getServiceItemBySlug(service.slug, itemSlug);
+      const item = await this.getServiceItemBySlug(serviceSlug, itemSlug);
       if (!item) return staticFallback || null;
-
-      return this.mapItemToSubServiceData(item, service, staticFallback);
+      return this.mapItemToSubServiceData(item, toParent({ slug: item.parent_slug, title: item.parent_name }), staticFallback);
     } catch (err) {
       console.warn(`[ContentService] getServiceItemDetail(${serviceSlug}, ${itemSlug}) fallback to static:`, err);
       return staticFallback || null;
     }
   }
 
-  private mapItemToSubServiceData(item: ServiceItem, parentService: Service, fallback?: SubServiceData): SubServiceData {
+  private mapItemToSubServiceData(item: ServiceItem, parentService: { slug: string; title: string }, fallback?: SubServiceData): SubServiceData {
     return {
       id: item.id,
       slug: item.slug,
-      parentSlug: parentService.slug,
-      parentName: parentService.title,
+      parentSlug: parentService.slug || item.parent_slug || '',
+      parentName: parentService.title || item.parent_name || '',
       title: item.title,
       shortDesc: item.short_description || fallback?.shortDesc || '',
       heroHeadline: item.hero_headline || fallback?.heroHeadline || item.title,
       heroSubheadline: item.hero_subheadline || fallback?.heroSubheadline || item.short_description || '',
-      heroBadge: item.hero_badge || fallback?.heroBadge || `${parentService.title.toUpperCase()} • SPECIALIZED SERVICE`,
-      heroImage: item.hero_image || fallback?.heroImage || parentService.hero_image || '/images/hero-logistics.jpg',
+      heroBadge: item.hero_badge || fallback?.heroBadge || `${(parentService.title || 'Service').toUpperCase()} • SPECIALIZED SERVICE`,
+      heroImage: item.hero_image || fallback?.heroImage || '/images/hero-logistics.jpg',
       heroVideo: item.hero_video || fallback?.heroVideo,
       heroFallbackImage: item.hero_fallback_image || fallback?.heroFallbackImage,
+      imageAlt: item.image_alt || fallback?.imageAlt || '',
       aboutBadge: item.about_badge || fallback?.aboutBadge || 'OPERATIONAL CAPABILITY',
       aboutHeading: item.about_heading || fallback?.aboutHeading || `${item.title} Built Around Your Cargo`,
       aboutDescription: item.about_description || item.full_description || fallback?.aboutDescription || '',
-      aboutBulletPoints: item.about_bullet_points || fallback?.aboutBulletPoints || [],
-      aboutImage: item.about_image || fallback?.aboutImage || item.hero_image || parentService.hero_image || '/images/hero-logistics.jpg',
-      capabilities: Array.isArray(item.capabilities) ? item.capabilities : (fallback?.capabilities || []),
-      whyArrowline: item.why_arrowline || fallback?.whyArrowline || [],
-      processSteps: item.process_steps || fallback?.processSteps || [],
-      applications: item.applications || fallback?.applications || [],
-      industries: item.industries || fallback?.industries || [],
-      faqs: item.faqs || fallback?.faqs || [],
-      gallery: item.gallery || fallback?.gallery || [],
+      aboutBulletPoints: pickValue(item.about_bullet_points, fallback?.aboutBulletPoints) || [],
+      aboutImage: item.about_image || fallback?.aboutImage || item.hero_image || '/images/hero-logistics.jpg',
+      capabilities: Array.isArray(item.capabilities) && item.capabilities.length > 0 ? item.capabilities : (fallback?.capabilities || []),
+      whyArrowline: pickValue(item.why_arrowline, fallback?.whyArrowline) || [],
+      processSteps: pickValue(item.process_steps, fallback?.processSteps) || [],
+      applications: pickValue(item.applications, fallback?.applications) || [],
+      industries: pickValue(item.industries, fallback?.industries) || [],
+      faqs: pickValue(item.faqs, fallback?.faqs) || [],
+      gallery: pickValue(item.gallery, fallback?.gallery) || [],
       videoUrl: item.video_url || fallback?.videoUrl,
       videoPoster: item.video_poster || fallback?.videoPoster,
       ctaHeadline: item.cta_headline || fallback?.ctaHeadline || "Ready to Coordinate Your Shipment?",
       seoTitle: item.seo_title || item.meta_title || fallback?.seoTitle || item.title,
-      seoDescription: item.seo_desc || item.meta_description || fallback?.seoDescription || item.short_description || '',
       seoDesc: item.seo_desc || item.meta_description || fallback?.seoDesc || item.short_description || '',
       canonicalUrl: item.canonical_url || fallback?.canonicalUrl,
       isPublished: item.is_published,
       displayOrder: item.display_order,
-      keywords: item.keywords || fallback?.keywords || [],
     };
   }
 }

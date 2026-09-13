@@ -13,34 +13,69 @@ export default function AdminIndustries() {
   const [editingId, setEditingId] = useState(null);
   const [cargoText, setCargoText] = useState("");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [source, setSource] = useState("database");
+  const [importing, setImporting] = useState(false);
 
   const load = async () => {
+    setLoading(true);
+    setError("");
     try {
       const response = await adminApi.get("/industries");
       setItems(response.data.data || []);
-    } catch (error) {
-      console.error("Loading industries:", error?.response?.data || error);
-      setItems(INDUSTRIES_SERVED.map((industry, index) => ({
-        id: industry.id,
-        slug: industry.id,
-        title: industry.title,
-        description: industry.description,
-        icon: industry.icon,
-        cargo_types: industry.cargoTypes,
-        image: industry.image,
-        is_published: true,
-        display_order: index,
-      })));
-      setSource("static");
-      setMessage("Showing existing website industries from logisticsData.ts. Apply the industries migration to enable database editing.");
+    } catch (err) {
+      console.error("Loading industries:", err?.response?.data || err);
+      setError(
+        err?.response?.data?.message ||
+          "Unable to load industries. Check that the backend is running and you are signed in as an admin."
+      );
+      setItems([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => { load(); }, []);
+
+  const importExisting = async () => {
+    if (
+      !window.confirm(
+        `Import ${INDUSTRIES_SERVED.length} industries from the website dataset into the database? Industries that already exist (same slug) will be skipped.`
+      )
+    ) {
+      return;
+    }
+    setImporting(true);
+    setError("");
+    try {
+      let created = 0;
+      for (const [index, industry] of INDUSTRIES_SERVED.entries()) {
+        if (items.some((item) => (item.slug || item.id) === industry.id)) continue;
+        await adminApi.post("/industries", {
+          slug: industry.id,
+          title: industry.title,
+          description: industry.description,
+          icon: industry.icon,
+          cargo_types: industry.cargoTypes,
+          image: industry.image,
+          is_published: true,
+          display_order: index,
+        });
+        created += 1;
+      }
+      await load();
+      setMessage(
+        created > 0
+          ? `Imported ${created} industries into the database.`
+          : "Nothing to import — industries already exist in the database."
+      );
+    } catch (err) {
+      console.error("Importing industries:", err?.response?.data || err);
+      setMessage(`Import failed: ${err?.response?.data?.message || err?.message || "unexpected error"}`);
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const update = (event) => {
     const { name, value, type, checked } = event.target;
@@ -89,7 +124,7 @@ export default function AdminIndustries() {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <div><h1 className="text-2xl font-bold text-slate-800">Industries</h1><p className="text-sm text-slate-500">Manage industry pages and cargo categories.</p></div>
-      {source === "static" && <p className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">These are the existing public website records. They are read-only until the industries table migration is applied.</p>}
+      {error && <div className="rounded-lg bg-rose-50 border border-rose-200 p-3 text-sm text-rose-800 flex items-center justify-between gap-4">{error}<button onClick={load} className="text-sm font-semibold text-rose-700 underline whitespace-nowrap">Retry</button></div>}
       {message && <p className="rounded-lg bg-slate-100 p-3 text-sm text-slate-700">{message}</p>}
       <form onSubmit={save} className="bg-white border border-slate-200 rounded-xl p-5 grid gap-4 md:grid-cols-2">
         {["title", "slug", "icon", "image"].map((name) => <label key={name}><span className="block text-sm font-semibold text-slate-700 mb-1">{name}</span><input name={name} value={form[name] || ""} onChange={update} className="w-full border rounded-lg p-2" /></label>)}
@@ -99,7 +134,18 @@ export default function AdminIndustries() {
         <label className="text-sm font-semibold text-slate-700">Display order<input name="display_order" type="number" value={form.display_order} onChange={update} className="mt-1 w-full border rounded-lg p-2" /></label>
         <div className="md:col-span-2 flex gap-2"><button className="px-4 py-2 rounded-lg bg-[#1E3A8A] text-white">{editingId ? "Update industry" : "Create industry"}</button>{editingId && <button type="button" onClick={() => { setEditingId(null); setForm(emptyIndustry); setCargoText(""); }} className="px-4 py-2 rounded-lg border">Cancel</button>}</div>
       </form>
-      {loading ? <p className="text-slate-500">Loading industries...</p> : <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">{items.length === 0 ? <p className="p-6 text-slate-500">No industries found.</p> : items.map((item) => <div key={item.id} className="p-4 border-b last:border-b-0 flex items-center justify-between gap-4"><div><p className="font-semibold">{item.title}</p><p className="text-sm text-slate-500">/{item.slug} - {item.is_published ? "Published" : "Draft"}</p></div><div className="flex gap-2"><button onClick={() => edit(item)} className="text-sm font-semibold text-[#1E3A8A]">Edit</button><button onClick={() => remove(item.id)} className="text-sm font-semibold text-red-600">Delete</button></div></div>)}</div>}
+      {loading ? <p className="text-slate-500">Loading industries...</p> : items.length === 0 && !error ? (
+        <div className="bg-white border border-slate-200 rounded-xl p-8 text-center space-y-3">
+          <p className="text-slate-500 font-medium">No industries in the database yet.</p>
+          <button
+            onClick={importExisting}
+            disabled={importing}
+            className="px-5 py-2.5 rounded-lg bg-[#1E3A8A] text-white text-sm font-semibold flex items-center gap-2 mx-auto disabled:opacity-50"
+          >
+            {importing ? "Importing..." : `Import website industries (${INDUSTRIES_SERVED.length})`}
+          </button>
+        </div>
+      ) : <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">{items.length === 0 ? <p className="p-6 text-slate-500">No industries found.</p> : items.map((item) => <div key={item.id} className="p-4 border-b last:border-b-0 flex items-center justify-between gap-4"><div><p className="font-semibold">{item.title}</p><p className="text-sm text-slate-500">/{item.slug} - {item.is_published ? "Published" : "Draft"}</p></div><div className="flex gap-2"><button onClick={() => edit(item)} className="text-sm font-semibold text-[#1E3A8A]">Edit</button><button onClick={() => remove(item.id)} className="text-sm font-semibold text-red-600">Delete</button></div></div>)}</div>}
     </div>
   );
 }

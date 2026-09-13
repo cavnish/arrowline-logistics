@@ -36,6 +36,7 @@ export default function ContactForm({ onSuccess, defaultService = "", isCompact 
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -45,6 +46,7 @@ export default function ContactForm({ onSuccess, defaultService = "", isCompact 
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+    if (submitError) setSubmitError(null);
     if (errors[name]) {
       setErrors((prev) => {
         const next = { ...prev };
@@ -73,8 +75,9 @@ export default function ContactForm({ onSuccess, defaultService = "", isCompact 
     if (formData.honeypot) return;
     if (!validateForm()) return;
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
-      // Submit to backend (MongoDB + email) with graceful fallback
+      // Submit to the configured production backend.
       const result = await submitLead({
         name: formData.name,
         company: formData.company,
@@ -101,6 +104,9 @@ export default function ContactForm({ onSuccess, defaultService = "", isCompact 
       });
     } catch (err) {
       console.error("Lead submission error: ", err);
+      setSubmitError(
+        err instanceof Error ? err.message : "Unable to submit your request. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -143,6 +149,13 @@ export default function ContactForm({ onSuccess, defaultService = "", isCompact 
           <h3 className="text-lg font-black text-[#1E3A8A] tracking-tight">
             Get an <span className="text-[#FF7A00]">Instant Estimate</span>
           </h3>
+        </div>
+      )}
+
+      {submitError && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700 flex items-start space-x-2" role="alert">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <span>{submitError}</span>
         </div>
       )}
 

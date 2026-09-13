@@ -12,7 +12,6 @@ interface ServiceCTAProps {
 export default function ServiceCTA({
   headline = "Move Your Cargo With Confidence",
   onOpenQuote,
-  onNavigateToContact,
 }: ServiceCTAProps) {
   return (
     <section className="py-12 sm:py-16 lg:py-20 bg-[#03212D] text-white relative overflow-hidden">

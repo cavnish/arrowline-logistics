@@ -28,7 +28,27 @@ import {
   Sliders,
   ArrowLeft,
   X,
+  RefreshCw,
+  Database,
 } from "lucide-react";
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function snakeToCamel(value) {
+  return value.replace(/_([a-z])/g, (_, ch) => ch.toUpperCase());
+}
+
+function serviceRowToForm(record = {}) {
+  const out = {};
+  for (const [key, value] of Object.entries(record)) {
+    if (key === "service_items" || key === "sub_services_count") continue;
+    out[snakeToCamel(key)] = value;
+  }
+  if (Array.isArray(record.subServices)) {
+    out.subServices = record.subServices.map((sub) => serviceRowToForm(sub));
+  }
+  return out;
+}
 
 export default function AdminServices() {
   // State: Data List
@@ -49,29 +69,27 @@ export default function AdminServices() {
   const [message, setMessage] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [loadError, setLoadError] = useState(null);
 
   // Load Services on Mount
   const loadServices = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await adminApi.get("/services");
       if (res.data?.data && res.data.data.length > 0) {
-        // Merge with static sub-services if backend does not include them
-        const merged = res.data.data.map((m) => {
-          const staticMatch = MAIN_SERVICES.find((s) => s.slug === m.slug);
-          return {
-            ...staticMatch,
-            ...m,
-            subServices: m.subServices || staticMatch?.subServices || [],
-          };
-        });
-        setMainServices(merged);
+        setMainServices(res.data.data.map(serviceRowToForm));
       } else {
-        setMainServices(MAIN_SERVICES);
+        setMainServices([]);
       }
     } catch (err) {
-      console.warn("[AdminServices] API unavailable, using local servicesData.ts dataset:", err);
-      setMainServices(MAIN_SERVICES);
+      console.warn("[AdminServices] Unable to load services from the database:", err);
+      setLoadError(
+        err?.response?.data?.message ||
+          "Unable to load services. Check that the backend is running and you are signed in as an admin."
+      );
+      setMainServices([]);
     } finally {
       setLoading(false);
     }
@@ -145,7 +163,7 @@ export default function AdminServices() {
   const startNewMain = () => {
     setEditType("main");
     setFormData({
-      id: `service-${Date.now()}`,
+      id: "",
       slug: "",
       title: "",
       shortDesc: "",
@@ -201,7 +219,7 @@ export default function AdminServices() {
 
     setEditType("sub");
     setFormData({
-      id: `sub-${Date.now()}`,
+      id: "",
       slug: "",
       parentSlug: pSlug,
       parentName: parent?.title || "Main Service",
@@ -256,59 +274,40 @@ export default function AdminServices() {
   const handleSave = async (e) => {
     if (e) e.preventDefault();
     setIsSaving(true);
+    setMessage(null);
 
     try {
       if (editType === "main") {
-        try {
-          await adminApi.patch(`/services/${formData.id || formData.slug}`, formData);
-        } catch (apiErr) {
-          console.warn("API update fallback to local state:", apiErr);
+        const { id, subServices, sub_services_count, service_items, parentName, ...payload } = formData;
+        let saved;
+        if (id && UUID_PATTERN.test(id)) {
+          const res = await adminApi.patch(`/services/${id}`, payload);
+          saved = res.data.data;
+        } else {
+          const res = await adminApi.post("/services", payload);
+          saved = res.data.data;
+          setFormData((prev) => ({ ...prev, id: saved.id }));
         }
-
-        setMainServices((prev) => {
-          const exists = prev.some((m) => m.slug === formData.slug || m.id === formData.id);
-          if (exists) {
-            return prev.map((m) =>
-              m.slug === formData.slug || m.id === formData.id ? { ...m, ...formData } : m
-            );
-          } else {
-            return [...prev, formData];
-          }
-        });
-
-        showToast(`Main Service "${formData.title}" saved successfully!`);
+        await loadServices();
+        showToast(`Main Service "${saved.title || formData.title}" saved successfully!`);
       } else {
-        const parentSlug = formData.parentSlug;
-        try {
-          await adminApi.patch(`/service-items/${formData.id || formData.slug}`, formData);
-        } catch (apiErr) {
-          console.warn("API sub-service update fallback to local state:", apiErr);
+        const { id, parentName, subServices, sub_services_count, service_items, ...payload } = formData;
+        let saved;
+        if (id && UUID_PATTERN.test(id)) {
+          const res = await adminApi.patch(`/service-items/${id}`, payload);
+          saved = res.data.data;
+        } else {
+          const res = await adminApi.post("/service-items", payload);
+          saved = res.data.data;
+          setFormData((prev) => ({ ...prev, id: saved.id }));
         }
-
-        setMainServices((prev) =>
-          prev.map((main) => {
-            if (main.slug !== parentSlug) return main;
-            const subExists = main.subServices?.some(
-              (s) => s.slug === formData.slug || s.id === formData.id
-            );
-            let updatedSubs;
-            if (subExists) {
-              updatedSubs = main.subServices.map((s) =>
-                s.slug === formData.slug || s.id === formData.id ? { ...s, ...formData } : s
-              );
-            } else {
-              updatedSubs = [...(main.subServices || []), formData];
-            }
-            return { ...main, subServices: updatedSubs };
-          })
-        );
-
-        showToast(`Sub-Service "${formData.title}" saved successfully!`);
+        await loadServices();
+        showToast(`Sub-Service "${saved.title || formData.title}" saved successfully!`);
       }
       setIsEditing(false);
     } catch (err) {
       console.error("Save error:", err);
-      showToast(err?.message || "Unable to save service changes.", "error");
+      showToast(err?.response?.data?.message || err?.message || "Unable to save service changes.", "error");
     } finally {
       setIsSaving(false);
     }
@@ -320,41 +319,34 @@ export default function AdminServices() {
   const handleDeleteMain = async (id, title) => {
     if (!window.confirm(`Are you sure you want to delete the main service "${title}"?`)) return;
 
+    if (!id || !UUID_PATTERN.test(id)) {
+      showToast("This record has not been saved to the database yet. Save it first, then delete.", "error");
+      return;
+    }
+
     try {
-      try {
-        await adminApi.delete(`/services/${id}`);
-      } catch (apiErr) {
-        console.warn("API delete fallback:", apiErr);
-      }
-      setMainServices((prev) => prev.filter((m) => m.id !== id && m.slug !== id));
+      await adminApi.delete(`/services/${id}`);
+      await loadServices();
       showToast(`Service "${title}" deleted.`);
     } catch (err) {
-      showToast(err?.message || "Failed to delete service.", "error");
+      showToast(err?.response?.data?.message || err?.message || "Failed to delete service.", "error");
     }
   };
 
-  const handleDeleteSub = async (parentSlug, subSlug, title) => {
+  const handleDeleteSub = async (parentSlug, subId, title) => {
     if (!window.confirm(`Delete sub-service "${title}"?`)) return;
 
-    try {
-      try {
-        await adminApi.delete(`/service-items/${subSlug}`);
-      } catch (apiErr) {
-        console.warn("API delete fallback:", apiErr);
-      }
+    if (!subId || !UUID_PATTERN.test(subId)) {
+      showToast("This record has not been saved to the database yet. Save it first, then delete.", "error");
+      return;
+    }
 
-      setMainServices((prev) =>
-        prev.map((main) => {
-          if (main.slug !== parentSlug) return main;
-          return {
-            ...main,
-            subServices: main.subServices.filter((s) => s.slug !== subSlug),
-          };
-        })
-      );
+    try {
+      await adminApi.delete(`/service-items/${subId}`);
+      await loadServices();
       showToast(`Sub-service "${title}" deleted.`);
     } catch (err) {
-      showToast(err?.message || "Failed to delete sub-service.", "error");
+      showToast(err?.response?.data?.message || err?.message || "Failed to delete sub-service.", "error");
     }
   };
 
@@ -370,20 +362,29 @@ export default function AdminServices() {
       const uploadData = new FormData();
       uploadData.append("file", file);
       uploadData.append("folder", editType === "main" ? "services" : "sub-services");
+      if (formData.slug) uploadData.append("slug", formData.slug);
 
       const res = await adminApi.post("/media", uploadData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (res.data?.data?.url) {
-        setFormData((prev) => ({ ...prev, [targetField]: res.data.data.url }));
-        showToast("Media uploaded successfully!");
+        const uploaded = res.data.data;
+        const updates = { [targetField]: uploaded.url };
+        if (targetField === "heroImage" && uploaded.public_id) {
+          updates.imagePublicId = uploaded.public_id;
+        }
+        setFormData((prev) => ({ ...prev, ...updates }));
+        showToast(uploaded.provider === "cloudinary" ? "Media uploaded to Cloudinary!" : "Media uploaded successfully!");
+      } else {
+        showToast("Upload did not return a media URL.", "error");
       }
     } catch (err) {
-      console.warn("Upload endpoint unavailable, using mock/local path:", err);
-      const localUrl = URL.createObjectURL(file);
-      setFormData((prev) => ({ ...prev, [targetField]: localUrl }));
-      showToast("Media file attached locally for preview.", "info");
+      console.error("Upload failed:", err);
+      showToast(
+        err?.response?.data?.message || "Upload failed. The file was not saved.",
+        "error"
+      );
     } finally {
       setIsUploading(false);
     }
@@ -415,6 +416,40 @@ export default function AdminServices() {
     const current = [...(formData[field] || [])];
     current.splice(index, 1);
     setFormData((prev) => ({ ...prev, [field]: current }));
+  };
+
+  // -------------------------------------------------------------
+  // Import Existing Website Services into the Database
+  // -------------------------------------------------------------
+  const importWebsiteServices = async () => {
+    if (
+      !window.confirm(
+        `Import ${MAIN_SERVICES.length} main services and their sub-services from the website dataset into the database? Services that already exist (same slug) will be skipped.`
+      )
+    ) {
+      return;
+    }
+    setIsImporting(true);
+    try {
+      let created = 0;
+      for (const main of MAIN_SERVICES) {
+        if (mainServices.some((m) => m.slug === main.slug)) continue;
+        const { subServices, sub_services_count, service_items, parentName, ...mainPayload } = main;
+        const res = await adminApi.post("/services", mainPayload);
+        if (res.data?.data?.id) created += 1;
+        for (const sub of subServices || []) {
+          const { id, ...subPayload } = sub;
+          await adminApi.post("/service-items", { ...subPayload, parentSlug: main.slug });
+        }
+      }
+      await loadServices();
+      showToast(created > 0 ? `Imported ${created} main service(s) into the database.` : "Nothing to import — services already exist in the database.");
+    } catch (err) {
+      console.error("Import services error:", err);
+      showToast(`Import failed: ${err?.response?.data?.message || err?.message || "unexpected error"}`, "error");
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   // =========================================================================
@@ -743,6 +778,33 @@ export default function AdminServices() {
                           />
                         </div>
                       )}
+                      <div className="space-y-1 mt-3">
+                        <label className="text-[11px] font-bold text-slate-600">
+                          Hero Image Alt Text (SEO / accessibility)
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.imageAlt || ""}
+                          onChange={(e) => updateField("imageAlt", e.target.value)}
+                          placeholder="Arrowline Logistics container transportation service in India"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-mono"
+                        />
+                      </div>
+                      <div className="space-y-1 mt-2">
+                        <label className="text-[11px] font-bold text-slate-600">
+                          Cloudinary Public ID (managed on upload)
+                        </label>
+                        <input
+                          type="text"
+                          readOnly
+                          value={formData.imagePublicId || ""}
+                          placeholder="Set automatically when you upload an image"
+                          className="w-full bg-slate-100 border border-slate-200 rounded-xl p-2 text-xs font-mono text-slate-500"
+                        />
+                        <p className="text-[10px] text-slate-400">
+                          Used to clean up the previous Cloudinary asset when the image is replaced or the service is deleted.
+                        </p>
+                      </div>
                     </div>
 
                     {/* Hero Video */}
@@ -954,7 +1016,7 @@ export default function AdminServices() {
                             <button
                               type="button"
                               onClick={() =>
-                                handleDeleteSub(formData.slug, sub.slug, sub.title)
+                                handleDeleteSub(formData.slug, sub.id, sub.title)
                               }
                               className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer"
                             >
@@ -1115,13 +1177,15 @@ export default function AdminServices() {
                                       "url",
                                       res.data.data.url
                                     );
+                                    showToast("Media uploaded successfully!");
+                                  } else {
+                                    showToast("Upload did not return a media URL.", "error");
                                   }
                                 } catch (err) {
-                                  updateArrayItem(
-                                    "gallery",
-                                    idx,
-                                    "url",
-                                    URL.createObjectURL(file)
+                                  console.error("Upload failed:", err);
+                                  showToast(
+                                    err?.response?.data?.message || "Upload failed. The file was not saved.",
+                                    "error"
                                   );
                                 }
                               }
@@ -1738,6 +1802,60 @@ export default function AdminServices() {
         </div>
       ) : (
         <div className="space-y-4">
+          {loadError && (
+            <div className="bg-rose-50 border border-rose-200 rounded-2xl p-5 flex items-center justify-between gap-4">
+              <div className="text-xs font-bold text-rose-800">
+                Database connection error: {loadError}
+              </div>
+              <button
+                type="button"
+                onClick={loadServices}
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                Retry
+              </button>
+            </div>
+          )}
+
+          {!loadError && mainServices.length === 0 && (
+            <div className="bg-white border border-slate-200 rounded-3xl p-10 text-center space-y-4 shadow-xs">
+              <Database className="w-10 h-10 text-slate-300 mx-auto" />
+              <div>
+                <h3 className="text-lg font-black text-[#062B3A]">
+                  No services in the database yet
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  The services published on the website live in {MAIN_SERVICES.length} main service records.
+                  Import them into the database to start editing, or create a new one.
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={importWebsiteServices}
+                  disabled={isImporting}
+                  className="px-5 py-2.5 bg-[#062B3A] hover:bg-[#03212D] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isImporting ? (
+                    <Clock className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Database className="w-4 h-4 text-[#FF6B1A]" />
+                  )}
+                  {isImporting ? "Importing..." : `Import Website Services (${MAIN_SERVICES.length})`}
+                </button>
+                <button
+                  type="button"
+                  onClick={startNewMain}
+                  className="px-5 py-2.5 bg-[#FF6B1A] hover:bg-[#E55A0D] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md flex items-center gap-2 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  Create Manually
+                </button>
+              </div>
+            </div>
+          )}
+
           {filteredServices.map((main, index) => {
             const isExpanded = expandedMainId === main.id || expandedMainId === main.slug;
             return (
@@ -1894,7 +2012,7 @@ export default function AdminServices() {
                               </button>
                               <button
                                 onClick={() =>
-                                  handleDeleteSub(main.slug, sub.slug, sub.title)
+                                  handleDeleteSub(main.slug, sub.id, sub.title)
                                 }
                                 className="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg cursor-pointer"
                                 title="Delete sub-service"

@@ -96,6 +96,8 @@ export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
                 <img
                   src={content("about_image", "/images/hero-logistics.jpg")}
                   alt="Mundra port container logistics crane and ship operations"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover object-center"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#062B3A]/80 via-transparent to-transparent" />
@@ -111,6 +113,8 @@ export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
                 <img
                   src="/images/truck-fleet-yard.jpg"
                   alt="Arrowline logistics fleet in transport yard"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
               </div>

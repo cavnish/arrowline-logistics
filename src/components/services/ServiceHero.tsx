@@ -1,15 +1,8 @@
 import { useState, useEffect } from "react";
-import { ArrowRight, Phone, Play } from "lucide-react";
+import { ArrowRight, Phone } from "lucide-react";
 import Reveal from "../Reveal";
-import ServiceBreadcrumb from "./ServiceBreadcrumb";
 import { COMPANY_DETAILS } from "../../data/logisticsData";
 import { buildTel } from "../../utils/contactLinks";
-
-interface BreadcrumbItem {
-  label: string;
-  href?: string;
-  isCurrent?: boolean;
-}
 
 interface ServiceHeroProps {
   badge: string;
@@ -19,7 +12,6 @@ interface ServiceHeroProps {
   image: string;
   videoUrl?: string;
   fallbackImage?: string;
-  breadcrumbItems?: BreadcrumbItem[];
   onOpenQuote: () => void;
   onExploreContent?: () => void;
 }
@@ -31,7 +23,6 @@ export default function ServiceHero({
   image,
   videoUrl,
   fallbackImage,
-  breadcrumbItems,
   onOpenQuote,
 }: ServiceHeroProps) {
   const [loaded, setLoaded] = useState(false);
@@ -88,11 +79,6 @@ export default function ServiceHero({
       {/* ── Content Container ── */}
       <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-28 flex flex-col justify-center">
         <div className="max-w-4xl space-y-6">
-
-          {/* Breadcrumb (for sub-services & navigation) */}
-          {breadcrumbItems && breadcrumbItems.length > 0 && (
-            <ServiceBreadcrumb items={breadcrumbItems} />
-          )}
 
           {/* Eyebrow Badge */}
           <Reveal delay={50}>

@@ -42,6 +42,7 @@ export interface SubServiceData {
   heroImage: string;
   heroVideo?: string;
   heroFallbackImage?: string;
+  imageAlt?: string;
   aboutBadge: string;
   aboutHeading: string;
   aboutDescription: string;
@@ -78,6 +79,7 @@ export interface MainServiceData {
   heroImage: string;
   heroVideo?: string;
   heroFallbackImage?: string;
+  imageAlt?: string;
   highlights: string[];
   aboutBadge: string;
   aboutHeading: string;
@@ -117,7 +119,7 @@ const roadSubServices: SubServiceData[] = [
     heroHeadline: "Reliable Container Transportation for Efficient Cargo Movement",
     heroSubheadline: "Port-to-factory containerized haulage with real-time GPS tracking, guaranteed chassis availability, and rapid port-gate turnaround.",
     heroBadge: "ROAD TRANSPORTATION • CONTAINER HAULAGE",
-    heroImage: "/images/road-transport.jpg",
+    heroImage: "/images/project-port.jpg",
     aboutBadge: "CONTAINER TRANSPORTATION",
     aboutHeading: "Connecting Sea Ports Directly to Factory Floors & Dry Ports.",
     aboutDescription: "Arrowline Logistics delivers specialized container transportation services designed for import, export, and domestic containerized movements. Operating directly out of Mundra Port and inland container depots (ICDs), our fleet of dedicated container trailers ensures timely pickup, secure twist-lock chassis transit, and seamless dock delivery without handling risk.",
@@ -185,7 +187,7 @@ const roadSubServices: SubServiceData[] = [
     heroHeadline: "Scalable FTL & LTL Road Transportation Across India",
     heroSubheadline: "Dedicated full truck capacity and cost-efficient partial load consolidation backed by scheduled departures and nationwide coverage.",
     heroBadge: "ROAD TRANSPORTATION • FTL & LTL",
-    heroImage: "/images/road-transport.jpg",
+    heroImage: "/images/truck-fleet-yard.jpg",
     aboutBadge: "FTL & LTL FREIGHT",
     aboutHeading: "Flexible Truckload Solutions Tailored to Your Supply Chain Volume.",
     aboutDescription: "Arrowline Logistics provides comprehensive Full Truckload (FTL) and Less-than-Truckload (LTL) services connecting production facilities, distribution centers, and industrial corridors. Whether you require dedicated multi-ton vehicle capacity for urgent point-to-point shipments or cost-effective consolidated freight movement, our road network ensures optimal space utilization and strict schedule adherence.",
@@ -252,7 +254,7 @@ const roadSubServices: SubServiceData[] = [
     heroHeadline: "Specialized ODC & Heavy Haulage Transportation",
     heroSubheadline: "Heavy-lift road freight engineering, route feasibility surveys, multi-axle hydraulic pullers, and turnkey transit coordination across India.",
     heroBadge: "ROAD TRANSPORTATION • ODC & HEAVY HAULAGE",
-    heroImage: "/images/project-cargo.jpg",
+    heroImage: "/images/project-road.jpg",
     aboutBadge: "ODC & HEAVY HAULAGE",
     aboutHeading: "Safely Moving Oversized & Super-Heavy Cargo Across Complex Corridors.",
     aboutDescription: "Over Dimensional Cargo (ODC) requires specialized engineering, meticulous route planning, and robust heavy-haulage equipment. Arrowline Logistics specializes in transporting oversized industrial equipment, boilers, transformers, and structural components that exceed standard highway dimensions and weight limits. We manage everything from civil bridge surveys and statutory permits to multi-axle trailer deployment and escort coordination.",
@@ -453,7 +455,7 @@ const roadSubServices: SubServiceData[] = [
     heroHeadline: "Machinery & Industrial Cargo Transportation Services",
     heroSubheadline: "Damage-free transit for high-value factory production lines, CNC machines, transformers, pumps, and precision engineering goods.",
     heroBadge: "ROAD TRANSPORTATION • MACHINERY & INDUSTRIAL",
-    heroImage: "/images/road-transport.jpg",
+    heroImage: "/images/hero-trucks-city.jpg",
     aboutBadge: "MACHINERY TRANSPORTATION",
     aboutHeading: "Safeguarding High-Value Industrial Assets During Long-Haul Transit.",
     aboutDescription: "Industrial machinery and precision engineering assemblies require specialized handling, shock-absorbing transit protection, and customized securing. Arrowline Logistics provides dedicated road freight solutions tailored to industrial machinery manufacturers, factory relocations, and import capital goods movements. From crated CNC milling machines to heavy foundry equipment, we ensure zero vibration damage and on-time plant arrival.",
@@ -594,7 +596,7 @@ const railSubServices: SubServiceData[] = [
     heroHeadline: "Container Rail Transportation & ICD Connectivity",
     heroSubheadline: "Scheduled double-stack container rakes from Mundra Port to major inland dry ports for import and export containers.",
     heroBadge: "RAIL TRANSPORTATION • CONTAINER RAIL",
-    heroImage: "/images/rail-multimodal.jpg",
+    heroImage: "/images/project-port.jpg",
     aboutBadge: "CONTAINER RAIL LOGISTICS",
     aboutHeading: "Seamless Port-to-ICD Container Movement via Dedicated Freight Corridors.",
     aboutDescription: "Container rail transportation is the backbone of India's import-export supply chain, moving thousands of 20ft and 40ft containers daily from maritime terminals to inland trade hubs. Arrowline Logistics coordinates container rake movements between Mundra Port and Inland Container Depots (ICDs) across Delhi NCR, Rajasthan, Punjab, Haryana, and Uttar Pradesh. We eliminate port congestion and optimize long-haul container shipping economics.",
@@ -728,7 +730,7 @@ const railSubServices: SubServiceData[] = [
     heroHeadline: "Integrated Multimodal Rail & Road Transportation",
     heroSubheadline: "End-to-end multimodal supply chain pipelines seamlessly combining rail freight, highway trucking, and port handling.",
     heroBadge: "RAIL TRANSPORTATION • MULTIMODAL RAIL",
-    heroImage: "/images/rail-multimodal.jpg",
+    heroImage: "/images/hero-trucks-city.jpg",
     aboutBadge: "MULTIMODAL RAIL INTEGRATION",
     aboutHeading: "The Best of Both Worlds: Rail Cost Efficiency + Road Doorstep Delivery.",
     aboutDescription: "Pure rail transport moves heavy cargo between railheads, but businesses need door-to-door delivery. Arrowline's multimodal rail transportation integrates long-haul rail corridors with dedicated first-mile pickup and last-mile trucking. We take full single-window responsibility from origin factory floor to destination warehouse, managing all modal transfers, transshipments, and digital tracking.",
@@ -795,7 +797,7 @@ const railSubServices: SubServiceData[] = [
     heroHeadline: "Standardized Intermodal Rail Freight Solutions",
     heroSubheadline: "Zero cargo touchpoints during mode transfers using standardized ISO containers across sea, rail, and road networks.",
     heroBadge: "RAIL TRANSPORTATION • INTERMODAL FREIGHT",
-    heroImage: "/images/rail-multimodal.jpg",
+    heroImage: "/images/hero-logistics.jpg",
     aboutBadge: "INTERMODAL RAIL ADVANTAGE",
     aboutHeading: "Seamlessly Transitioning Standard Containers Across Ship, Rail & Highway.",
     aboutDescription: "Intermodal rail freight involves the movement of cargo in standardized containers or trailers across multiple modes of transportation without the cargo itself being handled during mode changes. Arrowline Logistics orchestrates intermodal supply chains connecting Mundra maritime terminals to inland rail corridors and highway delivery. This eliminates theft, contamination, and handling damage while maximizing transit velocity.",
@@ -862,7 +864,7 @@ const railSubServices: SubServiceData[] = [
     heroHeadline: "Bulk & Industrial Cargo Rail Transportation",
     heroSubheadline: "Heavy-tonnage rail freight solutions designed for raw material supply chains, metallurgical plants, and bulk commodity movements.",
     heroBadge: "RAIL TRANSPORTATION • BULK INDUSTRIAL",
-    heroImage: "/images/rail-multimodal.jpg",
+    heroImage: "/images/project-cargo.jpg",
     aboutBadge: "BULK RAIL LOGISTICS",
     aboutHeading: "Moving High-Tonnage Industrial Commodities with Maximum Rail Efficiency.",
     aboutDescription: "Heavy industry requires continuous, reliable raw material supply chains moving thousands of tons of bulk cargo without interruption. Arrowline Logistics specializes in bulk and industrial cargo rail logistics, connecting port bulk terminals and mining regions to industrial smelters, power plants, and manufacturing clusters across India. We manage open wagon rakes, covered bulk trains, and mechanized terminal transfer operations.",
@@ -936,7 +938,7 @@ const projectCargoSubServices: SubServiceData[] = [
     heroHeadline: "Heavy & ODC Cargo Transportation With Engineered Precision",
     heroSubheadline: "Hydraulic multi-axle trailers, technical route surveys, civil infrastructure reinforcement, and turn-key heavy haulage across India.",
     heroBadge: "PROJECT CARGO • HEAVY & ODC",
-    heroImage: "/images/project-cargo.jpg",
+    heroImage: "/images/project-road.jpg",
     aboutBadge: "HEAVY & ODC TRANSPORTATION",
     aboutHeading: "Safely Moving India's Heaviest & Largest Industrial Machinery.",
     aboutDescription: "Over Dimensional Cargo (ODC) and super-heavy project equipment demand specialized engineering, precision equipment selection, and rigorous safety coordination. Arrowline Logistics specializes in hauling super-heavy reactors, power transformers, wind turbine components, and industrial machinery across complex Indian road corridors. We handle everything from technical bridge load assessments to multi-axle hydraulic puller execution.",
@@ -1003,7 +1005,7 @@ const projectCargoSubServices: SubServiceData[] = [
     heroHeadline: "Breakbulk Cargo Transportation & Port Handling",
     heroSubheadline: "Efficient movement of non-containerized heavy and oversized project shipments from Mundra Port to project sites across India.",
     heroBadge: "PROJECT CARGO • BREAKBULK",
-    heroImage: "/images/project-cargo.jpg",
+    heroImage: "/images/project-port.jpg",
     aboutBadge: "BREAKBULK SPECIALIZATION",
     aboutHeading: "Handling Non-Containerized Project Freight With Total Control.",
     aboutDescription: "Not all industrial cargo fits into standard shipping containers. Breakbulk cargo—including bundled steel pipes, structural girders, large crated machinery, turbine shafts, and rail wagons—requires specialized port-side handling, dedicated rigging, and tailored trailer configurations. Arrowline Logistics provides comprehensive breakbulk management from vessel discharge at Mundra Port to final site delivery.",
@@ -1137,7 +1139,7 @@ const projectCargoSubServices: SubServiceData[] = [
     heroHeadline: "Multi-Axle & Special Trailer Heavy Haulage",
     heroSubheadline: "Specialized hydraulic axle lines, steerable modular pullers, and extendable beam trailers engineered for India's heaviest freight.",
     heroBadge: "PROJECT CARGO • MULTI-AXLE & SPECIAL",
-    heroImage: "/images/project-cargo.jpg",
+    heroImage: "/images/road-transport.jpg",
     aboutBadge: "SPECIAL TRAILER FLEET",
     aboutHeading: "Engineering Extreme Load Distribution With Modular Hydraulic Axles.",
     aboutDescription: "When single-piece cargo weight exceeds 50 to 300+ Metric Tons, standard commercial trucks are incapable of carrying the load. Arrowline Logistics deploys specialized hydraulic modular multi-axle trailers (Goldhofer / Scheuerle technology) where each axle line features hydraulic suspension and independent steering. This allows us to navigate sharp turns, negotiate uneven terrain, and distribute immense weight safely across road bridges.",
@@ -1204,7 +1206,7 @@ const projectCargoSubServices: SubServiceData[] = [
     heroHeadline: "End-to-End Project Logistics & Turnkey Management",
     heroSubheadline: "Complete single-source logistics execution for capital projects, EPC contracts, industrial plant setups, and infrastructure developments.",
     heroBadge: "PROJECT CARGO • END-TO-END",
-    heroImage: "/images/project-cargo.jpg",
+    heroImage: "/images/hero-logistics.jpg",
     aboutBadge: "TURNKEY PROJECT MANAGEMENT",
     aboutHeading: "Managing Every Logistics Variable From Port of Entry to Final Commissioning.",
     aboutDescription: "Industrial capital projects involve hundreds of moving parts—from ocean charters and customs clearance at Mundra Port to specialized heavy haulage, laydown yard management, and crane rigging at site. Arrowline Logistics acts as a single-source project logistics partner, taking total operational accountability for delivering entire industrial plants on schedule and within budget.",
@@ -1479,7 +1481,7 @@ const warehousingSubServices: SubServiceData[] = [
     heroHeadline: "Container Storage & Yard Handling Solutions",
     heroSubheadline: "Secure off-dock container yard facilities near Mundra Port offering reach stacker handling, container storage, and de-stuffing.",
     heroBadge: "WAREHOUSING • CONTAINER HANDLING",
-    heroImage: "/images/project-warehouse.jpg",
+    heroImage: "/images/project-port.jpg",
     aboutBadge: "CONTAINER YARD & HANDLING",
     aboutHeading: "Optimizing Container Flow Near Mundra Port to Eliminate Demurrage.",
     aboutDescription: "High container terminal ground rent and shipping line detention fees can rapidly erode profit margins. Arrowline Logistics operates secure off-dock container storage and handling facilities located immediately outside Mundra Port. Equipped with heavy-duty reach stackers and skilled container handlers, our yard provides safe container staging, professional stuffing/de-stuffing, and empty box management.",
@@ -1546,7 +1548,7 @@ const warehousingSubServices: SubServiceData[] = [
     heroHeadline: "Professional Cargo Loading & Unloading Services",
     heroSubheadline: "Safe, mechanized cargo handling using modern forklifts, cranes, dock levelers, and experienced rigging crews.",
     heroBadge: "WAREHOUSING • LOADING & UNLOADING",
-    heroImage: "/images/project-warehouse.jpg",
+    heroImage: "/images/truck-fleet-yard.jpg",
     aboutBadge: "CARGO HANDLING EXPERTISE",
     aboutHeading: "Precision Handling Protocols Protecting Your Cargo at Every Transition.",
     aboutDescription: "The physical transfer of cargo between transport vehicles and storage facilities represents the moment of highest risk for handling damage. Arrowline Logistics provides professional, mechanized loading and unloading operations supported by experienced equipment operators and rigorous safety protocols. Whether handling palletized consumer goods, delicate drums, or heavy machinery, we guarantee safe, damage-free execution.",

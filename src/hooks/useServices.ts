@@ -1,10 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabaseClient';
 import {
   getAllMainServices,
   getMainServiceBySlug,
   getSubServiceBySlug,
-  getAllSubServices,
   MainServiceData,
   SubServiceData,
 } from '../data/servicesData';
@@ -16,41 +14,21 @@ export const useServices = () => {
   const [mainServices, setMainServices] = useState<MainServiceData[]>(getAllMainServices());
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [source, setSource] = useState<'supabase' | 'fallback'>('fallback');
+  const [source, setSource] = useState<'api' | 'fallback'>('fallback');
 
   const fetchServices = useCallback(async () => {
     try {
       setLoading(true);
 
-      if (!supabase) {
-        console.warn('[useServices] Supabase client not configured; using static data fallback.');
-        setMainServices(getAllMainServices());
-        setSource('fallback');
-        setLoading(false);
-        return;
-      }
-
-      // Fetch published services from Supabase
-      const { data: servicesData, error: servicesError } = await supabase
-        .from('services')
-        .select('*')
-        .eq('is_published', true)
-        .order('display_order');
-
-      if (servicesError) throw servicesError;
-
-      // Fetch published service items from Supabase
-      const { data: serviceItemsData, error: serviceItemsError } = await supabase
-        .from('service_items')
-        .select('*')
-        .eq('is_published', true)
-        .order('display_order');
-
-      if (serviceItemsError) throw serviceItemsError;
+      // Fetch published services and items from the Express public API.
+      const [servicesData, serviceItemsData] = await Promise.all([
+        contentService.getServices(),
+        contentService.getServiceItems(),
+      ]);
 
       if (servicesData && servicesData.length > 0) {
-        setServices(servicesData as Service[]);
-        setServiceItems((serviceItemsData || []) as ServiceItem[]);
+        setServices(servicesData);
+        setServiceItems(serviceItemsData || []);
 
         // Transform into rich MainServiceData objects
         const richList: MainServiceData[] = await Promise.all(
@@ -61,17 +39,17 @@ export const useServices = () => {
         );
 
         setMainServices(richList.filter(Boolean));
-        setSource('supabase');
+        setSource('api');
         setError(null);
       } else {
-        // Fallback to static data if no database rows
-        console.info('[useServices] Supabase returned 0 services; using static fallback.');
+        // Fallback to static data if no API rows
+        console.info('[useServices] API returned 0 services; using static fallback.');
         setMainServices(getAllMainServices());
         setSource('fallback');
       }
     } catch (err: any) {
-      console.warn('[useServices] Error fetching from Supabase, using static fallback:', err);
-      setError(err.message || 'Error fetching services from database');
+      console.warn('[useServices] Error fetching services, using static fallback:', err);
+      setError(err.message || 'Error fetching services from API');
       setMainServices(getAllMainServices());
       setSource('fallback');
     } finally {

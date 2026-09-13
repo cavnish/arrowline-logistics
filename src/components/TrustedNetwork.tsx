@@ -18,13 +18,14 @@ export default function TrustedNetwork() {
 
   useEffect(() => {
     const fetchPartners = async () => {
+      const apiUrl = ((import.meta as any).env?.VITE_API_URL || "").trim().replace(/\/$/, "");
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/trusted-network`);
+        const response = await axios.get(`${apiUrl}/api/trusted-network`);
         if (response.data.success) {
           setPartners(response.data.data);
         }
       } catch (error) {
-        console.error("Error fetching partners:", error);
+        console.error("Error fetching trusted network:", error);
       } finally {
         setLoading(false);
       }
@@ -55,6 +56,8 @@ export default function TrustedNetwork() {
                       <img 
                         src={partner.logo} 
                         alt={`${partner.name} logo`} 
+                        loading="lazy"
+                        decoding="async"
                         className="max-h-full max-w-[150px] object-contain"
                       />
                     </div>

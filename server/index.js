@@ -1,5 +1,9 @@
 import "dotenv/config";
 
+import path from "node:path";
+import fs from "node:fs";
+import { fileURLToPath } from "node:url";
+
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -12,6 +16,11 @@ import { sendLeadNotifications } from "./services/emailService.js";
 const app = express();
 
 const PORT = process.env.PORT || 5000;
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const distDir = path.join(__dirname, "..", "dist");
+const hasDist =
+  fs.existsSync(path.join(distDir, "index.html"));
 
 // SUPABASE
 
@@ -40,6 +49,10 @@ const supabase = createClient(
 
 app.use(express.json({ limit: "50kb" }));
 app.use(cookieParser());
+
+// Trust the reverse proxy one hop (Nginx on Hostinger) so rate limiting and
+// lead IP audit see the real client IP via X-Forwarded-For.
+app.set("trust proxy", 1);
 
 const corsOrigins = (
   process.env.CORS_ORIGIN ||
@@ -149,6 +162,10 @@ function validateLead(body) {
 // PUBLIC
 
 app.get("/", (_req, res) => {
+  if (hasDist) {
+    res.setHeader("Cache-Control", "no-cache");
+    return res.sendFile(path.join(distDir, "index.html"));
+  }
   res.json({
     service:
       "Arrowline Logistics API",
@@ -303,6 +320,51 @@ app.get("/api/industries", async (_req, res) => {
   if (error) {
     console.error("Public industries error:", error);
     return res.status(500).json({ success: false, message: "Unable to load industries" });
+  }
+
+  return res.json({ success: true, data: data || [] });
+});
+
+app.get("/api/clients", async (_req, res) => {
+  const { data, error } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("is_published", true)
+    .order("display_order", { ascending: true });
+
+  if (error) {
+    console.error("Public clients error:", error);
+    return res.status(500).json({ success: false, message: "Unable to load clients" });
+  }
+
+  return res.json({ success: true, data: data || [] });
+});
+
+app.get("/api/trusted-network", async (_req, res) => {
+  const { data, error } = await supabase
+    .from("trusted_network")
+    .select("*")
+    .eq("is_published", true)
+    .order("display_order", { ascending: true });
+
+  if (error) {
+    console.error("Public trusted-network error:", error);
+    return res.status(500).json({ success: false, message: "Unable to load trusted network" });
+  }
+
+  return res.json({ success: true, data: data || [] });
+});
+
+app.get("/api/service-items", async (_req, res) => {
+  const { data, error } = await supabase
+    .from("service_items")
+    .select("*")
+    .eq("is_published", true)
+    .order("display_order", { ascending: true });
+
+  if (error) {
+    console.error("Public service-items error:", error);
+    return res.status(500).json({ success: false, message: "Unable to load service items" });
   }
 
   return res.json({ success: true, data: data || [] });
@@ -482,6 +544,29 @@ app.post(
 app.use("/api/admin", adminRouter);
 
 // =====================================================
+// FRONTEND (production build hosted alongside the API)
+// =====================================================
+
+if (hasDist) {
+  app.use(
+    express.static(distDir, {
+      index: false,
+      setHeaders(res, filePath) {
+        if (filePath.includes(`${path.sep}assets${path.sep}`)) {
+          res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        }
+      },
+    })
+  );
+
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api/")) return next();
+    res.setHeader("Cache-Control", "no-cache");
+    res.sendFile(path.join(distDir, "index.html"));
+  });
+}
+
+// =====================================================
 // 404  
 // =====================================================
 
@@ -500,6 +585,27 @@ app.use(
 
 app.use(
   (err, _req, res, _next) => {
+    if (
+      err?.type === "entity.parse.failed" ||
+      (err instanceof SyntaxError &&
+        err?.status === 400 &&
+        "body" in err)
+    ) {
+      return res.status(400).json({
+        ok: false,
+        error: "Malformed JSON body",
+      });
+    }
+
+    if (
+      err?.type === "entity.too.large"
+    ) {
+      return res.status(413).json({
+        ok: false,
+        error: "Request body too large",
+      });
+    }
+
     console.error(
       "❌ Unhandled error:",
       err

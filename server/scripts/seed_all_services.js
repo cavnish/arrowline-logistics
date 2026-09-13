@@ -1,10 +1,15 @@
+import 'dotenv/config';
 import pg from 'pg';
 const { Client } = pg;
 import { getAllMainServices } from '../../src/data/servicesData.ts';
 
-const connStr = 'postgresql://postgres.vsbircholpdlhyznlrgi:Arrowline%401234@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres';
+const connStr = process.env.DATABASE_URL || '';
 
 async function seed() {
+  if (!connStr) {
+    console.error('DATABASE_URL is not set in server/.env');
+    process.exit(1);
+  }
   console.log('Connecting to database...');
   const client = new Client({
     connectionString: connStr,

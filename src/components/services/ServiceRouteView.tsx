@@ -7,7 +7,7 @@ import {
 } from "../../data/servicesData";
 import { contentService } from "../../services/contentService";
 import ServicePageTemplate from "./ServicePageTemplate";
-import { ArrowRight, AlertCircle, RefreshCw } from "lucide-react";
+import { ArrowRight, AlertCircle } from "lucide-react";
 
 interface ServiceRouteViewProps {
   slug: string;

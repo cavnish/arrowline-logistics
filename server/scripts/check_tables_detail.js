@@ -1,13 +1,18 @@
+import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://vsbircholpdlhyznlrgi.supabase.co';
-const supabaseServiceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzYmlyY2hvbHBkbGh5em5scmdpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NzQ5NDU3MSwiZXhwIjoyMTAzMDcwNTcxfQ.q2Usht9aYcuqQIGBSgJQlyeYercJTZ-Y-xJcY6zfxaQ';
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
   auth: { persistSession: false }
 });
 
 async function main() {
+  if (!supabaseUrl || !supabaseServiceRoleKey) {
+    console.error('SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are not set in server/.env');
+    process.exit(1);
+  }
   const tables = ['service_items', 'service_faqs', 'service_process_steps', 'service_industries', 'service_item_industries'];
   for (const t of tables) {
     const { data, error } = await supabase.from(t).select('*').limit(1);

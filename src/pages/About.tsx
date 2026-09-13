@@ -1,5 +1,4 @@
 import { COMPANY_DETAILS, TEAM_MEMBERS } from "../data/logisticsData";
-import InteractiveMap from "../components/InteractiveMap";
 import SEOMeta from "../components/SEOMeta";
 import Reveal from "../components/Reveal";
 import CountUp from "../components/CountUp";
@@ -452,28 +451,6 @@ export default function About() {
             })}
           </div>
         </div>
-      </section>
-
-      {/* ============================================================
-          SECTION 7 — Interactive India Map
-          ============================================================ */}
-      <section className="space-y-6">
-        <Reveal className="space-y-2 max-w-2xl">
-          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600">
-            <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full" />
-            NETWORK COVERAGE
-          </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#1E3A8A] leading-tight">
-            Our Regional <span className="text-[#FF7A00]">Operative Centers</span> in India
-          </h2>
-          <p className="text-sm text-slate-600 leading-relaxed">
-            Connecting coastal terminals, rail junctions, and national expressways, we
-            keep containers moving smoothly across the length and breadth of India.
-          </p>
-        </Reveal>
-        <Reveal direction="scale">
-          <InteractiveMap />
-        </Reveal>
       </section>
 
       {/* ============================================================

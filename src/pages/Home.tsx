@@ -6,14 +6,11 @@ import ServicesSection from "../components/ServicesSection";
 import WhyChooseUsSection from "../components/WhyChooseUsSection";
 import ProcessSection from "../components/ProcessSection";
 import IndustriesPreviewBar from "../components/IndustriesPreviewBar";
-// import InteractiveMap from "../components/InteractiveMap";
 import TestimonialsSection from "../components/TestimonialsSection";
 import FAQSection from "../components/FAQSection";
 import TrackTraceBar from "../components/TrackTraceBar";
 import ArrowlineLogo from "../components/ArrowlineLogo";
 import { Sparkles } from "lucide-react";
-import InteractiveMap from "../components/InteractiveMap";
-import Reveal from "../components/Reveal";
 
 interface HomeProps {
   onOpenQuote: () => void;
@@ -63,9 +60,7 @@ export default function Home({
       />
 
       {/* 5. Why Choose Arrowline */}
-      <WhyChooseUsSection
-        onOpenQuote={onOpenQuote}
-      />
+      <WhyChooseUsSection />
 
       {/* 6. Process */}
       <ProcessSection />
@@ -77,16 +72,7 @@ export default function Home({
         }
       />
 
-      {/* 8. India Coverage Map */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-[#F5F8FA] border-t border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal direction="scale">
-            <InteractiveMap />
-          </Reveal>
-        </div>
-      </section>
-
-      {/* 9. Testimonials */}
+      {/* 8. Testimonials */}
       <TestimonialsSection />
 
       {/* 10. FAQ */}
