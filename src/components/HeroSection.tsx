@@ -1,6 +1,7 @@
 import { useState, useEffect, type CSSProperties } from "react";
 import { ArrowRight, ChevronDown, Play } from "lucide-react";
 import { useSiteContent } from "../hooks/useSiteContent";
+import SmartImage from "./ui/SmartImage";
 
 interface HeroSectionProps {
   onOpenQuote: () => void;
@@ -41,8 +42,8 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
     >
       {/* ── BG photo + overlays ── */}
       <div className="absolute inset-0 z-0">
-        <img
-          src={content("hero_image", "/images/hero-logistics.jpg")}
+        <SmartImage
+          src={content("hero_image", "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg")}
           alt="Arrowline Logistics — India's premier multimodal network"
           className="w-full h-full object-cover object-center"
           style={{
@@ -150,23 +151,6 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
               </button>
             </div>
 
-            {/* Contact row
-            <div style={anim(loaded, 510)} className="flex flex-col sm:flex-row gap-4 pt-1">
-              <a
-                href="tel:+919021179108"
-                className="inline-flex items-center gap-2 text-white/60 hover:text-[#FF6B1A] text-sm transition-colors group"
-              >
-                <Phone className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                <span className="font-medium">+91 90211 79108</span>
-              </a>
-              <span className="hidden sm:block text-white/20">|</span>
-              <a
-                href="mailto:mundra@arrowlinelogistics.in"
-                className="text-white/60 hover:text-[#FF6B1A] text-sm transition-colors font-medium"
-              >
-                mundra@arrowlinelogistics.in
-              </a>
-            </div> */}
           </div>
 
         </div>

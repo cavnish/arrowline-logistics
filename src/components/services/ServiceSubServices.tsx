@@ -1,5 +1,6 @@
 import { ChevronRight, Check } from "lucide-react";
 import Reveal from "../Reveal";
+import SmartImage from "../ui/SmartImage";
 import { SubServiceData } from "../../data/servicesData";
 import { getOptimizedImageUrl, buildImageAlt } from "../../utils/imageUrl";
 
@@ -123,10 +124,9 @@ export default function ServiceSubServices({
                 >
                   {/* Image Frame */}
                   <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-                    <img
-                      src={getOptimizedImageUrl(sub.heroImage || sub.aboutImage || "/images/road-transport.jpg", { width: 800 })}
+                    <SmartImage
+                      src={getOptimizedImageUrl(sub.heroImage || sub.aboutImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg", { width: 800 })}
                       alt={sub.imageAlt || buildImageAlt(sub.title, sub.parentName)}
-                      loading="lazy"
                       width={800}
                       height={500}
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"

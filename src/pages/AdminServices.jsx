@@ -11,6 +11,7 @@ import {
   Eye,
   CheckCircle2,
   ChevronDown,
+  ChevronUp,
   ChevronRight,
   Upload,
   Globe,
@@ -41,7 +42,7 @@ function snakeToCamel(value) {
 function serviceRowToForm(record = {}) {
   const out = {};
   for (const [key, value] of Object.entries(record)) {
-    if (key === "service_items" || key === "sub_services_count") continue;
+    if (key === "service_items") continue;
     out[snakeToCamel(key)] = value;
   }
   if (Array.isArray(record.subServices)) {
@@ -71,6 +72,14 @@ export default function AdminServices() {
   const [isUploading, setIsUploading] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [loadError, setLoadError] = useState(null);
+
+  // State: Relational Visual Showcase + Cargo & Applications (per entity)
+  const [showcaseRows, setShowcaseRows] = useState([]);
+  const [cargoRows, setCargoRows] = useState([]);
+  const [showcaseLoading, setShowcaseLoading] = useState(false);
+  const [cargoLoading, setCargoLoading] = useState(false);
+  const [showcaseLoaded, setShowcaseLoaded] = useState(false);
+  const [cargoLoaded, setCargoLoaded] = useState(false);
 
   // Load Services on Mount
   const loadServices = async () => {
@@ -143,6 +152,7 @@ export default function AdminServices() {
     setEditType("main");
     setFormData(JSON.parse(JSON.stringify(service)));
     setActiveTab("general");
+    resetEntityLinkage();
     setIsEditing(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -156,6 +166,7 @@ export default function AdminServices() {
       parentName: parent?.title || "Main Service",
     });
     setActiveTab("general");
+    resetEntityLinkage();
     setIsEditing(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -173,15 +184,15 @@ export default function AdminServices() {
       heroHeadline: "",
       heroSubheadline: "",
       heroDescription: "",
-      heroImage: "/images/road-transport.jpg",
+      heroImage: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
       heroVideo: "",
-      heroFallbackImage: "/images/road-transport.jpg",
+      heroFallbackImage: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
       highlights: ["Pan-India Coverage", "GPS Telemetry", "24/7 Operations", "Port Clearance"],
       aboutBadge: "ABOUT THE SERVICE",
       aboutHeading: "",
       aboutDescription: "",
       aboutBulletPoints: ["Pan-India container & fleet transit", "Direct Mundra Port gate synchronization"],
-      aboutImage: "/images/road-transport.jpg",
+      aboutImage: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
       whyArrowline: [
         { number: "01", title: "Port Hub Access", desc: "Anchored directly at Mundra Port." },
         { number: "02", title: "Dedicated Fleet", desc: "Modern GPS-tracked vehicles." },
@@ -191,7 +202,7 @@ export default function AdminServices() {
         { step: "02", title: "Corridor Clearance", desc: "Route survey and vehicle positioning." },
       ],
       applications: [
-        { title: "Industrial Machinery", desc: "Engineered heavy lift handling.", image: "/images/road-transport.jpg" },
+        { title: "Industrial Machinery", desc: "Engineered heavy lift handling.", image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg" },
       ],
       industries: ["Manufacturing", "Engineering", "Automotive", "Energy & Power"],
       networkDescription: "Connecting ports, factories, warehouses and project sites through specialized transit.",
@@ -200,7 +211,7 @@ export default function AdminServices() {
       ],
       gallery: [],
       videoUrl: "",
-      videoPoster: "",
+      videoPoster: "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg",
       ctaHeadline: "Move Your Cargo With Confidence",
       seoTitle: "",
       seoDesc: "",
@@ -209,6 +220,7 @@ export default function AdminServices() {
       subServices: [],
     });
     setActiveTab("general");
+    resetEntityLinkage();
     setIsEditing(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -228,14 +240,14 @@ export default function AdminServices() {
       heroHeadline: "",
       heroSubheadline: "",
       heroBadge: `${(parent?.title || "ARROWLINE").toUpperCase()} • SPECIALIZED SERVICE`,
-      heroImage: "/images/road-transport.jpg",
+      heroImage: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
       heroVideo: "",
-      heroFallbackImage: "/images/road-transport.jpg",
+      heroFallbackImage: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
       aboutBadge: "SPECIALIZED CAPABILITY",
       aboutHeading: "",
       aboutDescription: "",
       aboutBulletPoints: ["Specialized chassis configuration", "Direct port-to-consignee dispatch"],
-      aboutImage: "/images/road-transport.jpg",
+      aboutImage: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
       capabilities: [
         { title: "Operational Scope", desc: "Configured for schedule adherence and freight integrity." },
       ],
@@ -248,7 +260,7 @@ export default function AdminServices() {
         { step: "02", title: "Trailer Placement", desc: "Chassis deployment at loading station." },
       ],
       applications: [
-        { title: "Standard Cargo", desc: "High integrity freight haulage.", image: "/images/road-transport.jpg" },
+        { title: "Standard Cargo", desc: "High integrity freight haulage.", image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg" },
       ],
       industries: ["Manufacturing", "Steel & Metals", "Engineering"],
       faqs: [
@@ -256,7 +268,7 @@ export default function AdminServices() {
       ],
       gallery: [],
       videoUrl: "",
-      videoPoster: "",
+      videoPoster: "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg",
       ctaHeadline: "Move Your Specialized Cargo With Confidence",
       seoTitle: "",
       seoDesc: "",
@@ -264,6 +276,7 @@ export default function AdminServices() {
       displayOrder: (parent?.subServices?.length || 0) + 1,
     });
     setActiveTab("general");
+    resetEntityLinkage();
     setIsEditing(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -363,6 +376,7 @@ export default function AdminServices() {
       uploadData.append("file", file);
       uploadData.append("folder", editType === "main" ? "services" : "sub-services");
       if (formData.slug) uploadData.append("slug", formData.slug);
+      if (editType !== "main" && formData.parentSlug) uploadData.append("parentSlug", formData.parentSlug);
 
       const res = await adminApi.post("/media", uploadData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -416,6 +430,302 @@ export default function AdminServices() {
     const current = [...(formData[field] || [])];
     current.splice(index, 1);
     setFormData((prev) => ({ ...prev, [field]: current }));
+  };
+
+  const moveArrayItem = (field, index, direction) => {
+    const current = [...(formData[field] || [])];
+    const target = index + direction;
+    if (target < 0 || target >= current.length) return;
+    const [item] = current.splice(index, 1);
+    current.splice(target, 0, item);
+    setFormData((prev) => ({ ...prev, [field]: current }));
+  };
+
+  // -------------------------------------------------------------
+  // Visual Showcase + Cargo & Applications (relational tables)
+  // -------------------------------------------------------------
+  const entityIsSaved = () => !!(formData.id && UUID_PATTERN.test(formData.id));
+
+  const entityOwner = () =>
+    editType === "main"
+      ? { service_id: formData.id }
+      : { service_item_id: formData.id };
+
+  const loadShowcaseRows = async (force = false) => {
+    if (!entityIsSaved() || (showcaseLoaded && !force)) return;
+    setShowcaseLoading(true);
+    try {
+      const res = await adminApi.get("/showcase", { params: entityOwner() });
+      const rows = res.data?.data || [];
+      setShowcaseRows(rows);
+      setShowcaseLoaded(true);
+    } catch (err) {
+      showToast(err?.response?.data?.message || "Failed to load Visual Showcase", "error");
+    } finally {
+      setShowcaseLoading(false);
+    }
+  };
+
+  const loadCargoRows = async (force = false) => {
+    if (!entityIsSaved() || (cargoLoaded && !force)) return;
+    setCargoLoading(true);
+    try {
+      const res = await adminApi.get("/cargo-applications", { params: entityOwner() });
+      const rows = res.data?.data || [];
+      setCargoRows(rows);
+      setCargoLoaded(true);
+    } catch (err) {
+      showToast(err?.response?.data?.message || "Failed to load Cargo & Applications", "error");
+    } finally {
+      setCargoLoading(false);
+    }
+  };
+
+  const openShowcaseTab = () => {
+    setActiveTab("showcase");
+    if (entityIsSaved() && !showcaseLoaded) loadShowcaseRows();
+  };
+
+  const openCargoTab = () => {
+    setActiveTab("cargo");
+    if (entityIsSaved() && !cargoLoaded) loadCargoRows();
+  };
+
+  const resetEntityLinkage = () => {
+    setShowcaseRows([]);
+    setCargoRows([]);
+    setShowcaseLoaded(false);
+    setCargoLoaded(false);
+  };
+
+  // Showcase row helpers
+  const addShowcaseRow = () => {
+    if (!entityIsSaved()) {
+      showToast("Save the service/sub-service first, then add Visual Showcase images.", "error");
+      return;
+    }
+    setShowcaseRows((prev) => [
+      ...prev,
+      { id: "", title: "Operations Image", caption: "", alt_text: "", image_url: "", image_public_id: "", image_format: "", image_width: null, image_height: null, is_published: true },
+    ]);
+  };
+
+  const updateShowcaseRow = (index, key, value) => {
+    setShowcaseRows((prev) => {
+      const next = [...prev];
+      next[index] = { ...(next[index] || {}), [key]: value };
+      return next;
+    });
+  };
+
+  const moveShowcaseRow = (index, direction) => {
+    setShowcaseRows((prev) => {
+      const next = [...prev];
+      const target = index + direction;
+      if (target < 0 || target >= next.length) return prev;
+      const [item] = next.splice(index, 1);
+      next.splice(target, 0, item);
+      return next;
+    });
+  };
+
+  const toggleShowcaseRow = (index) =>
+    updateShowcaseRow(index, "is_published", !(showcaseRows[index]?.is_published));
+
+  const deleteShowcaseRow = async (index) => {
+    const row = showcaseRows[index];
+    if (!row) return;
+    if (row.id && UUID_PATTERN.test(row.id)) {
+      try {
+        await adminApi.delete(`/showcase/${row.id}`);
+        showToast("Showcase image deleted (Cloudinary asset removed).");
+      } catch (err) {
+        showToast(err?.response?.data?.message || "Failed to delete showcase image", "error");
+        return;
+      }
+    }
+    setShowcaseRows((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const uploadShowcaseFile = async (e, index) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", formData.slug ? `services/${formData.slug}/showcase` : "visual-showcase");
+      const res = await adminApi.post("/media", fd, { headers: { "Content-Type": "multipart/form-data" } });
+      const up = res.data?.data;
+      if (!up?.url) throw new Error("No URL returned");
+      updateShowcaseRow(index, "image_url", up.url);
+      updateShowcaseRow(index, "image_public_id", up.public_id || null);
+      updateShowcaseRow(index, "image_format", up.format || null);
+      updateShowcaseRow(index, "image_width", up.width || null);
+      updateShowcaseRow(index, "image_height", up.height || null);
+      showToast("Showcase image uploaded to Cloudinary!");
+    } catch (err) {
+      showToast(err?.response?.data?.message || "Showcase image upload failed", "error");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const buildShowcasePayload = (row, index) => ({
+    title: row.title || "",
+    caption: row.caption || "",
+    alt_text: row.alt_text || "",
+    image_url: row.image_url || "",
+    image_public_id: row.image_public_id || null,
+    image_format: row.image_format || null,
+    image_width: row.image_width || null,
+    image_height: row.image_height || null,
+    display_order: index,
+    is_published: row.is_published === false ? false : true,
+    ...entityOwner(),
+  });
+
+  const saveShowcaseAll = async (e) => {
+    if (e) e.preventDefault();
+    if (!entityIsSaved()) {
+      showToast("Save the service/sub-service first, then manage Visual Showcase.", "error");
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const updated = [...showcaseRows];
+      for (let i = 0; i < updated.length; i++) {
+        const payload = buildShowcasePayload(updated[i], i);
+        if (updated[i].id && UUID_PATTERN.test(updated[i].id)) {
+          const res = await adminApi.patch(`/showcase/${updated[i].id}`, payload);
+          updated[i] = res.data.data;
+        } else {
+          const res = await adminApi.post("/showcase", payload);
+          updated[i] = res.data.data;
+        }
+      }
+      setShowcaseRows(updated);
+      showToast("Visual Showcase saved successfully!");
+    } catch (err) {
+      showToast(err?.response?.data?.message || "Failed to save Visual Showcase", "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Cargo & Applications row helpers
+  const addCargoRow = () => {
+    if (!entityIsSaved()) {
+      showToast("Save the service/sub-service first, then add cargo applications.", "error");
+      return;
+    }
+    setCargoRows((prev) => [
+      ...prev,
+      { id: "", title: "", description: "", alt_text: "", image_url: "", image_public_id: "", image_format: "", image_width: null, image_height: null, is_published: true },
+    ]);
+  };
+
+  const updateCargoRow = (index, key, value) => {
+    setCargoRows((prev) => {
+      const next = [...prev];
+      next[index] = { ...(next[index] || {}), [key]: value };
+      return next;
+    });
+  };
+
+  const moveCargoRow = (index, direction) => {
+    setCargoRows((prev) => {
+      const next = [...prev];
+      const target = index + direction;
+      if (target < 0 || target >= next.length) return prev;
+      const [item] = next.splice(index, 1);
+      next.splice(target, 0, item);
+      return next;
+    });
+  };
+
+  const toggleCargoRow = (index) =>
+    updateCargoRow(index, "is_published", !(cargoRows[index]?.is_published));
+
+  const deleteCargoRow = async (index) => {
+    const row = cargoRows[index];
+    if (!row) return;
+    if (row.id && UUID_PATTERN.test(row.id)) {
+      try {
+        await adminApi.delete(`/cargo-applications/${row.id}`);
+        showToast("Cargo application deleted (Cloudinary asset removed).");
+      } catch (err) {
+        showToast(err?.response?.data?.message || "Failed to delete cargo application", "error");
+        return;
+      }
+    }
+    setCargoRows((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const uploadCargoFile = async (e, index) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", formData.slug ? `services/${formData.slug}/cargo` : "cargo-applications");
+      const res = await adminApi.post("/media", fd, { headers: { "Content-Type": "multipart/form-data" } });
+      const up = res.data?.data;
+      if (!up?.url) throw new Error("No URL returned");
+      updateCargoRow(index, "image_url", up.url);
+      updateCargoRow(index, "image_public_id", up.public_id || null);
+      updateCargoRow(index, "image_format", up.format || null);
+      updateCargoRow(index, "image_width", up.width || null);
+      updateCargoRow(index, "image_height", up.height || null);
+      showToast("Cargo image uploaded to Cloudinary!");
+    } catch (err) {
+      showToast(err?.response?.data?.message || "Cargo image upload failed", "error");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const buildCargoPayload = (row, index) => ({
+    title: row.title || "",
+    description: row.description || "",
+    alt_text: row.alt_text || "",
+    image_url: row.image_url || null,
+    image_public_id: row.image_public_id || null,
+    image_format: row.image_format || null,
+    image_width: row.image_width || null,
+    image_height: row.image_height || null,
+    display_order: index,
+    is_published: row.is_published === false ? false : true,
+    ...entityOwner(),
+  });
+
+  const saveCargoAll = async (e) => {
+    if (e) e.preventDefault();
+    if (!entityIsSaved()) {
+      showToast("Save the service/sub-service first, then manage Cargo & Applications.", "error");
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const updated = [...cargoRows];
+      for (let i = 0; i < updated.length; i++) {
+        const payload = buildCargoPayload(updated[i], i);
+        if (updated[i].id && UUID_PATTERN.test(updated[i].id)) {
+          const res = await adminApi.patch(`/cargo-applications/${updated[i].id}`, payload);
+          updated[i] = res.data.data;
+        } else {
+          const res = await adminApi.post("/cargo-applications", payload);
+          updated[i] = res.data.data;
+        }
+      }
+      setCargoRows(updated);
+      showToast("Cargo & Applications saved successfully!");
+    } catch (err) {
+      showToast(err?.response?.data?.message || "Failed to save Cargo & Applications", "error");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // -------------------------------------------------------------
@@ -536,9 +846,10 @@ export default function AdminServices() {
                 icon: Layers,
               },
               { id: "media", label: "Gallery & Video", icon: Video },
+              { id: "showcase", label: "Visual Showcase", icon: ImageIcon },
               { id: "why", label: "Why Arrowline", icon: Shield },
               { id: "process", label: "Process Steps", icon: Clock },
-              { id: "applications", label: "Applications", icon: Briefcase },
+              { id: "applications", label: "Cargo & Applications", icon: Briefcase },
               { id: "industries", label: "Industries", icon: Globe },
               { id: "faq", label: "FAQ", icon: HelpCircle },
               { id: "seo", label: "SEO / GEO / AEO", icon: Sparkles },
@@ -549,7 +860,11 @@ export default function AdminServices() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {
+                    if (tab.id === "showcase") openShowcaseTab();
+                    else if (tab.id === "cargo") openCargoTab();
+                    else setActiveTab(tab.id);
+                  }}
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     isActive
                       ? "bg-[#062B3A] text-white shadow-xs"
@@ -756,7 +1071,7 @@ export default function AdminServices() {
                         type="text"
                         value={formData.heroImage || ""}
                         onChange={(e) => updateField("heroImage", e.target.value)}
-                        placeholder="/images/road-transport.jpg or URL"
+                        placeholder="https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg or URL"
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-mono"
                       />
                       <label className="inline-flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-[#062B3A] text-xs font-bold rounded-xl cursor-pointer">
@@ -841,7 +1156,7 @@ export default function AdminServices() {
                           type="text"
                           value={formData.heroFallbackImage || ""}
                           onChange={(e) => updateField("heroFallbackImage", e.target.value)}
-                          placeholder="/images/road-transport.jpg"
+                          placeholder="https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg"
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-mono"
                         />
                       </div>
@@ -956,6 +1271,15 @@ export default function AdminServices() {
                         />
                       </label>
                     </div>
+                    {formData.aboutImage && (
+                      <div className="aspect-[16/9] rounded-xl overflow-hidden border border-slate-200 bg-slate-100 mt-2">
+                        <img
+                          src={formData.aboutImage}
+                          alt="About Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1114,7 +1438,7 @@ export default function AdminServices() {
                     onClick={() =>
                       addArrayItem("gallery", {
                         id: `gal-${Date.now()}`,
-                        url: "/images/road-transport.jpg",
+                        url: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
                         title: "Operations Image",
                         caption: "Cargo handling at Mundra facility",
                       })
@@ -1136,13 +1460,33 @@ export default function AdminServices() {
                         <span className="text-xs font-bold text-slate-600">
                           Image 0{idx + 1}
                         </span>
-                        <button
-                          type="button"
-                          onClick={() => removeArrayItem("gallery", idx)}
-                          className="text-rose-600 hover:bg-rose-50 p-1 rounded cursor-pointer"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => moveArrayItem("gallery", idx, -1)}
+                            disabled={idx === 0}
+                            className="p-1 rounded text-slate-500 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                            aria-label="Move image up"
+                          >
+                            <ChevronUp className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveArrayItem("gallery", idx, 1)}
+                            disabled={idx === (formData.gallery || []).length - 1}
+                            className="p-1 rounded text-slate-500 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                            aria-label="Move image down"
+                          >
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeArrayItem("gallery", idx)}
+                            className="text-rose-600 hover:bg-rose-50 p-1 rounded cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
 
                       <div className="flex gap-2">
@@ -1230,7 +1574,209 @@ export default function AdminServices() {
               </div>
             )}
 
-            {/* 6. WHY ARROWLINE TAB */}
+            {/* 6. VISUAL SHOWCASE TAB (relational service_visual_showcase) */}
+            {activeTab === "showcase" && (
+              <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                  <div>
+                    <h3 className="text-lg font-black text-[#062B3A]">Visual Showcase</h3>
+                    <p className="text-xs text-slate-500">
+                      CMS-managed gallery images for this service/sub-service (Cloudinary + Supabase).
+                    </p>
+                  </div>
+                  {!entityIsSaved() && (
+                    <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5">
+                      Save the service/sub-service first to link showcase images.
+                    </span>
+                  )}
+                </div>
+
+                {/* Section heading + description (stored on the service record) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">
+                      Showcase Heading
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.showcaseHeading || ""}
+                      onChange={(e) => updateField("showcaseHeading", e.target.value)}
+                      placeholder="e.g. Container Transportation in Action"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#FF6B1A]/40"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">
+                      Showcase Description
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.showcaseDescription || ""}
+                      onChange={(e) => updateField("showcaseDescription", e.target.value)}
+                      placeholder="Real-world fleet operations, port handling, terminal staging..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#FF6B1A]/40"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                    Showcase Images ({showcaseRows.length})
+                  </span>
+                  <button
+                    type="button"
+                    onClick={addShowcaseRow}
+                    disabled={!entityIsSaved() || isUploading || isSaving}
+                    className="px-4 py-2 bg-[#062B3A] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Plus className="w-4 h-4 text-[#FF6B1A]" />
+                    <span>Add Showcase Image</span>
+                  </button>
+                </div>
+
+                {showcaseLoading ? (
+                  <div className="text-center py-10 text-xs text-slate-400">
+                    <RefreshCw className="w-5 h-5 inline animate-spin mr-2" />
+                    Loading showcase images...
+                  </div>
+                ) : showcaseRows.length === 0 ? (
+                  <div className="text-center py-12 rounded-2xl border border-dashed border-slate-300 bg-slate-50/60">
+                    <ImageIcon className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                    <p className="text-sm text-slate-500">No showcase images yet.</p>
+                    <p className="text-xs text-slate-400">Upload images and they will appear in the public Visual Showcase gallery.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {showcaseRows.map((row, idx) => (
+                      <div
+                        key={row.id || `new-showcase-${idx}`}
+                        className="rounded-2xl border border-slate-200 bg-[#F8FAFC] p-4 space-y-3"
+                      >
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => moveShowcaseRow(idx, -1)}
+                            disabled={idx === 0}
+                            className="p-1 rounded text-slate-500 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                            aria-label="Move up"
+                          >
+                            <ChevronUp className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveShowcaseRow(idx, 1)}
+                            disabled={idx === showcaseRows.length - 1}
+                            className="p-1 rounded text-slate-500 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                            aria-label="Move down"
+                          >
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                          <span className="text-xs font-bold text-slate-400">#{idx + 1}</span>
+                          <span className="ml-auto flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => toggleShowcaseRow(idx)}
+                              className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-wide cursor-pointer ${
+                                row.is_published === false
+                                  ? "bg-amber-100 text-amber-700"
+                                  : "bg-emerald-100 text-emerald-700"
+                              }`}
+                            >
+                              {row.is_published === false ? "Inactive" : "Active"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteShowcaseRow(idx)}
+                              className="text-rose-600 hover:bg-rose-50 p-1.5 rounded cursor-pointer"
+                              aria-label="Delete showcase image"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="space-y-2">
+                            <div className="aspect-[16/10] rounded-xl overflow-hidden border border-slate-200 bg-white flex items-center justify-center">
+                              {row.image_url ? (
+                                <img
+                                  src={row.image_url}
+                                  alt={row.alt_text || row.title || "Showcase preview"}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <span className="text-[10px] font-bold text-slate-400 px-4 text-center">
+                                  No image yet — upload below
+                                </span>
+                              )}
+                            </div>
+                            <label className="w-full px-3 py-2 bg-slate-100 hover:bg-slate-200 text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center gap-1.5">
+                              <Upload className="w-3.5 h-3.5 text-[#FF6B1A]" />
+                              {isUploading ? "Uploading..." : "Upload Image"}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => uploadShowcaseFile(e, idx)}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+
+                          <div className="md:col-span-2 space-y-3">
+                            <input
+                              type="text"
+                              value={row.title || ""}
+                              onChange={(e) => updateShowcaseRow(idx, "title", e.target.value)}
+                              placeholder="Image title (e.g. Container Terminal Staging)"
+                              className="w-full bg-white border border-slate-200 rounded-xl p-2 text-xs font-bold"
+                            />
+                            <input
+                              type="text"
+                              value={row.caption || ""}
+                              onChange={(e) => updateShowcaseRow(idx, "caption", e.target.value)}
+                              placeholder="Caption / description"
+                              className="w-full bg-white border border-slate-200 rounded-xl p-2 text-xs"
+                            />
+                            <input
+                              type="text"
+                              value={row.alt_text || ""}
+                              onChange={(e) => updateShowcaseRow(idx, "alt_text", e.target.value)}
+                              placeholder="Alt text (SEO)"
+                              className="w-full bg-white border border-slate-200 rounded-xl p-2 text-xs font-mono"
+                            />
+                            {row.image_url && (
+                              <input
+                                type="text"
+                                value={row.image_url || ""}
+                                onChange={(e) => updateShowcaseRow(idx, "image_url", e.target.value)}
+                                placeholder="Image URL"
+                                className="w-full bg-white border border-slate-200 rounded-xl p-2 text-xs font-mono text-slate-400"
+                              />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {showcaseRows.length > 0 && (
+                      <div className="flex justify-end pt-2">
+                        <button
+                          type="button"
+                          onClick={saveShowcaseAll}
+                          disabled={isUploading || isSaving}
+                          className="px-5 py-2.5 bg-[#FF6B1A] hover:bg-[#E85A0E] text-white text-xs font-black rounded-xl flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          <Check className="w-4 h-4" />
+                          Save Showcase & Order
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 7. WHY ARROWLINE TAB */}
             {activeTab === "why" && (
               <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -1378,82 +1924,199 @@ export default function AdminServices() {
             {/* 8. APPLICATIONS TAB */}
             {activeTab === "applications" && (
               <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
                   <div>
-                    <h3 className="text-lg font-black text-[#062B3A]">
-                      Cargo & Applications
-                    </h3>
+                    <h3 className="text-lg font-black text-[#062B3A]">Cargo & Applications</h3>
                     <p className="text-xs text-slate-500">
-                      Cargo profile image cards relevant to this service
+                      CMS-managed cargo profile cards for this service/sub-service.
                     </p>
                   </div>
+                  {!entityIsSaved() && (
+                    <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5">
+                      Save the service/sub-service first to link cargo applications.
+                    </span>
+                  )}
+                </div>
+
+                {/* Section heading + description (stored on the service record) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">
+                      Cargo Heading
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.cargoHeading || ""}
+                      onChange={(e) => updateField("cargoHeading", e.target.value)}
+                      placeholder="e.g. What We Transport & Handle"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#FF6B1A]/40"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">
+                      Cargo Description
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.cargoDescription || ""}
+                      onChange={(e) => updateField("cargoDescription", e.target.value)}
+                      placeholder="Specialized handling protocols configured for this cargo..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#FF6B1A]/40"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                    Cargo Profiles ({cargoRows.length})
+                  </span>
                   <button
                     type="button"
-                    onClick={() =>
-                      addArrayItem("applications", {
-                        title: "Cargo Profile",
-                        desc: "Handling and transit details...",
-                        image: "/images/road-transport.jpg",
-                      })
-                    }
-                    className="px-4 py-2 bg-[#062B3A] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer"
+                    onClick={addCargoRow}
+                    disabled={!entityIsSaved() || isUploading || isSaving}
+                    className="px-4 py-2 bg-[#062B3A] text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Plus className="w-4 h-4 text-[#FF6B1A]" />
                     <span>Add Cargo Profile</span>
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {(formData.applications || []).map((app, idx) => (
-                    <div
-                      key={idx}
-                      className="p-4 rounded-2xl border border-slate-200 bg-[#F8FAFC] space-y-3"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-600">
-                          Profile 0{idx + 1}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => removeArrayItem("applications", idx)}
-                          className="text-rose-600 hover:bg-rose-50 p-1 rounded cursor-pointer"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                {cargoLoading ? (
+                  <div className="text-center py-10 text-xs text-slate-400">
+                    <RefreshCw className="w-5 h-5 inline animate-spin mr-2" />
+                    Loading cargo applications...
+                  </div>
+                ) : cargoRows.length === 0 ? (
+                  <div className="text-center py-12 rounded-2xl border border-dashed border-slate-300 bg-slate-50/60">
+                    <Briefcase className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+                    <p className="text-sm text-slate-500">No cargo profiles yet.</p>
+                    <p className="text-xs text-slate-400">Add cargo types relevant to this service/sub-service.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {cargoRows.map((row, idx) => (
+                      <div
+                        key={row.id || `new-cargo-${idx}`}
+                        className="p-4 rounded-2xl border border-slate-200 bg-[#F8FAFC] space-y-3"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-600">Profile {idx + 1}</span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => moveCargoRow(idx, -1)}
+                              disabled={idx === 0}
+                              className="p-1 rounded text-slate-500 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                              aria-label="Move cargo profile up"
+                            >
+                              <ChevronUp className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveCargoRow(idx, 1)}
+                              disabled={idx === cargoRows.length - 1}
+                              className="p-1 rounded text-slate-500 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                              aria-label="Move cargo profile down"
+                            >
+                              <ChevronDown className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => toggleCargoRow(idx)}
+                              className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-wide cursor-pointer ${
+                                row.is_published === false
+                                  ? "bg-amber-100 text-amber-700"
+                                  : "bg-emerald-100 text-emerald-700"
+                              }`}
+                            >
+                              {row.is_published === false ? "Inactive" : "Active"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteCargoRow(idx)}
+                              className="text-rose-600 hover:bg-rose-50 p-1 rounded cursor-pointer"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+
+                        <input
+                          type="text"
+                          value={row.title || ""}
+                          onChange={(e) => updateCargoRow(idx, "title", e.target.value)}
+                          placeholder="Cargo Title (e.g. 20ft Containers)"
+                          className="w-full bg-white border border-slate-200 rounded-xl p-2 text-xs font-bold"
+                        />
+
+                        <textarea
+                          value={row.description || ""}
+                          onChange={(e) => updateCargoRow(idx, "description", e.target.value)}
+                          placeholder="Cargo Handling Description"
+                          rows={2}
+                          className="w-full bg-white border border-slate-200 rounded-xl p-2 text-xs"
+                        />
+
+                        <input
+                          type="text"
+                          value={row.alt_text || ""}
+                          onChange={(e) => updateCargoRow(idx, "alt_text", e.target.value)}
+                          placeholder="Alt text (SEO)"
+                          className="w-full bg-white border border-slate-200 rounded-xl p-2 text-xs font-mono"
+                        />
+
+                        <div className="flex gap-2">
+                          {row.image_url ? (
+                            <div className="flex-1">
+                              <div className="aspect-[16/9] rounded-xl overflow-hidden border border-slate-200 bg-white mb-2">
+                                <img
+                                  src={row.image_url}
+                                  alt={row.alt_text || row.title || "Cargo preview"}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <label className="flex-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center gap-1">
+                                <Upload className="w-3 h-3" />
+                                {isUploading ? "Uploading..." : "Replace Image"}
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => uploadCargoFile(e, idx)}
+                                  className="hidden"
+                                />
+                              </label>
+                            </div>
+                          ) : (
+                            <label className="flex-1 px-3 py-3 bg-slate-100 hover:bg-slate-200 text-xs font-bold rounded-xl cursor-pointer flex items-center justify-center gap-1.5 text-center">
+                              <Upload className="w-3.5 h-3.5 text-[#FF6B1A]" />
+                              {isUploading ? "Uploading..." : "Upload Image"}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => uploadCargoFile(e, idx)}
+                                className="hidden"
+                              />
+                            </label>
+                          )}
+                        </div>
                       </div>
+                    ))}
+                  </div>
+                )}
 
-                      <input
-                        type="text"
-                        value={app.title || ""}
-                        onChange={(e) =>
-                          updateArrayItem("applications", idx, "title", e.target.value)
-                        }
-                        placeholder="Cargo Title"
-                        className="w-full bg-white border border-slate-200 rounded-xl p-2 text-xs font-bold"
-                      />
-
-                      <textarea
-                        value={app.desc || ""}
-                        onChange={(e) =>
-                          updateArrayItem("applications", idx, "desc", e.target.value)
-                        }
-                        placeholder="Cargo Handling Description"
-                        rows={2}
-                        className="w-full bg-white border border-slate-200 rounded-xl p-2 text-xs"
-                      />
-
-                      <input
-                        type="text"
-                        value={app.image || ""}
-                        onChange={(e) =>
-                          updateArrayItem("applications", idx, "image", e.target.value)
-                        }
-                        placeholder="Image URL"
-                        className="w-full bg-white border border-slate-200 rounded-xl p-2 text-xs font-mono"
-                      />
-                    </div>
-                  ))}
-                </div>
+                {cargoRows.length > 0 && (
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="button"
+                      onClick={saveCargoAll}
+                      disabled={isUploading || isSaving}
+                      className="px-5 py-2.5 bg-[#FF6B1A] hover:bg-[#E85A0E] text-white text-xs font-black rounded-xl flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <Check className="w-4 h-4" />
+                      Save Cargo & Order
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1882,7 +2545,7 @@ export default function AdminServices() {
 
                     <div className="w-12 h-12 rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0">
                       <img
-                        src={main.heroImage || main.aboutImage || "/images/road-transport.jpg"}
+                        src={main.heroImage || main.aboutImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg"}
                         alt={main.title}
                         className="w-full h-full object-cover"
                       />
@@ -1979,7 +2642,7 @@ export default function AdminServices() {
                               </span>
                               <div className="w-9 h-9 rounded-xl overflow-hidden bg-slate-100 shrink-0">
                                 <img
-                                  src={sub.heroImage || sub.aboutImage || "/images/road-transport.jpg"}
+                                  src={sub.heroImage || sub.aboutImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg"}
                                   alt={sub.title}
                                   className="w-full h-full object-cover"
                                 />

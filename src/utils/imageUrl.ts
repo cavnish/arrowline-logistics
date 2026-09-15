@@ -16,6 +16,10 @@ export function getOptimizedImageUrl(url: string, options: ImageOptions = {}): s
   const match = url.match(CLOUDINARY_PATH_RE);
   if (!match) return url;
 
+  // SVG originals are returned untouched: f_auto would rasterize the vector
+  // and hurt crispness of brand logos.
+  if (match[2].toLowerCase().includes(".svg")) return url;
+
   const transforms: string[] = ["f_auto", "q_auto"];
   if (options.width) transforms.push(`w_${options.width}`);
   if (typeof options.quality === "number") {

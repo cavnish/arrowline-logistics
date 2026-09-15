@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { contentService } from "../services/contentService";
 import { getAllMainServices } from "../data/servicesData";
 import { getOptimizedImageUrl, buildImageAlt } from "../utils/imageUrl";
+import SmartImage from "./ui/SmartImage";
 
 interface ServicesSectionProps {
   onSelectService: (slug: string) => void;
@@ -25,7 +26,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
       slug: s.slug,
       title: s.title,
       shortDesc: s.shortDesc,
-      image: s.heroImage || s.aboutImage || "/images/road-transport.jpg",
+      image: s.heroImage || s.aboutImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
       imageAlt: s.imageAlt || buildImageAlt(s.title),
     }));
   });
@@ -42,7 +43,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
             slug: item.slug,
             title: item.title,
             shortDesc: item.short_description || "",
-            image: item.hero_image || item.about_image || "/images/road-transport.jpg",
+            image: item.hero_image || item.about_image || "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
             imageAlt: item.image_alt || buildImageAlt(item.title),
           }));
           setServices(mapped);
@@ -98,11 +99,9 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
 
                 {/* Image Frame */}
                 <div className="relative aspect-video overflow-hidden bg-slate-100">
-                  <img
+                  <SmartImage
                     src={getOptimizedImageUrl(service.image, { width: 800 })}
                     alt={service.imageAlt || `Arrowline ${service.title}`}
-                    loading="lazy"
-                    decoding="async"
                     width={800}
                     height={450}
                     className="h-full w-full object-cover object-center transition-transform duration-200 group-hover:scale-[1.02] motion-reduce:transform-none"

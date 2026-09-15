@@ -1,6 +1,7 @@
 import { ArrowRight, ChevronRight, Layers } from "lucide-react";
 import { MainServiceData, SubServiceData } from "../../data/servicesData";
 import Reveal from "../Reveal";
+import SmartImage from "../ui/SmartImage";
 import { getOptimizedImageUrl, buildImageAlt } from "../../utils/imageUrl";
 
 interface ServiceRelatedProps {
@@ -22,7 +23,7 @@ export default function ServiceRelated({
   return (
     <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
           <Reveal>
@@ -118,10 +119,9 @@ export default function ServiceRelated({
                         className="group relative rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
                       >
                         <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-                          <img
-                            src={getOptimizedImageUrl(main.heroImage || "/images/hero-logistics.jpg", { width: 800 })}
+                          <SmartImage
+                            src={getOptimizedImageUrl(main.heroImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg", { width: 800 })}
                             alt={main.imageAlt || buildImageAlt(main.title)}
-                            loading="lazy"
                             width={800}
                             height={500}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -167,10 +167,9 @@ export default function ServiceRelated({
                     className="group flex flex-col h-full bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#FF6B1A]/40 transition-all duration-300 hover:-translate-y-1.5 focus:outline-none"
                   >
                     <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-                      <img
-                        src={getOptimizedImageUrl(main.heroImage || "/images/hero-logistics.jpg", { width: 800 })}
+                      <SmartImage
+                        src={getOptimizedImageUrl(main.heroImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg", { width: 800 })}
                         alt={main.imageAlt || buildImageAlt(main.title)}
-                        loading="lazy"
                         width={800}
                         height={500}
                         className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"

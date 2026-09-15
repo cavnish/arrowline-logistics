@@ -31,7 +31,7 @@ function getEmbedUrl(url: string): { type: "youtube" | "vimeo" | "mp4"; src: str
 
 export default function VideoShowcase({
   videoUrl = null,
-  posterImage = "/images/video-poster.jpg",
+  posterImage = "https://res.cloudinary.com/uorctww6/image/upload/v1789377073/arrowline/general/video-poster.jpg",
   title = "See Arrowline in Action",
   subtitle = "Watch how we move India's supply chain — from Mundra Port to every corner of the nation.",
   duration = "2:14"

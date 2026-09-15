@@ -1,13 +1,13 @@
 import { useState } from "react";
 import SEOMeta from "../components/SEOMeta";
 import Reveal from "../components/Reveal";
-import { 
-  ArrowRight, 
-  Check, 
-  Truck, 
-  ShieldCheck, 
-  MapPin, 
-  Clock, 
+import {
+  ArrowRight,
+  Check,
+  Truck,
+  ShieldCheck,
+  MapPin,
+  Clock,
   ChevronDown,
   Phone
 } from "lucide-react";
@@ -79,7 +79,7 @@ export default function RoadTransportation({ onOpenQuote, onNavigateTo }: RoadTr
   ];
 
   const transportItems = [
-    "Containers", "Industrial Machinery", "Engineering Equipment", 
+    "Containers", "Industrial Machinery", "Engineering Equipment",
     "Project Cargo", "ODC Cargo", "Heavy Cargo", "Manufacturing Materials", "Commercial Freight"
   ];
 
@@ -91,8 +91,8 @@ export default function RoadTransportation({ onOpenQuote, onNavigateTo }: RoadTr
 
   return (
     <div className="w-full overflow-hidden bg-[#F5F8FA]">
-      <SEOMeta 
-        title="Road Transportation Services India | Pan-India Freight | Arrowline Logistics" 
+      <SEOMeta
+        title="Road Transportation Services India | Pan-India Freight | Arrowline Logistics"
         description="Premium road transportation services across India. Specializing in FTL, LTL, ODC, and Project Cargo from Mundra Port to any destination."
       />
 
@@ -100,9 +100,9 @@ export default function RoadTransportation({ onOpenQuote, onNavigateTo }: RoadTr
       <section className="relative min-h-[80vh] flex items-center overflow-hidden bg-[#062B3A] text-white">
         {/* Cinematic Background */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/images/road-transport-hero.jpg" 
-            alt="Premium Logistics Truck" 
+          <img
+            src="https://res.cloudinary.com/uorctww6/image/upload/v1789377072/arrowline/general/truck-fleet-yard.jpg"
+            alt="Premium Logistics Truck"
             className="h-full w-full object-cover opacity-40"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#062B3A] via-[#062B3A]/60 to-transparent" />
@@ -120,11 +120,11 @@ export default function RoadTransportation({ onOpenQuote, onNavigateTo }: RoadTr
                 ))}
               </div>
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight mb-6">
-                Reliable Road Transportation <br /> 
+                Reliable Road Transportation <br />
                 <span className="text-[#FF7A00]">Services Across India</span>
               </h1>
               <p className="text-lg sm:text-lg lg:text-xl text-slate-300 leading-relaxed mb-10 max-w-2xl">
-                Arrowline provides a high-performance road freight network anchored at Mundra Port, 
+                Arrowline provides a high-performance road freight network anchored at Mundra Port,
                 connecting industrial hubs, factories, and cities with precision, safety, and scale.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -171,7 +171,7 @@ export default function RoadTransportation({ onOpenQuote, onNavigateTo }: RoadTr
           <div className="grid gap-12 lg:grid-cols-2 items-center">
             <Reveal direction="left">
               <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl aspect-square lg:aspect-video">
-                <img src="/images/road-transport-detail.jpg" alt="Road Transport" className="h-full w-full object-cover" />
+                <img src="https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg" alt="Road Transport" className="h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#062B3A]/40 to-transparent" />
               </div>
             </Reveal>
@@ -183,9 +183,9 @@ export default function RoadTransportation({ onOpenQuote, onNavigateTo }: RoadTr
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {[
-                    "FTL (Full Truckload)", "LTL (Less than Truckload)", 
-                    "ODC (Over Dimensional Cargo)", "Heavy Haulage", 
-                    "Machinery transportation", "Project cargo", 
+                    "FTL (Full Truckload)", "LTL (Less than Truckload)",
+                    "ODC (Over Dimensional Cargo)", "Heavy Haulage",
+                    "Machinery transportation", "Project cargo",
                     "Container transportation", "Industrial cargo"
                   ].map((item) => (
                     <div key={item} className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
@@ -217,7 +217,7 @@ export default function RoadTransportation({ onOpenQuote, onNavigateTo }: RoadTr
                     <div className="text-4xl mb-6">{service.icon}</div>
                     <h3 className="text-xl font-bold text-[#062B3A] mb-3">{service.title}</h3>
                     <p className="text-sm text-slate-600 mb-6">Professional transportation solutions tailored for {service.title.toLowerCase()} requirements across India.</p>
-                    <button 
+                    <button
                       onClick={() => onNavigateTo(`services/${service.slug}`)}
                       className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#FF6B1A] group-hover:text-[#062B3A] transition-colors"
                     >
@@ -291,11 +291,11 @@ export default function RoadTransportation({ onOpenQuote, onNavigateTo }: RoadTr
             {transportItems.map((item, i) => (
               <Reveal key={i} delay={i * 50}>
                 <div className="group relative aspect-video overflow-hidden rounded-2xl cursor-pointer shadow-sm hover:shadow-xl transition-all">
-                  <img 
-                    src={`/images/transport/${item.toLowerCase().replace(/ /g, '-')}.jpg`} 
-                    alt={item} 
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                    onError={(e) => { e.currentTarget.src = '/images/road-transport-detail.jpg' }}
+                  <img
+                    src="https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg"
+                    alt={item}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    onError={(e) => { e.currentTarget.src = 'https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg' }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#062B3A] via-transparent to-transparent opacity-80" />
                   <div className="absolute bottom-4 left-4">
@@ -320,7 +320,7 @@ export default function RoadTransportation({ onOpenQuote, onNavigateTo }: RoadTr
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {["Manufacturing", "Engineering & Infrastructure", "Automotive", "FMCG & Retail", "Chemicals & Petrochemicals", "Ports & Logistics"].map((ind, i) => (
               <Reveal key={ind} delay={i * 100}>
-                <div 
+                <div
                   onClick={() => onNavigateTo(`industries`)}
                   className="group p-8 rounded-3xl border border-slate-200 bg-white transition-all hover:shadow-xl hover:border-[#FF6B1A]/50 cursor-pointer"
                 >
@@ -349,7 +349,7 @@ export default function RoadTransportation({ onOpenQuote, onNavigateTo }: RoadTr
             {faqs.map((faq, i) => (
               <Reveal key={i} delay={i * 50}>
                 <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
-                  <button 
+                  <button
                     onClick={() => setActiveFaq(activeFaq === i ? null : i)}
                     className="flex w-full items-center justify-between p-6 text-left hover:bg-[#F8FAFC] transition-colors"
                   >
@@ -380,8 +380,8 @@ export default function RoadTransportation({ onOpenQuote, onNavigateTo }: RoadTr
               <button onClick={onOpenQuote} className="px-8 py-4 bg-gradient-to-r from-[#FF6B1A] to-[#FF8C2A] hover:from-[#E55A0D] hover:to-[#FF7A00] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-xl transition-all hover:-translate-y-1 cursor-pointer flex items-center justify-center gap-2">
                 Get a Transport Quote <ArrowRight className="h-4 w-4" />
               </button>
-              <a 
-                href={buildTel(COMPANY_DETAILS.phone)} 
+              <a
+                href={buildTel(COMPANY_DETAILS.phone)}
                 className="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/30 text-white text-xs font-black uppercase tracking-wider rounded-xl backdrop-blur transition-all flex items-center justify-center gap-2"
               >
                 <Phone className="h-4 w-4" /> Speak With Our Logistics Team

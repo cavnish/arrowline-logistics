@@ -23,7 +23,7 @@ export default function IndustriesSection({ onOpenQuote }: IndustriesSectionProp
   return (
     <section className="py-16 lg:py-24 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 lg:mb-16 border-b border-slate-200 pb-6">
           <div className="space-y-3 max-w-2xl">

@@ -1,5 +1,6 @@
 import { CheckCircle2, ArrowRight, Phone, ShieldCheck } from "lucide-react";
 import Reveal from "../Reveal";
+import SmartImage from "../ui/SmartImage";
 import { COMPANY_DETAILS } from "../../data/logisticsData";
 import { buildTel } from "../../utils/contactLinks";
 
@@ -106,10 +107,9 @@ export default function ServiceAbout({
               <div className="relative mx-auto max-w-lg lg:max-w-none">
                 {/* Primary Image */}
                 <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100 aspect-[4/3] sm:aspect-[16/11]">
-                  <img
-                    src={image || "/images/hero-logistics.jpg"}
+                  <SmartImage
+                    src={image}
                     alt={heading}
-                    loading="lazy"
                     className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#062B3A]/50 via-transparent to-transparent" />

@@ -8,17 +8,17 @@ import {
 
 const projects = [
   {
-    image: "/images/project-road.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377043/arrowline/general/project-road.jpg",
     title: "Road Transportation",
     location: "Pan-India",
   },
   {
-    image: "/images/project-port.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377042/arrowline/general/project-port.jpg",
     title: "Mundra Port Logistics",
     location: "Gujarat",
   },
   {
-    image: "/images/project-warehouse.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377044/arrowline/general/project-warehouse.jpg",
     title: "Warehouse & Cargo",
     location: "India",
   },
@@ -198,7 +198,7 @@ export default function CoreAdvantages() {
                 "
               />
 
-              {/* LOCATION DOTS */}
+              LOCATION DOTS
 
               <span className="map-dot left-[47%] top-[22%]" />
               <span className="map-dot left-[55%] top-[30%]" />
@@ -209,7 +209,7 @@ export default function CoreAdvantages() {
               <span className="map-dot left-[48%] top-[78%]" />
 
               {/* Mundra highlight */}
-              <div className="absolute left-[30%] top-[38%] z-20">
+              {/* <div className="absolute left-[30%] top-[38%] z-20">
                 <span className="absolute -inset-2 animate-ping rounded-full bg-[#FF6B1A]/30" />
 
                 <span className="relative block h-3 w-3 rounded-full border-2 border-white bg-[#FF6B1A]" />
@@ -219,7 +219,7 @@ export default function CoreAdvantages() {
                     Mundra Hub
                   </span>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Floating network label */}

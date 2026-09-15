@@ -23,7 +23,7 @@ let errors = [];
 
 mainServices.forEach((main, mIndex) => {
   console.log(`\n--- [${mIndex + 1}/4] Main Vertical: "${main.title}" (/${main.slug}) ---`);
-  
+
   if (!main.heroHeadline || !main.heroImage || !main.shortDesc) {
     errors.push(`Main service "${main.slug}" is missing essential hero/overview copy.`);
   }

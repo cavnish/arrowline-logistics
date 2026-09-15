@@ -221,32 +221,42 @@ app.get("/health", (_req, res) => {
 });
 
 app.get("/api/content", async (_req, res) => {
-  const { data, error } = await supabase
-    .from("site_content")
-    .select("content_key, content_value")
-    .eq("is_published", true);
+  try {
+    const { data, error } = await supabase
+      .from("site_content")
+      .select("content_key, content_value")
+      .eq("is_published", true);
 
-  if (error) {
-    console.error("Public content error:", error);
-    return res.status(500).json({ success: false, message: "Unable to load content" });
+    if (error) {
+      console.error("Public content error:", error);
+      return res.status(500).json({ success: false, message: "Unable to load content" });
+    }
+
+    return res.json({ success: true, data: data || [] });
+  } catch (err) {
+    console.error("Public content error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
-
-  return res.json({ success: true, data: data || [] });
 });
 
 app.get("/api/services", async (_req, res) => {
-  const { data, error } = await supabase
-    .from("services")
-    .select("*")
-    .eq("is_published", true)
-    .order("display_order", { ascending: true });
+  try {
+    const { data, error } = await supabase
+      .from("services")
+      .select("*")
+      .eq("is_published", true)
+      .order("display_order", { ascending: true });
 
-  if (error) {
-    console.error("Public services error:", error);
-    return res.status(500).json({ success: false, message: "Unable to load services" });
+    if (error) {
+      console.error("Public services error:", error);
+      return res.status(500).json({ success: false, message: "Unable to load services" });
+    }
+
+    return res.json({ success: true, data: data || [] });
+  } catch (err) {
+    console.error("Public services error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
-
-  return res.json({ success: true, data: data || [] });
 });
 
 app.get("/api/services/:slug", async (req, res) => {
@@ -270,7 +280,90 @@ app.get("/api/services/:slug", async (req, res) => {
       .eq("is_published", true)
       .order("display_order", { ascending: true });
 
-    return res.json({ success: true, data: { ...service, subServices: subItems || [] } });
+    const subIds = (subItems || []).map((s) => s.id);
+
+    // Visual Showcase + Cargo & Applications for the main service.
+    // Wrapped so a missing table (migration not yet applied) never breaks the
+    // full service page — the frontend falls back to legacy JSONB content.
+    const safePick = (rows) => (Array.isArray(rows) ? rows : []);
+
+    const pickShowcaseFor = async (column, value) => {
+      try {
+        const { data } = await supabase
+          .from("service_visual_showcase")
+          .select("*")
+          .eq(column, value)
+          .eq("is_published", true)
+          .order("display_order", { ascending: true });
+        return safePick(data);
+      } catch (err) {
+        console.warn("[services] service_visual_showcase unavailable:", err?.message);
+        return [];
+      }
+    };
+
+    const pickCargoFor = async (column, value) => {
+      try {
+        const { data } = await supabase
+          .from("service_cargo_applications")
+          .select("*")
+          .eq(column, value)
+          .eq("is_published", true)
+          .order("display_order", { ascending: true });
+        return safePick(data);
+      } catch (err) {
+        console.warn("[services] service_cargo_applications unavailable:", err?.message);
+        return [];
+      }
+    };
+
+    const mainShowcase = await pickShowcaseFor("service_id", service.id);
+    const mainCargo = await pickCargoFor("service_id", service.id);
+
+    let subShowcase = [];
+    let subCargo = [];
+    if (subIds.length > 0) {
+      try {
+        const [ss, sc] = await Promise.all([
+          supabase
+            .from("service_visual_showcase")
+            .select("*")
+            .in("service_item_id", subIds)
+            .eq("is_published", true)
+            .order("display_order", { ascending: true })
+            .then(({ data }) => safePick(data)),
+          supabase
+            .from("service_cargo_applications")
+            .select("*")
+            .in("service_item_id", subIds)
+            .eq("is_published", true)
+            .order("display_order", { ascending: true })
+            .then(({ data }) => safePick(data)),
+        ]);
+        subShowcase = ss;
+        subCargo = sc;
+      } catch (err) {
+        console.warn("[services] sub showcase/cargo unavailable:", err?.message);
+        subShowcase = [];
+        subCargo = [];
+      }
+    }
+
+    const attach = (sub) => ({
+      ...sub,
+      showcaseItems: subShowcase.filter((row) => row.service_item_id === sub.id),
+      cargoApplications: subCargo.filter((row) => row.service_item_id === sub.id),
+    });
+
+    return res.json({
+      success: true,
+      data: {
+        ...service,
+        showcaseItems: mainShowcase,
+        cargoApplications: mainCargo,
+        subServices: (subItems || []).map(attach),
+      },
+    });
   } catch (err) {
     return res.status(500).json({ success: false, message: "Server error" });
   }
@@ -302,7 +395,43 @@ app.get("/api/services/:serviceSlug/:subSlug", async (req, res) => {
       return res.status(404).json({ success: false, message: "Sub-service not found" });
     }
 
-    return res.json({ success: true, data: { ...subItem, parentService: service } });
+    const safePick = (rows) => (Array.isArray(rows) ? rows : []);
+    let showcaseItems = [];
+    let cargoApplications = [];
+    try {
+      const [ss, sc] = await Promise.all([
+        supabase
+          .from("service_visual_showcase")
+          .select("*")
+          .eq("service_item_id", subItem.id)
+          .eq("is_published", true)
+          .order("display_order", { ascending: true })
+          .then(({ data }) => safePick(data)),
+        supabase
+          .from("service_cargo_applications")
+          .select("*")
+          .eq("service_item_id", subItem.id)
+          .eq("is_published", true)
+          .order("display_order", { ascending: true })
+          .then(({ data }) => safePick(data)),
+      ]);
+      showcaseItems = ss;
+      cargoApplications = sc;
+    } catch (err) {
+      console.warn("[services] sub showcase/cargo unavailable:", err?.message);
+      showcaseItems = [];
+      cargoApplications = [];
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        ...subItem,
+        showcaseItems: showcaseItems || [],
+        cargoApplications: cargoApplications || [],
+        parentService: service,
+      },
+    });
   } catch (err) {
     return res.status(500).json({ success: false, message: "Server error" });
   }
@@ -310,64 +439,86 @@ app.get("/api/services/:serviceSlug/:subSlug", async (req, res) => {
 
 
 app.get("/api/industries", async (_req, res) => {
-  const { data, error } = await supabase
-    .from("industries")
-    .select("id, slug, title, description, icon, cargo_types, image")
-    .eq("is_published", true)
-    .order("display_order", { ascending: true })
-    .order("title", { ascending: true });
+  try {
+    const { data, error } = await supabase
+      .from("industries")
+      .select("id, slug, title, description, icon, cargo_types, image")
+      .eq("is_published", true)
+      .order("display_order", { ascending: true })
+      .order("title", { ascending: true });
 
-  if (error) {
-    console.error("Public industries error:", error);
-    return res.status(500).json({ success: false, message: "Unable to load industries" });
+    if (error) {
+      console.error("Public industries error:", error);
+      return res.status(500).json({ success: false, message: "Unable to load industries" });
+    }
+
+    return res.json({ success: true, data: data || [] });
+  } catch (err) {
+    console.error("Public industries error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
-
-  return res.json({ success: true, data: data || [] });
 });
 
 app.get("/api/clients", async (_req, res) => {
-  const { data, error } = await supabase
-    .from("clients")
-    .select("*")
-    .eq("is_published", true)
-    .order("display_order", { ascending: true });
+  try {
+    const { data, error } = await supabase
+      .from("clients")
+      .select("*")
+      .eq("is_published", true)
+      .order("display_order", { ascending: true });
 
-  if (error) {
-    console.error("Public clients error:", error);
-    return res.status(500).json({ success: false, message: "Unable to load clients" });
+    if (error) {
+      console.error("Public clients error:", error);
+      return res.status(500).json({ success: false, message: "Unable to load clients" });
+    }
+
+    return res.json({ success: true, data: data || [] });
+  } catch (err) {
+    console.error("Public clients error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
-
-  return res.json({ success: true, data: data || [] });
 });
 
 app.get("/api/trusted-network", async (_req, res) => {
-  const { data, error } = await supabase
-    .from("trusted_network")
-    .select("*")
-    .eq("is_published", true)
-    .order("display_order", { ascending: true });
+  try {
+    const { data, error } = await supabase
+      .from("trusted_network")
+      .select("id, name, logo, logo_alt")
+      .eq("is_published", true)
+      .not("logo", "is", null)
+      .order("display_order", { ascending: true })
+      .order("name", { ascending: true });
 
-  if (error) {
-    console.error("Public trusted-network error:", error);
-    return res.status(500).json({ success: false, message: "Unable to load trusted network" });
+    if (error) {
+      console.error("Public trusted-network error:", error);
+      return res.status(500).json({ success: false, message: "Unable to load trusted network" });
+    }
+
+    return res.json({ success: true, data: data || [] });
+  } catch (err) {
+    console.error("Public trusted-network error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
-
-  return res.json({ success: true, data: data || [] });
 });
 
 app.get("/api/service-items", async (_req, res) => {
-  const { data, error } = await supabase
-    .from("service_items")
-    .select("*")
-    .eq("is_published", true)
-    .order("display_order", { ascending: true });
+  try {
+    const { data, error } = await supabase
+      .from("service_items")
+      .select("*")
+      .eq("is_published", true)
+      .order("display_order", { ascending: true });
 
-  if (error) {
-    console.error("Public service-items error:", error);
-    return res.status(500).json({ success: false, message: "Unable to load service items" });
+    if (error) {
+      console.error("Public service-items error:", error);
+      return res.status(500).json({ success: false, message: "Unable to load service items" });
+    }
+
+    return res.json({ success: true, data: data || [] });
+  } catch (err) {
+    console.error("Public service-items error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
-
-  return res.json({ success: true, data: data || [] });
 });
 
 const publicCollections = [
@@ -380,37 +531,49 @@ const publicCollections = [
   ["blog-posts", "blog_posts"],
   ["social-videos", "social_videos"],
   ["statistics", "statistics"],
+  ["leadership", "leadership"],
+  ["core-values", "core_values"],
 ];
 
 for (const [path, table] of publicCollections) {
   app.get(`/api/${path}`, async (_req, res) => {
-    let query = supabase.from(table).select("*").eq("is_published", true);
-    if (!["blog-categories"].includes(path)) {
-      query = query.order("display_order", { ascending: true });
-    }
-    const { data, error } = await query;
+    try {
+      let query = supabase.from(table).select("*").eq("is_published", true);
+      if (!["blog-categories"].includes(path)) {
+        query = query.order("display_order", { ascending: true });
+      }
+      const { data, error } = await query;
 
-    if (error) {
-      console.error(`Public ${path} error:`, error);
-      return res.status(500).json({ success: false, message: `Unable to load ${path}` });
-    }
+      if (error) {
+        console.error(`Public ${path} error:`, error);
+        return res.status(500).json({ success: false, message: `Unable to load ${path}` });
+      }
 
-    return res.json({ success: true, data: data || [] });
+      return res.json({ success: true, data: data || [] });
+    } catch (err) {
+      console.error(`Public ${path} error:`, err);
+      return res.status(500).json({ success: false, message: `Server error loading ${path}` });
+    }
   });
 }
 
 app.get("/api/site-settings", async (_req, res) => {
-  const { data, error } = await supabase
-    .from("site_settings")
-    .select("setting_key, setting_value, setting_type")
-    .eq("is_public", true);
+  try {
+    const { data, error } = await supabase
+      .from("site_settings")
+      .select("setting_key, setting_value, setting_type")
+      .eq("is_public", true);
 
-  if (error) {
-    console.error("Public site settings error:", error);
-    return res.status(500).json({ success: false, message: "Unable to load site settings" });
+    if (error) {
+      console.error("Public site settings error:", error);
+      return res.status(500).json({ success: false, message: "Unable to load site settings" });
+    }
+
+    return res.json({ success: true, data: data || [] });
+  } catch (err) {
+    console.error("Public site settings error:", err);
+    return res.status(500).json({ success: false, message: "Server error loading site settings" });
   }
-
-  return res.json({ success: true, data: data || [] });
 });
 
 // LEAD
@@ -567,7 +730,7 @@ if (hasDist) {
 }
 
 // =====================================================
-// 404  
+// 404
 // =====================================================
 
 app.use(

@@ -37,15 +37,15 @@ function drawLogo(
   const textWidth = doc.getTextWidth(wordmark);
   const arrowX = x + textWidth + 2; // Small gap after wordmark
   const arrowY = y - 5; // Align with wordmark top
-  
+
   // Draw a clean chevron arrow - simpler and more reliable than SVG path
   doc.setFillColor(...orange);
-  
+
   // Main chevron body - a right-pointing arrow shape
   const arrowSize = 6;
   const tipX = arrowX + arrowSize * 1.8;
   const tipY = arrowY + arrowSize / 2;
-  
+
   // Draw as polygon: left top, tip, left bottom
   doc.triangle(
     arrowX, arrowY,           // left top
@@ -53,7 +53,7 @@ function drawLogo(
     arrowX, arrowY + arrowSize, // left bottom
     "F"
   );
-  
+
   // Small rectangular stem to make it look like the logo
   doc.rect(
     arrowX - 3,
@@ -68,13 +68,13 @@ function drawLogo(
   doc.setFont("helvetica", "bold");
   doc.setFontSize(7);
   doc.setTextColor(...lightOrange);
-  
+
   // Dashes on both sides
   const subText = "LOGISTICS";
   const subWidth = doc.getTextWidth(subText);
   const dashWidth = 3;
   const gap = 2;
-  
+
   // Left dash
   doc.text("—", x, subY);
   // LOGISTICS text

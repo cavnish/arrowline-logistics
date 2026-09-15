@@ -74,7 +74,7 @@ export default function ServicePageTemplate({
         headline={service.heroHeadline || service.title}
         subheadline={service.heroSubheadline}
         description={(service as any).heroDescription || service.heroSubheadline || service.shortDesc}
-        image={service.heroImage || service.aboutImage || "/images/hero-logistics.jpg"}
+        image={service.heroImage || service.aboutImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg"}
         videoUrl={service.heroVideo || service.videoUrl}
         fallbackImage={service.heroFallbackImage || service.aboutImage}
         onOpenQuote={onOpenQuote}
@@ -98,7 +98,7 @@ export default function ServicePageTemplate({
               (service as any).aboutChecklist ||
               []
             }
-            image={service.aboutImage || service.heroImage || "/images/hero-logistics.jpg"}
+            image={service.aboutImage || service.heroImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg"}
             onOpenQuote={onOpenQuote}
           />
 
@@ -116,6 +116,8 @@ export default function ServicePageTemplate({
             <ServiceGallery
               serviceName={service.title}
               items={service.gallery}
+              heading={(service as SubServiceData).showcaseHeading}
+              description={(service as SubServiceData).showcaseDescription}
             />
           )}
 
@@ -132,6 +134,8 @@ export default function ServicePageTemplate({
           <ServiceApplications
             serviceName={service.title}
             applications={service.applications || []}
+            heading={(service as SubServiceData).cargoHeading}
+            description={(service as SubServiceData).cargoDescription}
           />
         </>
       ) : (
@@ -146,7 +150,7 @@ export default function ServicePageTemplate({
               (service as any).aboutChecklist ||
               []
             }
-            image={service.aboutImage || service.heroImage || "/images/hero-logistics.jpg"}
+            image={service.aboutImage || service.heroImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg"}
             onOpenQuote={onOpenQuote}
           />
 
@@ -170,6 +174,8 @@ export default function ServicePageTemplate({
           <ServiceApplications
             serviceName={service.title}
             applications={service.applications || []}
+            heading={(service as MainServiceData).cargoHeading}
+            description={(service as MainServiceData).cargoDescription}
           />
 
           {/* Image Gallery (if present) */}
@@ -177,6 +183,8 @@ export default function ServicePageTemplate({
             <ServiceGallery
               serviceName={service.title}
               items={service.gallery}
+              heading={(service as MainServiceData).showcaseHeading}
+              description={(service as MainServiceData).showcaseDescription}
             />
           )}
 

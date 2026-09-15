@@ -21,7 +21,7 @@ async function main() {
     'is_published', 'display_order', 'meta_title', 'meta_description',
     'canonical_url', 'og_image', 'capabilities', 'benefits'
   ];
-  
+
   for (const col of columnsToTest) {
     const { error } = await supabase.from('services').select(col).limit(1);
     if (error) {

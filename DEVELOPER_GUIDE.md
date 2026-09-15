@@ -225,7 +225,7 @@ faqs: [
   benefits: ["Benefit 1", "Benefit 2", ...],
   seoTitle: "Warehousing & Storage Services in India | Arrowline",
   seoDesc: "Climate-controlled warehousing and storage with inventory management...",
-  
+
   // Optional: Add premium features
   heroHeadline: "Modern Warehousing Solutions Built for Your Inventory",
   capabilities: [
@@ -423,8 +423,8 @@ interface ServiceDetail {
 
 Then in component:
 ```typescript
-<section style={{ 
-  backgroundColor: service.brandColor || "#062B3A" 
+<section style={{
+  backgroundColor: service.brandColor || "#062B3A"
 }}>
 ```
 

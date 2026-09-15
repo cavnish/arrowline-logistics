@@ -157,7 +157,7 @@ function buildClientHtml(lead) {
         ✉️ <a href="mailto:mundra@arrowlinelogistics.in">mundra@arrowlinelogistics.in</a>
       </div>
       <div style="font-size: 11px; opacity: 0.7; margin-top: 8px;">
-        Office 204, Portview Complex, Adani House, Mundra, Kutch, Gujarat 370421
+        Office 204, Portview Commercial Complex, Near Adani House, Mundra Port Road, Mundra, Kutch, Gujarat - 370421, India
       </div>
     </div>
 

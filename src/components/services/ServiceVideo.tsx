@@ -16,7 +16,7 @@ export default function ServiceVideo({ serviceName, videoUrl, posterImage }: Ser
   return (
     <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-10 sm:mb-14">
           <Reveal>
@@ -50,7 +50,7 @@ export default function ServiceVideo({ serviceName, videoUrl, posterImage }: Ser
             ) : (
               <div className="relative w-full h-full group cursor-pointer" onClick={() => setIsPlaying(true)}>
                 <img
-                  src={posterImage || "/images/hero-logistics.jpg"}
+                  src={posterImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg"}
                   alt={`${serviceName} video cover`}
                   loading="lazy"
                   decoding="async"

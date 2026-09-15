@@ -35,7 +35,7 @@ export default function MasonryGallery() {
       views: "14,230 views",
       likes: 428,
       comments: 65,
-      videoThumbnail: "/images/road-transport.jpg",
+      videoThumbnail: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
       videoUrl: "https://www.linkedin.com/feed/update/urn:li:activity:arrowline_1",
       description: "Incredibly proud of our highway fleet planning team! Yesterday we flagged off 25 high-cube trailers simultaneously from Mundra Port, Gujarat directly to Delhi NCR industrial warehouses. With live GPS tracking, our clients received delivery within 24 hours. #MundraPort #LogisticsIndia",
     },
@@ -48,7 +48,7 @@ export default function MasonryGallery() {
       views: "48.5K plays",
       likes: "2.4K",
       comments: 110,
-      videoThumbnail: "/images/project-cargo.jpg",
+      videoThumbnail: "https://res.cloudinary.com/uorctww6/image/upload/v1789377041/arrowline/general/project-cargo.jpg",
       videoUrl: "https://www.instagram.com/reel/arrowline_odc",
       description: "Precision, safety, and power. 🏗️ Watch our 85-ton modular trailer navigate a tight bypass structure on the national corridor. Pre-surveyed by our project planning division. #ODC #HeavyLift #IndiaInfrastructure",
     }

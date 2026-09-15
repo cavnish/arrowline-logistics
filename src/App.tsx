@@ -255,10 +255,10 @@ export default function App() {
     const gaId =
       (import.meta as any).env
         ?.VITE_GA_ID ||
-      "G-MUNDRA-STUB";
+      "";
 
     console.info(
-      `[Analytics] Arrowline SEO Agent — view: "/${activePage}", ID: ${gaId}`
+      `[Analytics] Arrowline SEO Agent — view: "/${activePage}", ID: ${gaId || "disabled"}`
     );
   }, [
     activePage,
@@ -456,14 +456,7 @@ export default function App() {
       </main>
 
       <Footer
-        setActivePage={
-          handlePageChange
-        }
-        openQuoteForm={() =>
-          setIsGlobalQuoteOpen(
-            true
-          )
-        }
+        setActivePage={handlePageChange}
       />
 
       {/* LEAD MODAL */}

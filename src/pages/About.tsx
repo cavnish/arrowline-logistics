@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { COMPANY_DETAILS, TEAM_MEMBERS } from "../data/logisticsData";
+import { contentService } from "../services/contentService";
 import SEOMeta from "../components/SEOMeta";
 import Reveal from "../components/Reveal";
 import CountUp from "../components/CountUp";
@@ -7,7 +9,9 @@ import {
   Eye, Target, Award, TrendingUp,
   Handshake, Shield, Lightbulb, Users, Leaf,
   Mail, MapPin, ArrowRight,
-  ClipboardCheck, Cpu, Package
+  ClipboardCheck, Cpu, Package,
+  Activity, Workflow, Globe,
+  type LucideIcon,
 } from "lucide-react";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 
@@ -100,8 +104,9 @@ const DIFFERENTIATORS = [
   },
 ];
 
-// Core values (right column list)
-const CORE_VALUES = [
+// Core values (right column list). Rendered from Supabase when present,
+// falling back to the built-in static copy so admin edits appear publicly.
+const STATIC_CORE_VALUES = [
   {
     icon: Handshake,
     title: "Customer Commitment",
@@ -128,6 +133,14 @@ const CORE_VALUES = [
     text: "From route optimization to green warehouses, we act responsibly for the long term.",
   },
 ];
+
+const CORE_VALUE_ICONS: Record<string, LucideIcon> = {
+  ShieldCheck: Shield,
+  TrendingDown: TrendingUp,
+  Activity: Activity,
+  Workflow: Workflow,
+  Globe: Globe,
+};
 
 /* ---------- Timeline item with individually animated dot & line ---------- */
 
@@ -183,6 +196,43 @@ function TimelineItem({
    ABOUT PAGE
    ================================================================ */
 export default function About() {
+  const [dbLeaders, setDbLeaders] = useState<any[]>([]);
+  const [dbValues, setDbValues] = useState<any[]>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    contentService
+      .getLeadership()
+      .then((rows) => { if (mounted) setDbLeaders(rows); })
+      .catch(() => undefined);
+    contentService
+      .getCoreValues()
+      .then((rows) => { if (mounted) setDbValues(rows); })
+      .catch(() => undefined);
+    return () => { mounted = false; };
+  }, []);
+
+  const leaders =
+    dbLeaders.length > 0
+      ? dbLeaders
+      : TEAM_MEMBERS.map((member) => ({
+          name: member.name,
+          role: member.role,
+          location: member.location,
+          email: member.email,
+          image: member.image,
+          bio: member.bio,
+        }));
+
+  const coreValues =
+    dbValues.length > 0
+      ? dbValues.map((value) => ({
+          icon: CORE_VALUE_ICONS[value.icon] || Handshake,
+          title: value.title,
+          text: value.description,
+        }))
+      : STATIC_CORE_VALUES;
+
   return (
     <div className="space-y-20">
       <SEOMeta
@@ -197,7 +247,7 @@ export default function About() {
         <Reveal direction="left" className="lg:col-span-6">
           <div className="relative rounded-2xl overflow-hidden shadow-xl group">
             <img
-              src="/images/rail-multimodal.jpg"
+              src="https://res.cloudinary.com/uorctww6/image/upload/v1789377045/arrowline/general/rail-multimodal.jpg"
               alt="Arrowline Logistics multimodal freight corridor across India"
               className="w-full h-72 sm:h-96 object-cover group-hover:scale-105 transition-transform duration-700"
             />
@@ -321,7 +371,7 @@ export default function About() {
 
           <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-200 group">
             <img
-              src="/images/business-handshake.jpg"
+              src="https://res.cloudinary.com/uorctww6/image/upload/v1789377036/arrowline/general/business-handshake.jpg"
               alt="Arrowline Logistics partnership handshake sealing a Pan-India logistics agreement"
               className="w-full h-64 sm:h-80 object-cover group-hover:scale-105 transition-transform duration-700"
             />
@@ -389,7 +439,7 @@ export default function About() {
 
           <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-200 group mt-4">
             <img
-              src="/images/road-transport.jpg"
+              src="https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg"
               alt="Arrowline modern GPS-enabled fleet on Indian expressway highway"
               className="w-full h-64 sm:h-80 object-cover group-hover:scale-105 transition-transform duration-700"
             />
@@ -404,7 +454,7 @@ export default function About() {
         <Reveal direction="left" className="lg:col-span-5">
           <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-200 group lg:sticky lg:top-28">
             <img
-              src="/images/truck-fleet-yard.jpg"
+              src="https://res.cloudinary.com/uorctww6/image/upload/v1789377072/arrowline/general/truck-fleet-yard.jpg"
               alt="Arrowline Logistics fleet parked at Mundra Port container yard, Gujarat"
               className="w-full h-96 lg:h-[500px] object-cover group-hover:scale-105 transition-transform duration-700"
             />
@@ -423,7 +473,7 @@ export default function About() {
           </Reveal>
 
           <div className="space-y-1">
-            {CORE_VALUES.map((v, i) => {
+            {coreValues.map((v, i) => {
               const Icon = v.icon;
               return (
                 <Reveal
@@ -472,7 +522,7 @@ export default function About() {
         </Reveal>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {TEAM_MEMBERS.map((member, idx) => (
+          {leaders.map((member, idx) => (
             <Reveal key={idx} delay={idx * 120} direction="up">
               <div className="bg-white border border-slate-200 hover:border-[#FF7A00]/40 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full group shadow-sm hover:shadow-xl hover:-translate-y-1">
                 <div className="aspect-square bg-slate-100 overflow-hidden relative">
@@ -548,7 +598,7 @@ export default function About() {
                 className="px-6 py-3 bg-[#FF7A00] hover:bg-[#E56D00] text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
               >
                 <MapPin className="w-4 h-4" />
-                <span>Visit Mundra Base</span>
+                <span>Visit Mundra Headquarters</span>
               </a>
               <a
                 href={buildMailto({ to: COMPANY_DETAILS.primaryEmail, context: "general" })}

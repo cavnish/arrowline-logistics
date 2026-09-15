@@ -1,95 +1,116 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { GalleryMediaItem } from "../../data/servicesData";
-import { X, ChevronLeft, ChevronRight, Image as ImageIcon, ZoomIn } from "lucide-react";
-import Reveal from "../Reveal";
+import { X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
+import SmartImage from "../ui/SmartImage";
 
 interface ServiceGalleryProps {
   serviceName: string;
   items: GalleryMediaItem[];
+  heading?: string;
+  description?: string;
 }
 
-export default function ServiceGallery({ serviceName, items }: ServiceGalleryProps) {
+function getOptimizedUrl(url: string, width: number) {
+  if (!url) return url;
+  if (url.includes("res.cloudinary.com")) {
+    return url.replace(/\/upload\/(v\d+\/)/, `/upload/w_${width},f_auto,q_auto/$1`);
+  }
+  return url;
+}
+
+export default function ServiceGallery({ serviceName, items, heading, description }: ServiceGalleryProps) {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
 
   if (!items || items.length === 0) return null;
 
-  const openLightbox = (index: number) => setSelectedIdx(index);
-  const closeLightbox = () => setSelectedIdx(null);
-  const nextImage = () => {
+  const openLightbox = useCallback((index: number) => setSelectedIdx(index), []);
+  const closeLightbox = useCallback(() => setSelectedIdx(null), []);
+  const nextImage = useCallback(() => {
     if (selectedIdx !== null) setSelectedIdx((selectedIdx + 1) % items.length);
-  };
-  const prevImage = () => {
+  }, [selectedIdx, items.length]);
+  const prevImage = useCallback(() => {
     if (selectedIdx !== null) setSelectedIdx((selectedIdx - 1 + items.length) % items.length);
+  }, [selectedIdx, items.length]);
+
+  const row1 = items.slice(0, Math.ceil(items.length / 2));
+  const row2 = items.slice(Math.ceil(items.length / 2));
+
+  const renderRow = (rowItems: GalleryMediaItem[], reverse: boolean) => {
+    const doubled = [...rowItems, ...rowItems];
+    const direction = reverse ? "right" : "left";
+    return (
+      <div className={`flex ${reverse ? "flex-row-reverse" : "flex-row"} gap-4 overflow-hidden`}>
+        <div
+          className={`flex gap-4 ${reverse ? "flex-row-reverse" : "flex-row"} ${direction === "left" ? "animate-marquee-left" : "animate-marquee-right"}`}
+          style={{ width: "max-content" }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.animationPlayState = "paused";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.animationPlayState = "running";
+          }}
+        >
+          {doubled.map((item, idx) => (
+            <div
+              key={`${item.id}-${idx}`}
+              className="shrink-0 w-[280px] sm:w-[340px] lg:w-[400px] aspect-[4/3] rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-lg transition-shadow cursor-pointer bg-slate-100"
+              onClick={() => openLightbox(idx % items.length)}
+            >
+              <SmartImage
+                src={getOptimizedUrl(item.url, 400)}
+                alt={item.title || `${serviceName} showcase`}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   return (
-    <section className="py-16 lg:py-24 bg-white relative overflow-hidden border-t border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
-          <Reveal>
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1 bg-[#EAF3F6] border border-[#062B3A]/15 rounded-full text-xs font-bold text-[#FF6B1A] tracking-widest uppercase shadow-sm">
-              <ImageIcon className="w-3.5 h-3.5" />
-              <span>VISUAL SHOWCASE</span>
-            </div>
-          </Reveal>
-
-          <Reveal delay={80}>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight">
-              {serviceName} in Action
-            </h2>
-          </Reveal>
-
-          <Reveal delay={140}>
-            <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto">
-              Real-world fleet operations, port handling, terminal staging, and heavy transport execution.
-            </p>
-          </Reveal>
+    <section className="py-10 lg:py-14 bg-white overflow-hidden border-t border-slate-100">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-end justify-between mb-6 lg:mb-8">
+          <div>
+            <h3 className="text-lg lg:text-xl font-black text-[#062B3A]">
+              {heading || `${serviceName} in Action`}
+            </h3>
+            {description && (
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">{description}</p>
+            )}
+          </div>
         </div>
 
-        {/* Gallery Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.map((item, index) => (
-            <Reveal key={item.id || index} delay={index * 80}>
-              <div
-                onClick={() => openLightbox(index)}
-                className="group relative rounded-3xl overflow-hidden aspect-[16/11] bg-slate-100 border border-slate-200 shadow-sm hover:shadow-2xl transition-all duration-300 cursor-pointer hover:-translate-y-1"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") openLightbox(index);
-                }}
-              >
-                <img
-                  src={item.url}
-                  alt={item.title || `${serviceName} gallery image`}
-                  loading="lazy"
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#062B3A]/85 via-[#062B3A]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 text-white">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-bold text-white">{item.title}</h4>
-                      {item.caption && (
-                        <p className="text-xs text-slate-300 line-clamp-1 mt-0.5">{item.caption}</p>
-                      )}
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-[#FF6B1A] flex items-center justify-center text-white shrink-0">
-                      <ZoomIn className="w-4 h-4" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <style>{`
+          @keyframes marquee-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+          @keyframes marquee-right {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+          }
+          .animate-marquee-left {
+            animation: marquee-left 25s linear infinite;
+          }
+          .animate-marquee-right {
+            animation: marquee-right 25s linear infinite;
+          }
+        `}</style>
 
+        <div className="space-y-4">
+          {row1.length > 0 && renderRow(row1, false)}
+          {row2.length > 0 && renderRow(row2, true)}
+        </div>
       </div>
 
-      {/* Lightbox Modal */}
       {selectedIdx !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#03212D]/95 backdrop-blur-md p-4 animate-in fade-in duration-200">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#03212D]/95 backdrop-blur-md p-4"
+          onClick={closeLightbox}
+        >
           <button
             type="button"
             onClick={closeLightbox}
@@ -98,7 +119,6 @@ export default function ServiceGallery({ serviceName, items }: ServiceGalleryPro
           >
             <X className="w-6 h-6" />
           </button>
-
           <button
             type="button"
             onClick={prevImage}
@@ -107,7 +127,6 @@ export default function ServiceGallery({ serviceName, items }: ServiceGalleryPro
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
-
           <button
             type="button"
             onClick={nextImage}
@@ -116,9 +135,8 @@ export default function ServiceGallery({ serviceName, items }: ServiceGalleryPro
           >
             <ChevronRight className="w-6 h-6" />
           </button>
-
-          <div className="max-w-5xl max-h-[85vh] flex flex-col items-center">
-            <img
+          <div className="max-w-5xl max-h-[85vh] flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+            <SmartImage
               src={items[selectedIdx].url}
               alt={items[selectedIdx].title}
               className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl border border-white/15"

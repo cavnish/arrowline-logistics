@@ -9,7 +9,7 @@ export default function BlogSection({ onOpenQuote }: BlogSectionProps) {
   return (
     <section className="py-16 lg:py-24 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 lg:mb-16">
           <div className="inline-flex items-center space-x-2 px-3.5 py-1 bg-[#EAF3F6] border border-[#062B3A]/15 rounded-full text-xs font-bold text-[#062B3A] tracking-widest uppercase shadow-sm">
@@ -41,7 +41,7 @@ export default function BlogSection({ onOpenQuote }: BlogSectionProps) {
                   loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                
+
                 {/* Category Pill */}
                 <span className="absolute top-3.5 left-3.5 bg-[#062B3A]/90 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
                   {post.category}
@@ -76,7 +76,7 @@ export default function BlogSection({ onOpenQuote }: BlogSectionProps) {
                   <span className="text-xs font-bold text-[#062B3A]">
                     By {post.author}
                   </span>
-                  
+
                   <button
                     onClick={onOpenQuote}
                     className="text-xs font-black uppercase text-[#FF6B1A] group-hover:text-[#FF7A00] flex items-center space-x-1 cursor-pointer"

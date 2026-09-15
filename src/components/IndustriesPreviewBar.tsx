@@ -23,7 +23,7 @@ export default function IndustriesPreviewBar({ onNavigateToIndustries }: Industr
   return (
     <section className="py-14 lg:py-18 bg-white border-y border-slate-200/80 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Header Strip */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 pb-4">
           <div className="space-y-2 max-w-2xl">

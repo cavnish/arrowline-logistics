@@ -28,7 +28,7 @@ export default function Contact({ onFormSuccess }: ContactProps) {
             Direct Communication Channels
           </span>
           <h1 className="text-2xl sm:text-4xl font-black text-[#1E3A8A] tracking-tight leading-tight">
-            Connect with Our <span className="text-[#FF7A00]">Mundra Operations</span> Base
+            Connect with Our <span className="text-[#FF7A00]">Mundra Headquarters</span>
           </h1>
           <p className="text-xs text-slate-600 leading-relaxed">
             Get instant shipping rates, status on active transits, or coordinate customs documentation with our dedicated planners. Available 24/7.
@@ -65,7 +65,7 @@ export default function Contact({ onFormSuccess }: ContactProps) {
                 <Mail className="w-5 h-5" />
               </div>
               <div>
-                <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mundra Base Office</span>
+                <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mundra Headquarters</span>
                 <a
                   href={buildMailto({ to: COMPANY_DETAILS.primaryEmail, context: "quote" })}
                   className="block text-xs font-black text-[#1E3A8A] hover:text-[#FF7A00] transition-colors mt-0.5 truncate"
@@ -98,7 +98,7 @@ export default function Contact({ onFormSuccess }: ContactProps) {
             <div className="flex items-start space-x-3">
               <MapPin className="w-5 h-5 text-[#FF7A00] flex-shrink-0 mt-0.5" />
               <div className="space-y-1">
-                <span className="block text-xs font-bold text-[#1E3A8A] uppercase tracking-wide">Mundra Port Yard Base:</span>
+                <span className="block text-xs font-bold text-[#1E3A8A] uppercase tracking-wide">Mundra Headquarters:</span>
                 <p className="text-[11px] text-slate-700 leading-relaxed">
                   {COMPANY_DETAILS.headOffice}
                 </p>

@@ -125,10 +125,10 @@ export const COMPANY_DETAILS = {
   tagline: "Moving Cargo. Connecting India.",
   secondaryTagline: "Logistics & Transportation Services Across India",
   primaryEmail: "mundra@arrowlinelogistics.in",
-  secondaryEmail: "vinay@arrowlinelogistics.in",
-  phone: "+91 9021179108",
+  secondaryEmail: "info@arrowlinelogistics.in",
+  phone: "+91 99222 04446",
   secondaryPhone: "+91 9766262612",
-  whatsapp: "+919021179108",
+  whatsapp: "+919922204446",
   headOffice: "Office 204, Portview Commercial Complex, Near Adani House, Mundra Port Road, Mundra, Kutch, Gujarat - 370421, India",
   aboutShort: "ARROWLINE LOGISTICS is a premier multimodal logistics and transportation company operating across India. Centered at Mundra Port, Gujarat—the gateway of India's maritime trade—we integrate road transportation (FTL/PTL), rail freight, coastal shipping, and customs clearance to deliver reliable, optimized, and secure door-to-door supply chain solutions.",
   aboutDetailed: "Arrowline Logistics provides end-to-end logistics, material transport, and supply chain solutions designed to move industrial goods, containers, and oversized cargo efficiently across India. Grounded at Mundra Port, Gujarat, we coordinate highway transport, CONCOR rail links, coastal shipping routes, and global freight forwarding to deliver seamless pan-India connectivity for major industries."
@@ -186,7 +186,7 @@ export const CORE_SERVICES: ServiceDetail[] = [
     keyCapability: "Full Truck Load (FTL) & Container Movement",
     shortDesc: "Reliable road transportation solutions across India, including Full Truck Load (FTL) and Part Truck Load (PTL) services for industrial materials and high-volume cargo with real-time GPS tracking.",
     longDesc: "Arrowline Logistics provides comprehensive road transportation and freight services across India, specializing in Full Truck Load (FTL) and Part Truck Load (PTL) operations. Our GPS-enabled fleet delivers secure, door-to-door transit from ports and production centers to regional warehouses with customized routing, vetted drivers, and strict safety guidelines.",
-    image: "/images/road-transport.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
     features: [
       "Pan-India coverage & express freight movement across 500+ cities",
       "Full Truck Load (FTL) dedicated capacity & Part Truck Load (PTL) distribution",
@@ -211,7 +211,7 @@ export const CORE_SERVICES: ServiceDetail[] = [
     keyCapability: "Sea-Road Port Integration & Coastal Loops",
     shortDesc: "Cost-efficient coastal shipping and maritime solutions connecting Mundra Port to major coastal hubs with seamless sea-road interface.",
     longDesc: "Our coastal shipping solutions provide a sustainable, cost-efficient logistics alternative for appropriate cargo types and routes. By utilizing India’s vast coastline, we connect key western ports with southern and eastern destinations through a synchronized sea-road model that reduces long-haul highway wear and freight expenses.",
-    image: "/images/hero-logistics.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg",
     features: [
       "Cost-effective long-haul freight alternative for heavy bulk goods and steel",
       "Seamless sea-road interface minimizing multi-handling risks",
@@ -235,7 +235,7 @@ export const CORE_SERVICES: ServiceDetail[] = [
     keyCapability: "CONCOR Coordination & Long-Haul Corridors",
     shortDesc: "Cost-optimized logistical pipelines combining rail, road, and coastal networks backed by robust coordination with Indian Railways and dry ports.",
     longDesc: "We provide integrated rail and multimodal logistics combining rail freight corridors, coastal links, and highway trucking to deliver cost-optimized bulk transportation. Backed by coordination with Indian Railways and private container train operators (CONCOR), our operations enable containerized cargo to travel smoothly from port terminals to inland container depots (ICDs).",
-    image: "/images/rail-multimodal.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377045/arrowline/general/rail-multimodal.jpg",
     features: [
       "Scheduled departure timetables via Western Dedicated Freight Corridors (WDFC)",
       "High cost efficiency for long-haul routes exceeding 500 kilometers",
@@ -259,7 +259,7 @@ export const CORE_SERVICES: ServiceDetail[] = [
     keyCapability: "ICEGATE Documentation & Compliance Management",
     shortDesc: "Compliant custom brokerage and documentation support ensuring smooth, swift clearance of import and export shipments at Mundra Port.",
     longDesc: "We provide compliant customs clearance and brokerage coordination to facilitate smooth cross-border freight flow. From ICEGATE filing to tariff classifications, duty calculations, and port authority liaison, our experienced team manages documentation accurately to prevent costly port delays.",
-    image: "/images/truck-fleet-yard.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377072/arrowline/general/truck-fleet-yard.jpg",
     features: [
       "Accurate Bill of Entry (BOE) and Shipping Bill filings on ICEGATE",
       "Comprehensive guidance on customs duty tariffs and import/export regulations",
@@ -288,7 +288,7 @@ export const CORE_SERVICES: ServiceDetail[] = [
     heroSubheadline: "Dedicated truck movement from pickup to delivery without unnecessary transshipment.",
     shortDesc: "Dedicated FTL transportation for manufacturers, distributors, exporters, warehouses and businesses that need direct, controlled movement of full truck shipments across India.",
     longDesc: "Arrowline Logistics provides dedicated FTL transportation for manufacturers, distributors, exporters, warehouses and businesses that need direct, controlled movement of full truck shipments across India. One vehicle, one shipment, direct delivery—eliminating multiple handling points and consolidation delays.",
-    image: "/images/road-transport.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
     features: [
       "Direct movement without transshipment or intermediate consolidation",
       "Lower handling and reduced transshipment risk",
@@ -342,7 +342,7 @@ export const CORE_SERVICES: ServiceDetail[] = [
     heroSubheadline: "Planned shared capacity for smaller shipments between major business locations.",
     shortDesc: "Part-load solutions for businesses with smaller shipments that do not require full truck capacity. Planned consolidation with scheduled dispatches.",
     longDesc: "Arrowline Logistics offers Part Truck Load (PTL) services for businesses with smaller shipments that do not require complete truck capacity. Our planned consolidation and scheduled dispatch model makes PTL cost-effective while maintaining reliability.",
-    image: "/images/road-transport.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
     features: [
       "Shared truck capacity for smaller shipments",
       "Multi-location consolidation from multiple suppliers or to multiple destinations",
@@ -396,7 +396,7 @@ export const CORE_SERVICES: ServiceDetail[] = [
     heroSubheadline: "Factory, warehouse, distributor and customer deliveries planned around your business.",
     shortDesc: "Comprehensive local and interstate transportation services for factory-to-warehouse, warehouse-to-distributor, and customer delivery movements across major Indian business corridors.",
     longDesc: "Arrowline Logistics provides reliable local and interstate transportation services supporting factory deliveries, warehouse transfers, distributor movements, and customer fulfillment across India's major business corridors.",
-    image: "/images/road-transport.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
     features: [
       "Factory to warehouse transfers",
       "Warehouse to distributor movement",
@@ -453,7 +453,7 @@ export const CORE_SERVICES: ServiceDetail[] = [
     heroSubheadline: "20-ft and 40-ft import/export container movement with coordinated road transportation.",
     shortDesc: "Specialized container transportation for 20-ft and 40-ft containers, with seamless coordination between ports, CFS facilities, and inland warehouses.",
     longDesc: "Arrowline Logistics provides specialized container transportation services for import and export cargo movement. From port pickup to CFS delivery to final inland warehouse placement, we coordinate the complete logistics chain.",
-    image: "/images/road-transport.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
     features: [
       "20-ft and 40-ft container transportation",
       "Port-to-CFS movement and coordination",
@@ -511,7 +511,7 @@ export const CORE_SERVICES: ServiceDetail[] = [
     heroSubheadline: "Priority dispatch and final-mile delivery with confirmation and POD support.",
     shortDesc: "Express transportation and last-mile delivery services for time-sensitive shipments, retail replenishment, and urgent business cargo with confirmation and tracking.",
     longDesc: "Arrowline Logistics provides fast express transportation and last-mile delivery services for time-critical shipments. When timing matters, our priority dispatch and delivery confirmation ensure your cargo reaches on schedule.",
-    image: "/images/road-transport.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
     features: [
       "Priority dispatch for urgent shipments",
       "Express transportation with reduced transit time",
@@ -568,7 +568,7 @@ export const CORE_SERVICES: ServiceDetail[] = [
     heroSubheadline: "Suitable trailers and route planning for machinery, steel, solar and project cargo.",
     shortDesc: "Specialized heavy cargo and Over Dimensional Cargo (ODC) transportation for machinery, steel, solar equipment, and project cargo requiring route assessment and planning.",
     longDesc: "Arrowline Logistics provides specialized transportation for heavy and oversized cargo. From machinery and industrial equipment to solar panels and project cargo, we plan routes, select appropriate vehicles, and coordinate the movement of non-standard shipments.",
-    image: "/images/road-transport.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
     features: [
       "Heavy machinery movement",
       "ODC (Over Dimensional Cargo) transportation",
@@ -627,7 +627,7 @@ export const PROCESS_STEPS: ProcessStep[] = [
     subtitle: "Cargo Analysis & Consultation",
     description: "We analyze your material dimensions, weight, origin, destination, timeline requirements, and commercial considerations.",
     icon: "FileSearch",
-    image: "/images/business-handshake.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377036/arrowline/general/business-handshake.jpg"
   },
   {
     step: "02",
@@ -635,7 +635,7 @@ export const PROCESS_STEPS: ProcessStep[] = [
     subtitle: "Multimodal Route Optimization",
     description: "Our logistics planners design the optimal multimodal route combining road, rail, or coastal shipping for best cost & speed.",
     icon: "Route",
-    image: "/images/hero-logistics.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg"
   },
   {
     step: "03",
@@ -643,7 +643,7 @@ export const PROCESS_STEPS: ProcessStep[] = [
     subtitle: "Safe Loading & Inspection",
     description: "GPS-enabled fleet arrives for on-schedule cargo pickup with certified heavy lashing, seal verification, and digital manifest.",
     icon: "PackageCheck",
-    image: "/images/truck-fleet-yard.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377072/arrowline/general/truck-fleet-yard.jpg"
   },
   {
     step: "04",
@@ -651,7 +651,7 @@ export const PROCESS_STEPS: ProcessStep[] = [
     subtitle: "Dedicated Transit Execution",
     description: "Your consignment moves smoothly across national expressways, freight rail corridors, or coastal shipping lines.",
     icon: "Truck",
-    image: "/images/road-transport.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg"
   },
   {
     step: "05",
@@ -659,7 +659,7 @@ export const PROCESS_STEPS: ProcessStep[] = [
     subtitle: "Real-Time 24/7 Visibility",
     description: "Live GPS tracking and milestone updates keep your supply chain team informed of location, ETA, and progress.",
     icon: "Activity",
-    image: "/images/rail-multimodal.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377045/arrowline/general/rail-multimodal.jpg"
   },
   {
     step: "06",
@@ -667,7 +667,7 @@ export const PROCESS_STEPS: ProcessStep[] = [
     subtitle: "On-Time Doorstep Handover",
     description: "Safe final-mile unloading, electronic Proof of Delivery (e-POD) sign-off, and seamless consignment closure.",
     icon: "CheckCircle",
-    image: "/images/hero-trucks-city.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377039/arrowline/general/hero-trucks-city.jpg"
   }
 ];
 
@@ -679,7 +679,7 @@ export const INDUSTRIES_SERVED: IndustryItem[] = [
     description: "Just-in-time FTL movement of auto parts, engine blocks, and assembly components across manufacturing belts.",
     icon: "Car",
     cargoTypes: ["Engine components", "Chassis parts", "Finished vehicles", "Tires & batteries"],
-    image: "/images/road-transport.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg"
   },
   {
     id: "fmcg-retail",
@@ -687,7 +687,7 @@ export const INDUSTRIES_SERVED: IndustryItem[] = [
     description: "High-frequency nationwide distribution connecting manufacturing units with regional warehousing hubs.",
     icon: "ShoppingBag",
     cargoTypes: ["Packaged foods", "Beverages", "Consumer goods", "Personal care"],
-    image: "/images/hero-trucks-city.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377039/arrowline/general/hero-trucks-city.jpg"
   },
   {
     id: "manufacturing-engineering",
@@ -695,7 +695,7 @@ export const INDUSTRIES_SERVED: IndustryItem[] = [
     description: "Industrial equipment, precision machinery, casting units, and structural fabrication transport.",
     icon: "Cog",
     cargoTypes: ["Heavy machinery", "Castings & forgings", "Pumps & turbines", "Industrial assemblies"],
-    image: "/images/project-cargo.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377041/arrowline/general/project-cargo.jpg"
   },
   {
     id: "pharmaceutical",
@@ -703,7 +703,7 @@ export const INDUSTRIES_SERVED: IndustryItem[] = [
     description: "Secure, time-critical logistics for active pharmaceutical ingredients (API) and medical products.",
     icon: "ShieldAlert",
     cargoTypes: ["APIs & bulk chemicals", "Medical equipment", "Packaging materials", "Formulations"],
-    image: "/images/truck-fleet-yard.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377072/arrowline/general/truck-fleet-yard.jpg"
   },
   {
     id: "chemical",
@@ -711,7 +711,7 @@ export const INDUSTRIES_SERVED: IndustryItem[] = [
     description: "Compliant containerized transportation for specialty chemicals, industrial polymers, and raw resins.",
     icon: "FlaskConical",
     cargoTypes: ["Polymers & resins", "Specialty chemicals", "Bulk liquid containers", "Fertilizers"],
-    image: "/images/hero-logistics.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg"
   },
   {
     id: "infrastructure-steel",
@@ -719,7 +719,7 @@ export const INDUSTRIES_SERVED: IndustryItem[] = [
     description: "Heavy-haul flatbed and rail transportation for steel coils, pipes, TMT bars, and construction equipment.",
     icon: "HardHat",
     cargoTypes: ["Steel coils & sheets", "TMT bars & pipes", "Cement & gypsum", "Earthmoving machines"],
-    image: "/images/project-cargo.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377041/arrowline/general/project-cargo.jpg"
   },
   {
     id: "solar-energy",
@@ -727,7 +727,7 @@ export const INDUSTRIES_SERVED: IndustryItem[] = [
     description: "Specialized handling for solar panels, inverters, transformers, wind turbine components, and substations.",
     icon: "Sun",
     cargoTypes: ["Solar PV modules", "Inverter skids", "Power transformers", "Wind turbine parts"],
-    image: "/images/rail-multimodal.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377045/arrowline/general/rail-multimodal.jpg"
   },
   {
     id: "ecommerce-electronics",
@@ -735,7 +735,7 @@ export const INDUSTRIES_SERVED: IndustryItem[] = [
     description: "High-velocity linehaul trucking and express freight connectivity between port hubs and fulfillment centers.",
     icon: "Layers",
     cargoTypes: ["Consumer electronics", "Telecom equipment", "Apparel & textiles", "Bulk parcel linehaul"],
-    image: "/images/hero-trucks-city.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377039/arrowline/general/hero-trucks-city.jpg"
   }
 ];
 
@@ -845,7 +845,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     challenge: "The shipment measured 5.8m width and 6.2m height, encountering low bridges, overhead power lines, and multi-state permit requirements across 5 states.",
     solution: "Arrowline performed comprehensive route feasibility surveys, deployed hydraulic modular multi-axle trailers, and coordinated with state utility teams for real-time overhead line lifting.",
     result: "Delivered safely in 18 days (3 days ahead of schedule), saving the client ₹12 Lakhs in port demurrage and site delay penalties.",
-    image: "/images/project-cargo.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377041/arrowline/general/project-cargo.jpg",
     badge: "ODC Heavy Lift"
   },
   {
@@ -858,7 +858,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     challenge: "Long-haul highway trucking was facing rising diesel costs, toll charges, and erratic delivery timelines due to highway congestion.",
     solution: "We engineered a coastal shipping route from Mundra Port to Chennai Port, with synchronized local FTL road trailers for last-mile delivery to factories.",
     result: "Logistics costs were reduced by 32%, carbon footprint dropped by ~45%, and supply schedule reliability reached 100%.",
-    image: "/images/hero-logistics.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg",
     badge: "Cost Reduction 32%"
   },
   {
@@ -871,7 +871,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     challenge: "Strict 2°C to 8°C thermal constraints with strict zero-tolerance QA criteria and tight flight boarding schedules.",
     solution: "Deployed specialized temperature-controlled GPS-monitored container trucks with dual refrigeration backups and live temperature telemetry.",
     result: "Delivered in 12.5 hours directly to the airport cargo terminal with 100% temperature compliance and zero transit deviations.",
-    image: "/images/road-transport.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
     badge: "Express 12.5h Transit"
   },
   {
@@ -884,7 +884,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     challenge: "High vessel volume arriving in tight sequence required rapid port clearance to prevent port detention charges.",
     solution: "Arrowline coordinated direct vessel-to-rail loading at Mundra port, routing dedicated container rakes straight to Rajasthan dry-port.",
     result: "100% of 220 containers cleared and dispatched within 72 hours, saving over ₹18 Lakhs in potential container detention.",
-    image: "/images/rail-multimodal.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377045/arrowline/general/rail-multimodal.jpg",
     badge: "220 TEUs Cleared"
   }
 ];
@@ -952,7 +952,7 @@ export const BLOG_POSTS: BlogPost[] = [
     author: "Operations Desk",
     category: "Road Transport",
     summary: "Discover how Full Truck Load (FTL) logistics provides dedicated vehicle space, reduces transit delays, and optimizes supply chains from Mundra Port to industrial centers.",
-    image: "/images/road-transport.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg"
   },
   {
     id: "blog-2",
@@ -963,7 +963,7 @@ export const BLOG_POSTS: BlogPost[] = [
     author: "Maritime Team",
     category: "Port Logistics",
     summary: "An in-depth analysis of Mundra Port’s maritime infrastructure, customs clearance workflows, and how multimodal connectivity links western maritime trade with northern inland depots.",
-    image: "/images/hero-logistics.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg"
   },
   {
     id: "blog-3",
@@ -974,7 +974,7 @@ export const BLOG_POSTS: BlogPost[] = [
     author: "Supply Chain Team",
     category: "Multimodal Strategy",
     summary: "Comparing the economics of dedicated freight rail corridors versus express highway trucking for bulk, containerized, and industrial cargo across India.",
-    image: "/images/rail-multimodal.jpg"
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377045/arrowline/general/rail-multimodal.jpg"
   }
 ];
 
@@ -1042,8 +1042,8 @@ export const TEAM_MEMBERS: TeamMember[] = [
   {
     name: "Vinay Kumar",
     role: "Director & Head of Multimodal Operations",
-    location: "Mundra Operations Base",
-    email: "vinay@arrowlinelogistics.in",
+    location: "Mundra Headquarters",
+    email: "info@arrowlinelogistics.in",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&h=400&fit=crop",
     bio: "Over 18 years of logistics expertise in the Kutch maritime belt. Vinay coordinates direct relationships with port authorities, custom houses, and shipping line alliances at Mundra and Kandla."
   },
@@ -1075,7 +1075,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     id: "g1",
     title: "Mundra Port Container Berth Operations",
     category: "Mundra Port",
-    image: "/images/hero-logistics.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg",
     alt: "Mundra port shipping container crane unloading cargo at Gujarat terminal",
     caption: "Direct vessel-to-trailer loading of 40-foot containers at Adani Mundra Port."
   },
@@ -1083,7 +1083,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     id: "g2",
     title: "FTL Heavy Fleet on Expressway Corridor",
     category: "Road Fleet",
-    image: "/images/road-transport.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
     alt: "Modern heavy cargo truck moving down expressway in India at sunset",
     caption: "GPS-enabled FTL high-cube container trucks navigating national express transport corridors."
   },
@@ -1091,7 +1091,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     id: "g3",
     title: "85-Ton ODC Cargo Transport",
     category: "ODC Cargo",
-    image: "/images/project-cargo.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377041/arrowline/general/project-cargo.jpg",
     alt: "Large industrial power transformer on multi-axle hydraulic modular trailer",
     caption: "Executing synchronized project cargo logistics using heavy modular multi-axle pullers with safety escorts."
   },
@@ -1099,7 +1099,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     id: "g4",
     title: "Multimodal Rail Freight Terminal Loading",
     category: "Rail Freight",
-    image: "/images/rail-multimodal.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377045/arrowline/general/rail-multimodal.jpg",
     alt: "Double stack container train loaded at inland dry port in India",
     caption: "Direct rail-to-road loading operations in coordination with Indian Railways and CONCOR private freight rail links."
   },
@@ -1107,7 +1107,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     id: "g5",
     title: "Customs Inspection & Port Gate Dispatch",
     category: "Customs",
-    image: "/images/truck-fleet-yard.jpg",
+    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377072/arrowline/general/truck-fleet-yard.jpg",
     alt: "Customs inspection and cargo lashing validation at port warehouse",
     caption: "Pre-shipment custom document checks and container seal verifications performed by Arrowline CHA agents."
   }
@@ -1121,7 +1121,7 @@ export const getOrganizationSchema = () => {
     "name": COMPANY_DETAILS.name,
     "alternateName": "Arrowline Multimodal Logistics",
     "url": "https://www.arrowlinelogistics.in",
-    "logo": "https://www.arrowlinelogistics.in/logo.png",
+    "logo": "https://res.cloudinary.com/uorctww6/image/upload/v1789377037/arrowline/general/favicon.png",
     "contactPoint": {
       "@type": "ContactPoint",
       "telephone": COMPANY_DETAILS.phone,
@@ -1142,7 +1142,7 @@ export const getLocalBusinessSchema = () => {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": COMPANY_DETAILS.name,
-    "image": "https://www.arrowlinelogistics.in/images/hero-logistics.jpg",
+    "image": "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg",
     "@id": "https://www.arrowlinelogistics.in/#localbusiness",
     "url": "https://www.arrowlinelogistics.in",
     "telephone": COMPANY_DETAILS.phone,

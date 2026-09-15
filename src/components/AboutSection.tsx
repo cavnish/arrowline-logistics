@@ -2,6 +2,7 @@ import { CheckCircle2, ArrowRight, Phone, Award } from "lucide-react";
 import { COMPANY_DETAILS } from "../data/logisticsData";
 import { buildTel } from "../utils/contactLinks";
 import { useSiteContent } from "../hooks/useSiteContent";
+import SmartImage from "./ui/SmartImage";
 
 interface AboutSectionProps {
   onNavigateToAbout: () => void;
@@ -93,11 +94,9 @@ export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
 
               {/* Primary Large Image (Port & Container Crane) */}
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100 aspect-[4/3] sm:aspect-[16/11]">
-                <img
-                  src={content("about_image", "/images/hero-logistics.jpg")}
+                <SmartImage
+                  src={content("about_image", "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg")}
                   alt="Mundra port container logistics crane and ship operations"
-                  loading="lazy"
-                  decoding="async"
                   className="w-full h-full object-cover object-center"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#062B3A]/80 via-transparent to-transparent" />
@@ -110,11 +109,9 @@ export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
 
               {/* Overlapping Secondary Image (Fleet in Yard) */}
               <div className="absolute -bottom-8 -left-6 sm:-left-8 w-1/2 rounded-2xl overflow-hidden shadow-2xl border-4 border-white hidden sm:block aspect-[4/3]">
-                <img
-                  src="/images/truck-fleet-yard.jpg"
+                <SmartImage
+                  src="https://res.cloudinary.com/uorctww6/image/upload/v1789377072/arrowline/general/truck-fleet-yard.jpg"
                   alt="Arrowline logistics fleet in transport yard"
-                  loading="lazy"
-                  decoding="async"
                   className="w-full h-full object-cover"
                 />
               </div>

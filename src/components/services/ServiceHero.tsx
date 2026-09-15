@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArrowRight, Phone } from "lucide-react";
 import Reveal from "../Reveal";
+import SmartImage from "../ui/SmartImage";
 import { COMPANY_DETAILS } from "../../data/logisticsData";
 import { buildTel } from "../../utils/contactLinks";
 
@@ -33,7 +34,7 @@ export default function ServiceHero({
     return () => clearTimeout(t);
   }, []);
 
-  const heroMediaBg = fallbackImage || image || "/images/hero-logistics.jpg";
+  const heroMediaBg = fallbackImage || image || "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg";
 
   return (
     <section className="relative w-full min-h-[75vh] lg:min-h-[82vh] flex items-center overflow-hidden bg-[#062B3A] text-white">
@@ -58,7 +59,7 @@ export default function ServiceHero({
             />
           </video>
         ) : (
-          <img
+          <SmartImage
             src={heroMediaBg}
             alt={headline}
             className="w-full h-full object-cover object-center"

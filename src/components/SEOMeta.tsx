@@ -14,7 +14,7 @@ export default function SEOMeta({
   description,
   keywords = "multimodal logistics India, road transport FTL, coastal shipping India, Mundra Port logistics, ODC transport Gujarat, rail freight CONCOR, project cargo India, customs brokerage Mundra, shipping cargo India",
   canonicalUrl = "https://www.arrowlinelogistics.in",
-  ogImage = "https://www.arrowlinelogistics.in/images/hero-logistics.jpg"
+  ogImage = "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg"
 }: SEOMetaProps) {
   useEffect(() => {
     // 1. Update Title

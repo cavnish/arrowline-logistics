@@ -52,6 +52,12 @@ export interface Service {
   cta_url?: string | null;
   seo_title?: string | null;
   seo_desc?: string | null;
+  showcase_heading?: string | null;
+  showcase_description?: string | null;
+  cargo_heading?: string | null;
+  cargo_description?: string | null;
+  showcaseItems?: any[] | null;
+  cargoApplications?: any[] | null;
   created_at: string;
   updated_at: string;
 }
@@ -98,6 +104,12 @@ export interface ServiceItem {
   seo_title?: string | null;
   seo_desc?: string | null;
   keywords?: any;
+  showcase_heading?: string | null;
+  showcase_description?: string | null;
+  cargo_heading?: string | null;
+  cargo_description?: string | null;
+  showcaseItems?: any[] | null;
+  cargoApplications?: any[] | null;
   created_at: string;
   updated_at: string;
 }
@@ -186,6 +198,42 @@ function toParent(partial: any): { slug: string; title: string } {
   return { slug: partial?.slug || '', title: partial?.title || '' };
 }
 
+// Relational Visual Showcase rows (service_visual_showcase) take priority over
+// the legacy JSONB gallery. Returns rows shaped for ServiceGallery.
+function resolveShowcase(record: any, fallbackGallery: any, serviceName: string): any[] {
+  const rows = Array.isArray(record?.showcaseItems) && record.showcaseItems.length > 0
+    ? record.showcaseItems
+    : null;
+  if (rows) {
+    return rows.map((row: any) => ({
+      id: row.id,
+      url: row.image_url,
+      title: row.title || `${serviceName} operations`,
+      caption: row.caption || undefined,
+      alt_text: row.alt_text || undefined,
+    }));
+  }
+  return pickValue(record?.gallery, fallbackGallery) || [];
+}
+
+// Relational Cargo & Applications rows (service_cargo_applications) take
+// priority over the legacy JSONB applications. Returns rows shaped for
+// ServiceApplications.
+function resolveCargo(record: any, fallbackApplications: any): any[] {
+  const rows = Array.isArray(record?.cargoApplications) && record.cargoApplications.length > 0
+    ? record.cargoApplications
+    : null;
+  if (rows) {
+    return rows.map((row: any) => ({
+      title: row.title,
+      desc: row.description || '',
+      image: row.image_url || 'https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg',
+      alt_text: row.alt_text || undefined,
+    }));
+  }
+  return pickValue(record?.applications, fallbackApplications) || [];
+}
+
 class ContentService {
   // Services
   async getServices(): Promise<Service[]> {
@@ -260,6 +308,28 @@ class ContentService {
     }
   }
 
+  // Leadership team
+  async getLeadership(): Promise<any[]> {
+    try {
+      const data = await apiGet('/api/leadership');
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      console.error('[ContentService] getLeadership error:', err);
+      return [];
+    }
+  }
+
+  // Core values
+  async getCoreValues(): Promise<any[]> {
+    try {
+      const data = await apiGet('/api/core-values');
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      console.error('[ContentService] getCoreValues error:', err);
+      return [];
+    }
+  }
+
   // Transforms a service record into MainServiceData format with static fallback
   async getServiceDetail(slug: string): Promise<MainServiceData | null> {
     const staticFallback = getStaticMainServiceBySlug(slug) || getStaticMainServiceBySlug(normalizeSlug(slug));
@@ -282,7 +352,7 @@ class ContentService {
         heroHeadline: service.hero_headline || staticFallback?.heroHeadline || service.title,
         heroSubheadline: service.hero_subheadline || staticFallback?.heroSubheadline || service.short_description || '',
         heroDescription: service.hero_description || service.full_description || staticFallback?.heroDescription || '',
-        heroImage: service.hero_image || staticFallback?.heroImage || '/images/hero-logistics.jpg',
+        heroImage: service.hero_image || staticFallback?.heroImage || 'https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg',
         heroVideo: service.hero_video || staticFallback?.heroVideo,
         heroFallbackImage: service.hero_fallback_image || staticFallback?.heroFallbackImage,
         imageAlt: service.image_alt || staticFallback?.imageAlt || '',
@@ -291,14 +361,18 @@ class ContentService {
         aboutHeading: service.about_heading || staticFallback?.aboutHeading || `${service.title} Excellence`,
         aboutDescription: service.about_description || service.full_description || staticFallback?.aboutDescription || '',
         aboutBulletPoints: pickValue(service.about_bullet_points, staticFallback?.aboutBulletPoints) || [],
-        aboutImage: service.about_image || staticFallback?.aboutImage || service.hero_image || '/images/hero-logistics.jpg',
+        aboutImage: service.about_image || staticFallback?.aboutImage || service.hero_image || 'https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg',
         whyArrowline: pickValue(service.why_arrowline, staticFallback?.whyArrowline) || [],
         processSteps: pickValue(service.process_steps, staticFallback?.processSteps) || [],
-        applications: pickValue(service.applications, staticFallback?.applications) || [],
+        applications: resolveCargo(service, staticFallback?.applications),
         industries: pickValue(service.industries, staticFallback?.industries) || [],
         networkDescription: service.network_description || staticFallback?.networkDescription || '',
         faqs: pickValue(service.faqs, staticFallback?.faqs) || [],
-        gallery: pickValue(service.gallery, staticFallback?.gallery) || [],
+        gallery: resolveShowcase(service, staticFallback?.gallery, service.title),
+        showcaseHeading: service.showcase_heading || `${service.title} in Action`,
+        showcaseDescription: service.showcase_description || "Real-world fleet operations, port handling, terminal staging, and heavy transport execution.",
+        cargoHeading: service.cargo_heading || "What We Transport & Handle",
+        cargoDescription: service.cargo_description || `Specialized handling protocols configured specifically for ${service.title.toLowerCase()} cargo profiles.`,
         videoUrl: service.video_url || staticFallback?.videoUrl,
         videoPoster: service.video_poster || staticFallback?.videoPoster,
         ctaHeadline: service.cta_headline || staticFallback?.ctaHeadline || "Ready to Streamline Your Freight?",
@@ -340,7 +414,7 @@ class ContentService {
       heroHeadline: item.hero_headline || fallback?.heroHeadline || item.title,
       heroSubheadline: item.hero_subheadline || fallback?.heroSubheadline || item.short_description || '',
       heroBadge: item.hero_badge || fallback?.heroBadge || `${(parentService.title || 'Service').toUpperCase()} • SPECIALIZED SERVICE`,
-      heroImage: item.hero_image || fallback?.heroImage || '/images/hero-logistics.jpg',
+      heroImage: item.hero_image || fallback?.heroImage || 'https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg',
       heroVideo: item.hero_video || fallback?.heroVideo,
       heroFallbackImage: item.hero_fallback_image || fallback?.heroFallbackImage,
       imageAlt: item.image_alt || fallback?.imageAlt || '',
@@ -348,14 +422,18 @@ class ContentService {
       aboutHeading: item.about_heading || fallback?.aboutHeading || `${item.title} Built Around Your Cargo`,
       aboutDescription: item.about_description || item.full_description || fallback?.aboutDescription || '',
       aboutBulletPoints: pickValue(item.about_bullet_points, fallback?.aboutBulletPoints) || [],
-      aboutImage: item.about_image || fallback?.aboutImage || item.hero_image || '/images/hero-logistics.jpg',
+      aboutImage: item.about_image || fallback?.aboutImage || item.hero_image || 'https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg',
       capabilities: Array.isArray(item.capabilities) && item.capabilities.length > 0 ? item.capabilities : (fallback?.capabilities || []),
       whyArrowline: pickValue(item.why_arrowline, fallback?.whyArrowline) || [],
       processSteps: pickValue(item.process_steps, fallback?.processSteps) || [],
-      applications: pickValue(item.applications, fallback?.applications) || [],
+      applications: resolveCargo(item, fallback?.applications),
       industries: pickValue(item.industries, fallback?.industries) || [],
       faqs: pickValue(item.faqs, fallback?.faqs) || [],
-      gallery: pickValue(item.gallery, fallback?.gallery) || [],
+      gallery: resolveShowcase(item, fallback?.gallery, item.title),
+      showcaseHeading: item.showcase_heading || `${item.title} in Action`,
+      showcaseDescription: item.showcase_description || "Real-world fleet operations, port handling, terminal staging, and heavy transport execution.",
+      cargoHeading: item.cargo_heading || "What We Transport & Handle",
+      cargoDescription: item.cargo_description || `Specialized handling protocols configured specifically for ${item.title.toLowerCase()} cargo profiles.`,
       videoUrl: item.video_url || fallback?.videoUrl,
       videoPoster: item.video_poster || fallback?.videoPoster,
       ctaHeadline: item.cta_headline || fallback?.ctaHeadline || "Ready to Coordinate Your Shipment?",

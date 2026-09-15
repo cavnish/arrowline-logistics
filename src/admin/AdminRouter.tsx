@@ -22,6 +22,7 @@ import AdminEnquiries from "../pages/AdminEnquiries";
 import AdminEnquiryDetail from "../pages/AdminEnquiryDetail";
 import AdminServices from "../pages/AdminServices";
 import AdminIndustries from "../pages/AdminIndustries";
+import AdminTrustedNetwork from "../pages/AdminTrustedNetwork";
 import AdminCollection from "../pages/AdminCollection";
 import AdminContent from "../pages/AdminContent";
 import AdminMediaLibrary from "../pages/AdminMediaLibrary";
@@ -191,6 +192,9 @@ export default function AdminRouter() {
 
           <Route path="services" element={<AdminServices />} />
           <Route path="industries" element={<AdminIndustries />} />
+          <Route path="trusted-network" element={<AdminTrustedNetwork />} />
+          <Route path="leadership" element={<AdminCollection resource="leadership" title="Leadership Team" />} />
+          <Route path="core-values" element={<AdminCollection resource="core-values" title="Core Values" />} />
           <Route path="content" element={<AdminContent />} />
           <Route path="media" element={<AdminMediaLibrary />} />
           <Route path="case-studies" element={<AdminCollection resource="case-studies" title="Case Studies" />} />
@@ -199,8 +203,6 @@ export default function AdminRouter() {
           <Route path="clients" element={<AdminCollection resource="clients" title="Clients" />} />
           <Route path="faqs" element={<AdminCollection resource="faqs" title="FAQs" />} />
           <Route path="testimonials" element={<AdminCollection resource="testimonials" title="Testimonials" />} />
-          <Route path="blog-posts" element={<AdminCollection resource="blog-posts" title="Blog Posts" />} />
-          <Route path="blog-categories" element={<AdminCollection resource="blog-categories" title="Blog Categories" />} />
           <Route path="social-videos" element={<AdminCollection resource="social-videos" title="Social Videos" />} />
           <Route path="statistics" element={<AdminCollection resource="statistics" title="Statistics" />} />
           <Route path="site-settings" element={<AdminCollection resource="site-settings" title="Site Settings" />} />
