@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 
 import Lenis from "lenis";
 
@@ -29,7 +29,7 @@ import {
   buildWhatsApp,
 } from "./utils/contactLinks";
 
-import AdminRouter from "./admin/AdminRouter";
+const AdminRouter = lazy(() => import("./admin/AdminRouter"));
 
 export default function App() {
   const [activePage, setActivePage] =
@@ -310,7 +310,22 @@ export default function App() {
   // ===================================================
 
   if (isAdminRoute) {
-    return <AdminRouter />;
+    return (
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-10 h-10 border-4 border-slate-200 border-t-[#1E3A8A] rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-sm font-medium text-slate-600">
+                Loading admin portal...
+              </p>
+            </div>
+          </div>
+        }
+      >
+        <AdminRouter />
+      </Suspense>
+    );
   }
 
   // ===================================================

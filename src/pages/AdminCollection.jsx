@@ -2,9 +2,7 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import adminApi from "../services/adminApi";
 import {
   CASE_STUDIES,
-  CLIENT_LOGOS,
   CLIENT_TESTIMONIALS,
-  FAQ_ITEMS,
   GALLERY_ITEMS,
   LOGISTICS_STATS,
   REGIONAL_HUBS,
@@ -24,8 +22,6 @@ const configs = {
     "name", "slug", "state", "city", "description",
     "address", "image", "map_url", "meta_title", "meta_description",
   ],
-  clients: ["name", "logo", "category", "website", "is_featured"],
-  faqs: ["question", "answer", "category"],
   testimonials: [
     "customer_name", "company", "position", "testimonial",
     "photo", "rating",
@@ -42,18 +38,18 @@ const configs = {
 
 const labels = (key) => key.replaceAll("_", " ");
 
-const IMAGE_FIELDS = ["image", "photo", "featured_image", "thumbnail", "logo"];
+const IMAGE_FIELDS = ["image", "photo", "featured_image", "thumbnail"];
 const LONG_FIELDS = new Set([
   "description", "content", "answer", "challenge", "solution",
   "results", "testimonial", "excerpt", "address", "setting_value", "bio",
 ]);
 const PUBLISHED_RESOURCES = [
-  "case-studies", "gallery", "locations", "clients", "faqs",
+  "case-studies", "gallery", "locations",
   "testimonials", "social-videos", "statistics",
   "leadership", "core-values",
 ];
 const ORDER_RESOURCES = [
-  "case-studies", "gallery", "locations", "clients", "faqs",
+  "case-studies", "gallery", "locations",
   "testimonials", "social-videos", "statistics",
   "leadership", "core-values",
 ];
@@ -75,10 +71,6 @@ const staticRecords = {
     id: item.id, title: item.title, description: item.caption, category: item.category,
     image: item.image, alt_text: item.alt, is_published: true, display_order: index,
   })),
-  faqs: FAQ_ITEMS.map((item, index) => ({
-    id: item.id, question: item.question, answer: item.answer, category: item.category,
-    is_published: true, display_order: index,
-  })),
   testimonials: CLIENT_TESTIMONIALS.map((item, index) => ({
     id: item.id, customer_name: item.clientName, company: item.company, position: item.role,
     testimonial: item.comment, photo: item.avatar, rating: item.rating,
@@ -92,10 +84,6 @@ const staticRecords = {
     id: item.id, name: item.name, slug: item.id, state: item.state,
     description: item.details, address: item.connectivity,
     is_published: true, display_order: index,
-  })),
-  clients: CLIENT_LOGOS.map((item, index) => ({
-    id: `client-${index}`, name: item.name, logo: "", category: item.logoType,
-    website: "", is_featured: true, is_published: true, display_order: index,
   })),
   "site-settings": Object.entries(COMPANY_DETAILS).map(([key, value]) => ({
     id: key, setting_key: key, setting_value: String(value), setting_type: "text",
@@ -349,7 +337,7 @@ export default function AdminCollection({ resource, title }) {
         {fields.map((field) => {
           const isLong = LONG_FIELDS.has(field);
           const isImage = IMAGE_FIELDS.includes(field);
-          const isBoolean = ["is_published", "is_featured"].includes(field);
+          const isBoolean = field === "is_published";
           const isNumber = field === "display_order";
           const value = form[field] ?? "";
 
@@ -465,19 +453,6 @@ export default function AdminCollection({ resource, title }) {
           </label>
         )}
 
-        {resource === "clients" && !fields.includes("is_featured") && (
-          <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-            <input
-              name="is_featured"
-              type="checkbox"
-              checked={Boolean(form.is_featured)}
-              onChange={update}
-              className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-            />
-            Featured partner
-          </label>
-        )}
-
         <div className="md:col-span-2 flex gap-2">
           <button
             type="submit"
@@ -578,11 +553,6 @@ export default function AdminCollection({ resource, title }) {
                         {item.display_order !== undefined && (
                           <span className="text-xs text-slate-400">
                             Order: {item.display_order}
-                          </span>
-                        )}
-                        {resource === "clients" && item.is_featured && (
-                          <span className="text-xs text-amber-600 font-medium">
-                            Featured
                           </span>
                         )}
                       </div>

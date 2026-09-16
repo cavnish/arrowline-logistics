@@ -1,11 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { FAQ_ITEMS } from "../data/logisticsData";
+import type { FAQItem } from "../data/logisticsData";
 import { ChevronDown, HelpCircle, Phone } from "lucide-react";
 import { COMPANY_DETAILS } from "../data/logisticsData";
 import { buildTel } from "../utils/contactLinks";
 
 export default function FAQSection() {
-  const [openFaqId, setOpenFaqId] = useState<string>(FAQ_ITEMS[0].id);
+  const [faqs, setFaqs] = useState<FAQItem[]>(FAQ_ITEMS);
+  const [openFaqId, setOpenFaqId] = useState<string>(FAQ_ITEMS[0]?.id || "");
+
+  useEffect(() => {
+    let mounted = true;
+    const apiUrl = ((import.meta as any).env?.VITE_API_URL || "").trim().replace(/\/$/, "");
+    axios
+      .get(`${apiUrl}/api/faqs`)
+      .then((response) => {
+        const fetched = (response.data?.data || [])
+          .filter((item: any) => item.question && item.answer)
+          .map((item: any): FAQItem => ({
+            id: String(item.id),
+            question: item.question,
+            answer: item.answer,
+            category: item.category || "",
+          }));
+        if (!mounted || fetched.length === 0) return;
+        setFaqs(fetched);
+        setOpenFaqId((current) => (fetched.some((item) => item.id === current) ? current : fetched[0].id));
+      })
+      .catch((error) => {
+        console.error("Error fetching FAQs:", error);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const toggleFaq = (id: string) => {
     setOpenFaqId((prev) => (prev === id ? "" : id));
@@ -60,7 +89,7 @@ export default function FAQSection() {
 
           {/* Right Column: Accordion List (Matching Reference Image) */}
           <div className="lg:col-span-7 space-y-3.5">
-            {FAQ_ITEMS.map((item) => {
+            {faqs.map((item) => {
               const isOpen = openFaqId === item.id;
               return (
                 <div

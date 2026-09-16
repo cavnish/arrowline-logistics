@@ -76,7 +76,6 @@ const sidebarLinks = [
   { to: "/arrowline-admin/core-values", label: "Core Values", icon: Star },
   { to: "/arrowline-admin/gallery", label: "Gallery", icon: Images },
   { to: "/arrowline-admin/locations", label: "Locations", icon: MapPin },
-  { to: "/arrowline-admin/clients", label: "Clients", icon: Users },
   { to: "/arrowline-admin/faqs", label: "FAQs", icon: HelpCircle },
   { to: "/arrowline-admin/testimonials", label: "Testimonials", icon: MessageSquare },
   { to: "/arrowline-admin/social-videos", label: "Social Videos", icon: Video },
