@@ -34,6 +34,7 @@ const ALLOWED_FOLDERS = new Set([
   "arrowline/cargo-applications",
   "arrowline/leadership",
   "arrowline/core-values",
+  "arrowline/about",
 ]);
 
 function detectImageFormat(buffer) {

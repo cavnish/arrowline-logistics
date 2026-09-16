@@ -7,9 +7,11 @@ import {
   Quote,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { getOptimizedImageUrl } from "../utils/imageUrl";
 
 interface Testimonial {
-  id: number;
+  id: string;
   name: string;
   role: string;
   company: string;
@@ -17,11 +19,14 @@ interface Testimonial {
   time: string;
   initial: string;
   avatarColor: string;
+  photo?: string;
+  rating: number;
+  isVerified: boolean;
 }
 
-const testimonials: Testimonial[] = [
+const fallbackTestimonials: Testimonial[] = [
   {
-    id: 1,
+    id: "fallback-1",
     name: "Rahul Sharma",
     role: "Operations Manager",
     company: "Adani Exports",
@@ -30,9 +35,11 @@ const testimonials: Testimonial[] = [
     time: "4 months ago",
     initial: "R",
     avatarColor: "bg-orange-600",
+    rating: 5,
+    isVerified: true,
   },
   {
-    id: 2,
+    id: "fallback-2",
     name: "Priya Iyer",
     role: "Supply Chain Director",
     company: "Tata Chemicals",
@@ -41,9 +48,11 @@ const testimonials: Testimonial[] = [
     time: "5 months ago",
     initial: "P",
     avatarColor: "bg-emerald-600",
+    rating: 5,
+    isVerified: true,
   },
   {
-    id: 3,
+    id: "fallback-3",
     name: "Vikram Mehta",
     role: "Logistics Coordinator",
     company: "JSW Steel",
@@ -52,9 +61,11 @@ const testimonials: Testimonial[] = [
     time: "5 months ago",
     initial: "V",
     avatarColor: "bg-blue-600",
+    rating: 5,
+    isVerified: true,
   },
   {
-    id: 4,
+    id: "fallback-4",
     name: "Neha Patel",
     role: "Procurement Manager",
     company: "Renewable Energy Solutions",
@@ -63,9 +74,11 @@ const testimonials: Testimonial[] = [
     time: "6 months ago",
     initial: "N",
     avatarColor: "bg-purple-600",
+    rating: 5,
+    isVerified: true,
   },
   {
-    id: 5,
+    id: "fallback-5",
     name: "Amit Verma",
     role: "Plant Operations Head",
     company: "Industrial Manufacturing Co.",
@@ -74,15 +87,122 @@ const testimonials: Testimonial[] = [
     time: "6 months ago",
     initial: "A",
     avatarColor: "bg-slate-700",
+    rating: 5,
+    isVerified: true,
   },
 ];
+
+const AVATAR_COLORS = [
+  "bg-orange-600",
+  "bg-emerald-600",
+  "bg-blue-600",
+  "bg-purple-600",
+  "bg-slate-700",
+  "bg-rose-600",
+  "bg-cyan-600",
+  "bg-amber-600",
+];
+
+function getAvatarColor(name: string): string {
+  let hash = 0;
+  const str = String(name || "");
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+
+function getInitials(name: string): string {
+  return String(name || "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+}
+
+function formatRelativeTime(value: string | null | undefined): string {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months} month${months === 1 ? "" : "s"} ago`;
+  const years = Math.floor(months / 12);
+  return `${years} year${years === 1 ? "" : "s"} ago`;
+}
+
+interface ApiRecord {
+  id: string;
+  customer_name?: string;
+  company?: string;
+  position?: string;
+  testimonial?: string;
+  photo?: string | null;
+  rating?: number | null;
+  is_verified?: boolean;
+  created_at?: string;
+}
+
+function mapRecord(record: ApiRecord): Testimonial {
+  const name = record.customer_name || "Customer";
+  return {
+    id: String(record.id),
+    name,
+    role: record.position || "",
+    company: record.company || "",
+    message: record.testimonial || "",
+    time: formatRelativeTime(record.created_at) || "Verified review",
+    initial: getInitials(name),
+    avatarColor: getAvatarColor(name),
+    photo: record.photo || undefined,
+    rating: Math.max(1, Math.min(5, Number(record.rating) || 5)),
+    isVerified: record.is_verified !== false,
+  };
+}
 
 export default function TestimonialsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(fallbackTestimonials);
   const [visibleCards, setVisibleCards] = useState(3);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
+
+  /*
+   * FETCH CMS TESTIMONIALS
+   *
+   * API data wins. The hardcoded list above is only used when the
+   * backend is unreachable.
+   */
+  useEffect(() => {
+    let mounted = true;
+    const apiUrl = String((import.meta as any).env?.VITE_API_URL || "").trim().replace(/\/$/, "");
+    const load = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/api/testimonials`);
+        if (!mounted) return;
+        if (response.data?.success && Array.isArray(response.data.data) && response.data.data.length > 0) {
+          setTestimonials(response.data.data.map(mapRecord));
+          setCurrentIndex(0);
+        }
+      } catch (error) {
+        console.error("Error fetching testimonials:", error);
+      }
+    };
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   /*
    * RESPONSIVE CARD COUNT
@@ -131,6 +251,14 @@ export default function TestimonialsSection() {
       resizeObserver.disconnect();
     };
   }, []);
+
+  /*
+   * Average rating + review count derived from available data.
+   */
+  const averageRating = testimonials.length > 0
+    ? testimonials.reduce((total, item) => total + item.rating, 0) / testimonials.length
+    : 5;
+  const reviewCount = testimonials.length;
 
   /*
    * Maximum possible slide.
@@ -250,7 +378,7 @@ export default function TestimonialsSection() {
               <div className="flex items-center gap-2">
 
                 <span className="text-3xl lg:text-4xl font-black text-[#24458F]">
-                  5.0
+                  {averageRating.toFixed(1)}
                 </span>
 
                 <div>
@@ -265,7 +393,7 @@ export default function TestimonialsSection() {
                   </div>
 
                   <p className="text-[9px] text-slate-500 mt-0.5">
-                    Based on 6 reviews
+                    Based on {reviewCount} review{(reviewCount === 1 ? "" : "s")}
                   </p>
 
                 </div>
@@ -333,7 +461,7 @@ export default function TestimonialsSection() {
           <div className="flex items-center gap-2">
 
             <span className="text-2xl font-black text-[#24458F]">
-              5.0
+              {averageRating.toFixed(1)}
             </span>
 
             <div>
@@ -350,7 +478,7 @@ export default function TestimonialsSection() {
               </div>
 
               <p className="text-[9px] text-slate-500">
-                Based on 6 reviews
+                Based on {reviewCount} review{(reviewCount === 1 ? "" : "s")}
               </p>
 
             </div>
@@ -470,12 +598,11 @@ export default function TestimonialsSection() {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          className="
+                          className={`
                             w-4
                             h-4
-                            fill-[#FF7200]
-                            text-[#FF7200]
-                          "
+                            ${star <= Math.round(testimonial.rating) ? "fill-[#FF7200] text-[#FF7200]" : "fill-slate-200 text-slate-200"}
+                          `}
                         />
                       ))}
 
@@ -483,26 +610,28 @@ export default function TestimonialsSection() {
 
                     {/* VERIFIED */}
 
-                    <div className="
-                      flex
-                      items-center
-                      gap-1
-                      px-2
-                      py-0.5
-                      rounded-full
-                      border
-                      border-emerald-200
-                      bg-emerald-50
-                      text-emerald-600
-                    ">
+                    {testimonial.isVerified && (
+                      <div className="
+                        flex
+                        items-center
+                        gap-1
+                        px-2
+                        py-0.5
+                        rounded-full
+                        border
+                        border-emerald-200
+                        bg-emerald-50
+                        text-emerald-600
+                      ">
 
-                      <CheckCircle2 className="w-3 h-3" />
+                        <CheckCircle2 className="w-3 h-3" />
 
-                      <span className="text-[8px] font-bold">
-                        Verified
-                      </span>
+                        <span className="text-[8px] font-bold">
+                          Verified
+                        </span>
 
-                    </div>
+                      </div>
+                    )}
 
                   </div>
 
@@ -530,23 +659,41 @@ export default function TestimonialsSection() {
 
                   <div className="flex items-center gap-3">
 
-                    <div
-                      className={`
-                        w-10
-                        h-10
-                        rounded-full
-                        ${testimonial.avatarColor}
-                        flex
-                        items-center
-                        justify-center
-                        text-white
-                        font-bold
-                        text-sm
-                        shrink-0
-                      `}
-                    >
-                      {testimonial.initial}
-                    </div>
+                    {testimonial.photo ? (
+                      <img
+                        src={getOptimizedImageUrl(testimonial.photo, { width: 96 })}
+                        alt={testimonial.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="
+                          w-10
+                          h-10
+                          rounded-full
+                          object-cover
+                          ring-1
+                          ring-slate-200
+                          shrink-0
+                        "
+                      />
+                    ) : (
+                      <div
+                        className={`
+                          w-10
+                          h-10
+                          rounded-full
+                          ${testimonial.avatarColor}
+                          flex
+                          items-center
+                          justify-center
+                          text-white
+                          font-bold
+                          text-sm
+                          shrink-0
+                        `}
+                      >
+                        {testimonial.initial}
+                      </div>
+                    )}
 
                     <div className="min-w-0">
 
@@ -685,7 +832,7 @@ export default function TestimonialsSection() {
               sm:text-[10px]
               text-slate-500
             ">
-              Based on 6 reviews
+              Based on {reviewCount} review{(reviewCount === 1 ? "" : "s")}
             </span>
 
           </div>

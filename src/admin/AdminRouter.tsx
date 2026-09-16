@@ -24,6 +24,8 @@ import AdminServices from "../pages/AdminServices";
 import AdminIndustries from "../pages/AdminIndustries";
 import AdminTrustedNetwork from "../pages/AdminTrustedNetwork";
 import AdminCollection from "../pages/AdminCollection";
+import AdminTestimonials from "../pages/AdminTestimonials";
+import AdminAbout from "../pages/AdminAbout";
 import AdminContent from "../pages/AdminContent";
 import AdminMediaLibrary from "../pages/AdminMediaLibrary";
 
@@ -202,7 +204,8 @@ export default function AdminRouter() {
           <Route path="locations" element={<AdminCollection resource="locations" title="Locations" />} />
           <Route path="clients" element={<AdminCollection resource="clients" title="Clients" />} />
           <Route path="faqs" element={<AdminCollection resource="faqs" title="FAQs" />} />
-          <Route path="testimonials" element={<AdminCollection resource="testimonials" title="Testimonials" />} />
+          <Route path="testimonials" element={<AdminTestimonials />} />
+          <Route path="about" element={<AdminAbout />} />
           <Route path="social-videos" element={<AdminCollection resource="social-videos" title="Social Videos" />} />
           <Route path="statistics" element={<AdminCollection resource="statistics" title="Statistics" />} />
           <Route path="site-settings" element={<AdminCollection resource="site-settings" title="Site Settings" />} />

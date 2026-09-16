@@ -2138,6 +2138,10 @@ const COLLECTION_TABLE = {
   "site-settings": "site_settings",
   leadership: "leadership",
   "core-values": "core_values",
+  "about-images": "about_images",
+  "about-pillars": "about_pillars",
+  "about-milestones": "about_milestones",
+  "about-differentiators": "about_differentiators",
 };
 
 const COLLECTION_COLUMNS = {
@@ -2147,7 +2151,7 @@ const COLLECTION_COLUMNS = {
   gallery: ["title","description","category","image","alt_text","is_published","display_order"],
   locations: ["slug","name","state","city","description","address","image","map_url","meta_title","meta_description","is_published","display_order"],
   faqs: ["question","answer","category","is_published","display_order"],
-  testimonials: ["customer_name","company","position","testimonial","photo","rating","is_published","display_order"],
+  testimonials: ["customer_name","company","position","testimonial","photo","rating","is_verified","is_published","display_order"],
   "blog-categories": ["name","slug","description","is_published"],
   "blog-posts": ["title","slug","category_id","author","featured_image","excerpt","content","meta_title","meta_description","keywords","published_at","display_order","is_published"],
   "social-videos": ["title","video_url","embed_url","thumbnail","description","platform","is_published","display_order"],
@@ -2155,6 +2159,10 @@ const COLLECTION_COLUMNS = {
   "site-settings": ["setting_key","setting_value","setting_type","is_public"],
   leadership: ["name","role","location","email","bio","image","image_public_id","image_alt","display_order","is_published"],
   "core-values": ["title","description","icon","display_order","is_published"],
+  "about-images": ["slot","title","alt_text","image_url","image_public_id","is_published","display_order"],
+  "about-pillars": ["icon","title","text","color","is_published","display_order"],
+  "about-milestones": ["year","title","text","is_published","display_order"],
+  "about-differentiators": ["icon","title","text","accent","is_published","display_order"],
 };
 
 function pickColumns(body, allowed) {
@@ -2165,7 +2173,7 @@ function pickColumns(body, allowed) {
 
 // Generic collections that persist a Cloudinary public_id so the old asset can
 // be destroyed when the image is replaced or the record deleted.
-const IMAGE_PUBLIC_ID_RESOURCES = new Set(["leadership"]);
+const IMAGE_PUBLIC_ID_RESOURCES = new Set(["leadership", "about-images"]);
 
 router.get("/:resource", requireAdmin, async (req, res) => {
   try {
@@ -2178,7 +2186,7 @@ router.get("/:resource", requireAdmin, async (req, res) => {
     const search = String(req.query.search || "").trim();
     if (search) {
       const textCols = (COLLECTION_COLUMNS[resource] || [])
-        .filter((c) => !/^(is_|images|cargo_types|display_order|updated_at|created_at|published_at|category_id|is_public)$/.test(c));
+        .filter((c) => !/^(is_[a-z_]+|images|cargo_types|display_order|updated_at|created_at|published_at|category_id|is_public|photo|rating|image|logo|featured_image|thumbnail|video_url|embed_url|image_public_id|image_alt|map_url)$/.test(c));
       if (textCols.length) query = query.or(textCols.map((c) => `${c}.ilike.%${search}%`).join(","));
     }
 

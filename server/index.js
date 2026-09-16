@@ -576,6 +576,60 @@ app.get("/api/site-settings", async (_req, res) => {
   }
 });
 
+// =====================================================
+// PUBLIC — About page consolidated endpoint
+// =====================================================
+
+app.get("/api/about", async (_req, res) => {
+  try {
+    const [contentRes, imagesRes, pillarsRes, milestonesRes, differentiatorsRes] = await Promise.all([
+      supabase
+        .from("site_content")
+        .select("content_key, content_value, section, content_type, is_published")
+        .eq("is_published", true),
+      supabase
+        .from("about_images")
+        .select("*")
+        .order("display_order", { ascending: true }),
+      supabase
+        .from("about_pillars")
+        .select("*")
+        .eq("is_published", true)
+        .order("display_order", { ascending: true }),
+      supabase
+        .from("about_milestones")
+        .select("*")
+        .eq("is_published", true)
+        .order("display_order", { ascending: true }),
+      supabase
+        .from("about_differentiators")
+        .select("*")
+        .eq("is_published", true)
+        .order("display_order", { ascending: true }),
+    ]);
+
+    const firstErr = [contentRes.error, imagesRes.error, pillarsRes.error, milestonesRes.error, differentiatorsRes.error].find(Boolean);
+    if (firstErr) {
+      console.error("Public /api/about error:", firstErr);
+      return res.status(500).json({ success: false, message: "Unable to load About page data" });
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        siteContent: (contentRes.data || []).reduce((map, row) => { map[row.content_key] = row.content_value; return map; }, {}),
+        images: imagesRes.data || [],
+        pillars: pillarsRes.data || [],
+        milestones: milestonesRes.data || [],
+        differentiators: differentiatorsRes.data || [],
+      },
+    });
+  } catch (err) {
+    console.error("Public /api/about error:", err);
+    return res.status(500).json({ success: false, message: "Server error loading About page" });
+  }
+});
+
 // LEAD
 
 app.post(

@@ -22,6 +22,7 @@ import {
   Users,
   Star,
   Handshake,
+  Info,
   LogOut,
   Menu,
   X,
@@ -59,6 +60,11 @@ const sidebarLinks = [
     to: "/arrowline-admin/content",
     label: "Website Content",
     icon: Files,
+  },
+  {
+    to: "/arrowline-admin/about",
+    label: "About Page",
+    icon: Info,
   },
   {
     to: "/arrowline-admin/media",

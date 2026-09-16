@@ -1,12 +1,22 @@
-﻿node_modules/
+﻿# --- Dependencies & build output ---
+node_modules/
 dist/
-.env
-.env.*
-!.env.example
-*.log
 
+# --- Environment files (never commit real values) ---
 .env
 .env.*
 !.env.example
 
+# --- Secrets / credential files ---
+admin-login.json
 APi.txt
+
+# --- Logs ---
+*.log
+_server.err.log
+_server.out.log
+
+# --- Local scratch / tooling state ---
+.scratch/
+.claude/
+.kilo/

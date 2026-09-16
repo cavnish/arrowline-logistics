@@ -330,6 +330,24 @@ class ContentService {
     }
   }
 
+  // About page (consolidated CMS payload from /api/about)
+  async getAbout(): Promise<any | null> {
+    try {
+      const data = await apiGet('/api/about');
+      if (!data || typeof data !== 'object') return null;
+      return {
+        siteContent: data.siteContent || {},
+        images: Array.isArray(data.images) ? data.images : [],
+        pillars: Array.isArray(data.pillars) ? data.pillars : [],
+        milestones: Array.isArray(data.milestones) ? data.milestones : [],
+        differentiators: Array.isArray(data.differentiators) ? data.differentiators : [],
+      };
+    } catch (err) {
+      console.error('[ContentService] getAbout error:', err);
+      return null;
+    }
+  }
+
   // Transforms a service record into MainServiceData format with static fallback
   async getServiceDetail(slug: string): Promise<MainServiceData | null> {
     const staticFallback = getStaticMainServiceBySlug(slug) || getStaticMainServiceBySlug(normalizeSlug(slug));
