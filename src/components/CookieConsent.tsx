@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Cookie, X } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { ShieldCheck, X } from "lucide-react";
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 
 const STORAGE_KEY = "arrowline_cookie_consent";
 
@@ -115,7 +115,7 @@ export default function CookieConsent() {
   };
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <AnimatePresence>
         {showBanner && !dismissing && (
           <motion.div
@@ -128,48 +128,55 @@ export default function CookieConsent() {
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="fixed bottom-0 left-0 right-0 z-50 px-3 pb-3 sm:px-6 sm:pb-6"
           >
-            <div className="mx-auto max-w-3xl bg-white border border-slate-200 rounded-2xl shadow-[0_20px_60px_-15px_rgba(3,33,45,0.35)] p-4 sm:p-5 overflow-hidden relative">
-              {/* Top brand accent */}
+            <div className="mx-auto max-w-3xl bg-white border border-slate-200 rounded-2xl shadow-[0_14px_40px_-12px_rgba(3,33,45,0.22)] px-4 sm:px-6 py-4 sm:py-5 overflow-hidden relative">
+              {/* Thin orange top accent */}
               <div className="absolute left-0 right-0 top-0 h-1 bg-gradient-to-r from-[#FF6B1A] to-[#FFB366]" />
 
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="w-10 h-10 shrink-0 rounded-xl bg-[#FEF9F0] border border-[#FF6B1A]/20 flex items-center justify-center">
-                  <Cookie className="w-5 h-5 text-[#FF6B1A]" />
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
+                <div className="w-10 h-10 shrink-0 rounded-xl bg-[#FEF6EE] border border-[#FF6B1A]/15 flex items-center justify-center">
+                  <ShieldCheck className="w-5 h-5 text-[#FF6B1A]" />
                 </div>
 
-                <div className="flex-1 min-w-0 space-y-1">
-                  <h2 className="text-sm font-black text-[#1E3A8A] flex items-center gap-2">
-                    We use cookies
-                    <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-[#EAF3F6] text-[9px] font-bold text-[#062B3A] uppercase tracking-wider">
-                      Privacy-first
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2.5">
+                    <h2 className="text-base font-black tracking-tight text-[#1E3A8A]">
+                      Your Privacy Matters
+                    </h2>
+                    <span className="hidden sm:inline-flex px-2.5 py-0.5 rounded-full bg-[#EAF3F6] text-[9px] font-bold text-[#062B3A] uppercase tracking-wider">
+                      Your Choice
                     </span>
-                  </h2>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    Essential cookies keep Arrowline Logistics working. Optional
-                    cookies help us understand usage. No unnecessary tracking added.
+                  </div>
+                  <p className="mt-1.5 text-sm text-slate-600 leading-relaxed">
+                    We use cookies to improve your experience, remember your
+                    preferences, and help our website work smoothly.
                   </p>
-                  <button
-                    type="button"
-                    onClick={openSettings}
-                    className="text-xs font-bold text-[#1E3A8A] underline underline-offset-2 hover:text-[#FF6B1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2 rounded-sm"
-                  >
-                    Cookie Settings
-                  </button>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <button
+                      type="button"
+                      onClick={openSettings}
+                      className="text-xs font-bold text-[#1E3A8A] underline underline-offset-2 hover:text-[#FF6B1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2 rounded-sm"
+                    >
+                      Cookie Preferences
+                    </button>
+                    <span className="text-[11px] text-slate-400">
+                      You can change your preferences at any time.
+                    </span>
+                  </div>
                 </div>
 
-                <div className="flex flex-col-reverse sm:flex-row gap-2 sm:shrink-0">
+                <div className="flex flex-col sm:flex-row gap-2 sm:shrink-0 sm:items-center">
                   <button
                     type="button"
                     onClick={rejectOptional}
-                    className="px-4 py-2.5 rounded-xl border border-slate-300 text-[#1E3A8A] text-xs font-bold uppercase tracking-wide transition-all active:scale-95 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2"
+                    className="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-300 text-[#1E3A8A] text-xs font-bold uppercase tracking-wide transition-all active:scale-[0.98] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2"
                   >
-                    Reject Optional
+                    Essential Only
                   </button>
                   <button
                     type="button"
                     onClick={acceptAll}
                     autoFocus
-                    className="px-4 py-2.5 rounded-xl bg-[#FF7A00] hover:bg-[#E56D00] text-white text-xs font-black uppercase tracking-wide transition-all active:scale-95 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A00] focus-visible:ring-offset-2"
+                    className="w-full sm:w-auto px-5 py-3 rounded-xl bg-[#FF7A00] hover:bg-[#E56D00] text-white text-xs font-black uppercase tracking-wide transition-all active:scale-[0.98] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A00] focus-visible:ring-offset-2"
                   >
                     Accept All
                   </button>
@@ -222,8 +229,8 @@ export default function CookieConsent() {
                 </div>
 
                 <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-                  Manage which cookies we may use. Essential cookies are always
-                  active because the website needs them to function.
+                  Choose what makes your visit better. Essential cookies are
+                  always active so our website works smoothly.
                 </p>
 
                 <div className="mt-5 space-y-3">
@@ -239,14 +246,14 @@ export default function CookieConsent() {
 
                   <CookieToggle
                     label="Analytics Cookies"
-                    description="Understand website usage to improve your experience."
+                    description="Help us understand what is most useful, so we can keep improving."
                     checked={draft.analytics}
                     onChange={(value) => setDraft((prev) => ({ ...prev, analytics: value }))}
                   />
 
                   <CookieToggle
                     label="Marketing Cookies"
-                    description="Personalise promotional content."
+                    description="Help us share relevant updates and offers with you."
                     checked={draft.marketing}
                     onChange={(value) => setDraft((prev) => ({ ...prev, marketing: value }))}
                   />
@@ -273,7 +280,7 @@ export default function CookieConsent() {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </MotionConfig>
   );
 }
 
