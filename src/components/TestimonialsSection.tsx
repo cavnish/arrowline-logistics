@@ -9,6 +9,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { getOptimizedImageUrl } from "../utils/imageUrl";
+import Reveal from "./Reveal";
 
 interface Testimonial {
   id: string;
@@ -350,7 +351,7 @@ export default function TestimonialsSection() {
             HEADER
         ====================================================== */}
 
-        <div className="flex items-center justify-between gap-4 mb-5">
+        <Reveal className="flex items-center justify-between gap-4 mb-5">
 
           {/* TITLE */}
 
@@ -450,7 +451,7 @@ export default function TestimonialsSection() {
 
           </div>
 
-        </div>
+        </Reveal>
 
         {/* =====================================================
             MOBILE RATING

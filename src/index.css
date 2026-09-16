@@ -209,3 +209,93 @@ html.lenis, html.lenis body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ----------------------------------------------------
+   SCROLL REVEAL SYSTEM
+   Reveal.tsx toggles `.is-visible` on these elements
+   via IntersectionObserver. GPU-friendly transform +
+   opacity transitions only.
+   ---------------------------------------------------- */
+.reveal-up,
+.reveal-left,
+.reveal-right,
+.reveal-scale {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.reveal-up {
+  transform: translateY(28px);
+}
+.reveal-left {
+  transform: translateX(-32px);
+}
+.reveal-right {
+  transform: translateX(32px);
+}
+.reveal-scale {
+  transform: scale(0.96);
+}
+
+.reveal-up.is-visible,
+.reveal-left.is-visible,
+.reveal-right.is-visible,
+.reveal-scale.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-up,
+.reveal-left,
+.reveal-right,
+.reveal-scale {
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  animation-duration: var(--reveal-duration, 700ms);
+}
+
+/* ----------------------------------------------------
+   PREMIUM BUTTON / CARD MICRO-INTERACTIONS
+   GPU-friendly hover + press states applied via
+   utility classes in components.
+   ---------------------------------------------------- */
+@keyframes btn-shine {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(220%); }
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent, rgba(255,255,255,0.25), transparent);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+.btn-shine:hover::after {
+  animation: btn-shine 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ----------------------------------------------------
+   MOTION SAFETY
+   Respect users who prefer reduced motion globally.
+   ---------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-up,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

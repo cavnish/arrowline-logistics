@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { getOptimizedImageUrl } from "../utils/imageUrl";
+import Reveal from "./Reveal";
 
 interface TrustedPartner {
   id: string;
@@ -95,7 +96,7 @@ export default function TrustStrip() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
-        <div>
+        <Reveal delay={60}>
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#FF6B1A]">
             Our Trusted Network
           </p>
@@ -106,7 +107,7 @@ export default function TrustStrip() {
           >
             Trusted by Industry Leaders
           </h2>
-        </div>
+        </Reveal>
       </div>
 
       {/* Logo Slider */}

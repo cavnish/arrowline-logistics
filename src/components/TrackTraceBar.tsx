@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Search, CheckCircle2 } from "lucide-react";
+import Reveal from "./Reveal";
 
 interface TrackTraceBarProps { }
 
@@ -17,7 +18,7 @@ export default function TrackTraceBar(_props: TrackTraceBarProps) {
   return (
     <section className="bg-white text-[#062B3A] py-12 border-t border-slate-200 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="bg-[#F0F5FA] border border-slate-200/90 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-6">
+        <Reveal className="bg-[#F0F5FA] border border-slate-200/90 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-6">
 
           <div className="space-y-1.5 text-center lg:text-left">
             <span className="text-[10px] font-black uppercase tracking-widest text-[#FF6B1A] block">
@@ -60,7 +61,7 @@ export default function TrackTraceBar(_props: TrackTraceBarProps) {
             )}
           </div>
 
-        </div>
+        </Reveal>
       </div>
     </section>
   );

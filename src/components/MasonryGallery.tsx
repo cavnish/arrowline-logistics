@@ -2,6 +2,7 @@ import { useState } from "react";
 import { GALLERY_ITEMS } from "../data/logisticsData";
 import { X, ChevronLeft, ChevronRight, Play, Heart, MessageCircle, Share2, Filter, Grid, Film, Star } from "lucide-react";
 import { cn } from "../utils/cn";
+import Reveal from "./Reveal";
 
 export default function MasonryGallery() {
   const [activeTab, setActiveTab] = useState<"photos" | "social">("photos");
@@ -103,8 +104,8 @@ export default function MasonryGallery() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPhotos.map((item, index) => (
+              <Reveal key={item.id} delay={index * 60} duration={450}>
               <div
-                key={item.id}
                 onClick={() => setLightboxIndex(index)}
                 className="group bg-white border border-slate-200 rounded-2xl overflow-hidden cursor-pointer hover:border-[#FF7A00]/40 hover:-translate-y-1 transition-all duration-300 relative shadow-sm hover:shadow-lg"
               >
@@ -128,6 +129,7 @@ export default function MasonryGallery() {
                   <p className="text-[11px] text-slate-600 leading-normal line-clamp-2">{item.caption}</p>
                 </div>
               </div>
+              </Reveal>
             ))}
           </div>
 
@@ -151,8 +153,9 @@ export default function MasonryGallery() {
             </p>
           </div>
 
-          {mockSocialFeeds.map((feed) => (
-            <div key={feed.id} className="bg-white border border-slate-200 rounded-2xl p-5 lg:p-6 space-y-4 shadow-sm">
+          {mockSocialFeeds.map((feed, index) => (
+            <Reveal key={feed.id} delay={index * 100}>
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 lg:p-6 space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-[#1E3A8A] rounded-full border border-slate-200 flex items-center justify-center font-bold text-white text-xs">
@@ -221,6 +224,7 @@ export default function MasonryGallery() {
                 </button>
               </div>
             </div>
+            </Reveal>
           ))}
         </div>
       )}

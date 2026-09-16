@@ -4,6 +4,7 @@ import { contentService } from "../services/contentService";
 import { getAllMainServices } from "../data/servicesData";
 import { getOptimizedImageUrl, buildImageAlt } from "../utils/imageUrl";
 import SmartImage from "./ui/SmartImage";
+import Reveal from "./Reveal";
 
 interface ServicesSectionProps {
   onSelectService: (slug: string) => void;
@@ -68,7 +69,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-10 lg:mb-14">
+        <Reveal className="text-center max-w-3xl mx-auto space-y-3 mb-10 lg:mb-14">
           <div className="inline-flex items-center space-x-2 px-3.5 py-1 bg-white border border-[#062B3A]/15 rounded-full text-xs font-bold text-[#FF6B1A] tracking-widest uppercase shadow-sm">
             <span>OUR SERVICES</span>
           </div>
@@ -80,13 +81,13 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
             From single container highway dispatches to multimodal rail rakes, specialized heavy-lift engineering, and modern industrial warehousing, we provide end-to-end supply chain integration.
           </p>
-        </div>
+        </Reveal>
 
         {/* Service cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 min-[1200px]:grid-cols-4 gap-5 lg:gap-6 items-stretch">
-          {services.map((service) => (
+          {services.map((service, index) => (
+            <Reveal key={service.id || service.slug} delay={index * 80} duration={500} className="h-full">
             <a
-              key={service.id || service.slug}
               href={`#/services/${service.slug}`}
               onClick={(event) => {
                 event.preventDefault();
@@ -128,6 +129,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
                 </div>
               </article>
             </a>
+            </Reveal>
           ))}
         </div>
 

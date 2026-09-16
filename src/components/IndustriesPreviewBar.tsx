@@ -1,5 +1,6 @@
 import { INDUSTRIES_SERVED } from "../data/logisticsData";
 import { Car, ShoppingBag, Cog, ShieldAlert, FlaskConical, HardHat, Sun, Layers, ArrowRight } from "lucide-react";
+import Reveal from "./Reveal";
 
 interface IndustriesPreviewBarProps {
   onNavigateToIndustries: () => void;
@@ -25,7 +26,7 @@ export default function IndustriesPreviewBar({ onNavigateToIndustries }: Industr
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Header Strip */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 pb-4">
+        <Reveal className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 pb-4">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center space-x-2 px-3 py-1 bg-[#EAF3F6] border border-[#062B3A]/15 rounded-full text-xs font-bold text-[#062B3A] tracking-widest uppercase">
               <span>SPECIALIZED SECTOR LOGISTICS</span>
@@ -45,11 +46,12 @@ export default function IndustriesPreviewBar({ onNavigateToIndustries }: Industr
             <span>VIEW ALL INDUSTRIES & SPECIFICATIONS</span>
             <ArrowRight className="w-4 h-4 text-[#FF6B1A]" />
           </button>
-        </div>
+        </Reveal>
 
         {/* Quick Industry Grid (Preview) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
-          {INDUSTRIES_SERVED.slice(0, 6).map((ind) => (
+          {INDUSTRIES_SERVED.slice(0, 6).map((ind, index) => (
+            <Reveal key={ind.id} delay={index * 60} duration={450}>
             <div
               key={ind.id}
               onClick={onNavigateToIndustries}
@@ -69,6 +71,7 @@ export default function IndustriesPreviewBar({ onNavigateToIndustries }: Industr
                 <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
               </div>
             </div>
+            </Reveal>
           ))}
         </div>
 

@@ -3,6 +3,7 @@ import { COMPANY_DETAILS } from "../data/logisticsData";
 import { buildTel } from "../utils/contactLinks";
 import { useSiteContent } from "../hooks/useSiteContent";
 import SmartImage from "./ui/SmartImage";
+import Reveal from "./Reveal";
 
 interface AboutSectionProps {
   onNavigateToAbout: () => void;
@@ -27,7 +28,7 @@ export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
 
           {/* Left Column: Text & Benefits */}
-          <div className="lg:col-span-6 space-y-6">
+          <Reveal direction="left" className="lg:col-span-6 space-y-6">
 
             {/* Small Orange Eyebrow Label */}
             <div className="inline-flex items-center space-x-2 px-3 py-1 bg-[#EAF3F6] border border-[#062B3A]/20 rounded-full text-[11px] font-extrabold text-[#062B3A] tracking-wider uppercase">
@@ -86,10 +87,10 @@ export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
               </div>
             </div>
 
-          </div>
+          </Reveal>
 
           {/* Right Column: Layered Image Composition */}
-          <div className="lg:col-span-6 relative">
+          <Reveal direction="scale" className="lg:col-span-6 relative">
             <div className="relative mx-auto max-w-lg lg:max-w-none">
 
               {/* Primary Large Image (Port & Container Crane) */}
@@ -126,7 +127,7 @@ export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
               </div>
 
             </div>
-          </div>
+          </Reveal>
 
         </div>
       </div>

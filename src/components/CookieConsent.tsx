@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Cookie, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 const STORAGE_KEY = "arrowline_cookie_consent";
 
@@ -49,6 +50,7 @@ function storeConsent(state: ConsentState) {
 export default function CookieConsent() {
   const [consent, setConsent] = useState<ConsentState | null>(loadStoredConsent);
   const [showSettings, setShowSettings] = useState(false);
+  const [dismissing, setDismissing] = useState(false);
   const [draft, setDraft] = useState({
     analytics: false,
     marketing: false,
@@ -67,6 +69,16 @@ export default function CookieConsent() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showSettings]);
 
+  const dismissBanner = (next: ConsentState) => {
+    setDismissing(true);
+    window.setTimeout(() => {
+      storeConsent(next);
+      setConsent(next);
+      setShowSettings(false);
+      setDismissing(false);
+    }, 300);
+  };
+
   const acceptAll = () => {
     const next: ConsentState = {
       necessary: true,
@@ -74,16 +86,12 @@ export default function CookieConsent() {
       marketing: true,
       timestamp: new Date().toISOString(),
     };
-    storeConsent(next);
-    setConsent(next);
-    setShowSettings(false);
+    dismissBanner(next);
   };
 
   const rejectOptional = () => {
     const next: ConsentState = { ...DEFAULT_PREFS, timestamp: new Date().toISOString() };
-    storeConsent(next);
-    setConsent(next);
-    setShowSettings(false);
+    dismissBanner(next);
   };
 
   const savePreferences = () => {
@@ -106,142 +114,165 @@ export default function CookieConsent() {
     setShowSettings(true);
   };
 
-  if (!showBanner && !showSettings) return null;
-
   return (
     <>
-      {showBanner && (
-        <div
-          role="region"
-          aria-label="Cookie consent"
-          className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4 sm:px-6 sm:pb-6"
-        >
-          <div className="mx-auto max-w-3xl bg-white border border-slate-200 rounded-2xl shadow-2xl p-5 sm:p-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-              <div className="w-10 h-10 shrink-0 rounded-xl bg-[#FEF9F0] border border-[#FF6B1A]/20 flex items-center justify-center">
-                <Cookie className="w-5 h-5 text-[#FF6B1A]" />
-              </div>
-
-              <div className="flex-1 min-w-0 space-y-1.5">
-                <h2 className="text-sm font-black text-[#1E3A8A]">We use cookies</h2>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  We use essential cookies to keep Arrowline Logistics working
-                  properly, and optional cookies to understand website usage and
-                  improve your experience.
-                </p>
-                <button
-                  type="button"
-                  onClick={openSettings}
-                  className="text-xs font-bold text-[#1E3A8A] underline underline-offset-2 hover:text-[#FF6B1A] transition-colors"
-                >
-                  Cookie Settings
-                </button>
-              </div>
-
-              <div className="flex flex-col-reverse sm:flex-row gap-2 sm:shrink-0">
-                <button
-                  type="button"
-                  onClick={rejectOptional}
-                  className="px-4 py-2.5 rounded-xl border border-slate-300 text-[#1E3A8A] text-xs font-bold uppercase tracking-wide transition-all active:scale-95 hover:bg-slate-50"
-                >
-                  Reject Optional
-                </button>
-                <button
-                  type="button"
-                  onClick={acceptAll}
-                  autoFocus
-                  className="px-4 py-2.5 rounded-xl bg-[#FF7A00] hover:bg-[#E56D00] text-white text-xs font-black uppercase tracking-wide transition-all active:scale-95"
-                >
-                  Accept All
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showSettings && (
-        <div
-          className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-[#03212D]/40 backdrop-blur-[2px] animate-in fade-in duration-200"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setShowSettings(false);
-          }}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="cookie-settings-title"
-            className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      <AnimatePresence>
+        {showBanner && !dismissing && (
+          <motion.div
+            key="cookie-banner"
+            role="region"
+            aria-label="Cookie consent"
+            initial={{ opacity: 0, y: 40, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 40, scale: 0.98 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed bottom-0 left-0 right-0 z-50 px-3 pb-3 sm:px-6 sm:pb-6"
           >
-            <div className="absolute left-0 right-0 top-0 h-1 bg-gradient-to-r from-[#FF6B1A] to-[#FFB366]" />
+            <div className="mx-auto max-w-3xl bg-white border border-slate-200 rounded-2xl shadow-[0_20px_60px_-15px_rgba(3,33,45,0.35)] p-4 sm:p-5 overflow-hidden relative">
+              {/* Top brand accent */}
+              <div className="absolute left-0 right-0 top-0 h-1 bg-gradient-to-r from-[#FF6B1A] to-[#FFB366]" />
 
-            <div className="p-5 sm:p-6 relative">
-              <div className="flex items-start justify-between gap-4">
-                <h2 id="cookie-settings-title" className="text-base font-black text-[#1E3A8A]">
-                  Cookie Settings
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => setShowSettings(false)}
-                  autoFocus
-                  aria-label="Close cookie settings"
-                  className="text-slate-400 hover:text-[#1E3A8A] p-1 rounded-lg border border-transparent hover:border-slate-200 transition-all"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-                Manage which cookies we may use. Essential cookies are always
-                active because the website needs them to function.
-              </p>
-
-              <div className="mt-5 space-y-3">
-                <div className="flex items-center justify-between gap-3 border border-slate-200 rounded-xl px-4 py-3 bg-slate-50">
-                  <div>
-                    <p className="text-xs font-bold text-[#1E3A8A]">Essential Cookies</p>
-                    <p className="text-[10px] text-slate-500">Always active</p>
-                  </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">
-                    On
-                  </span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="w-10 h-10 shrink-0 rounded-xl bg-[#FEF9F0] border border-[#FF6B1A]/20 flex items-center justify-center">
+                  <Cookie className="w-5 h-5 text-[#FF6B1A]" />
                 </div>
 
-                <CookieToggle
-                  label="Analytics Cookies"
-                  description="Understand website usage to improve your experience."
-                  checked={draft.analytics}
-                  onChange={(value) => setDraft((prev) => ({ ...prev, analytics: value }))}
-                />
+                <div className="flex-1 min-w-0 space-y-1">
+                  <h2 className="text-sm font-black text-[#1E3A8A] flex items-center gap-2">
+                    We use cookies
+                    <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-[#EAF3F6] text-[9px] font-bold text-[#062B3A] uppercase tracking-wider">
+                      Privacy-first
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    Essential cookies keep Arrowline Logistics working. Optional
+                    cookies help us understand usage. No unnecessary tracking added.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={openSettings}
+                    className="text-xs font-bold text-[#1E3A8A] underline underline-offset-2 hover:text-[#FF6B1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2 rounded-sm"
+                  >
+                    Cookie Settings
+                  </button>
+                </div>
 
-                <CookieToggle
-                  label="Marketing Cookies"
-                  description="Personalise promotional content."
-                  checked={draft.marketing}
-                  onChange={(value) => setDraft((prev) => ({ ...prev, marketing: value }))}
-                />
-              </div>
-
-              <div className="mt-6 flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={savePreferences}
-                  className="w-full py-3 bg-[#FF7A00] hover:bg-[#E56D00] text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95"
-                >
-                  Save Preferences
-                </button>
-                <button
-                  type="button"
-                  onClick={acceptAll}
-                  className="w-full py-3 border border-slate-300 text-[#1E3A8A] hover:bg-slate-50 text-xs font-bold uppercase tracking-widest rounded-xl transition-all active:scale-95"
-                >
-                  Accept All
-                </button>
+                <div className="flex flex-col-reverse sm:flex-row gap-2 sm:shrink-0">
+                  <button
+                    type="button"
+                    onClick={rejectOptional}
+                    className="px-4 py-2.5 rounded-xl border border-slate-300 text-[#1E3A8A] text-xs font-bold uppercase tracking-wide transition-all active:scale-95 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2"
+                  >
+                    Reject Optional
+                  </button>
+                  <button
+                    type="button"
+                    onClick={acceptAll}
+                    autoFocus
+                    className="px-4 py-2.5 rounded-xl bg-[#FF7A00] hover:bg-[#E56D00] text-white text-xs font-black uppercase tracking-wide transition-all active:scale-95 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A00] focus-visible:ring-offset-2"
+                  >
+                    Accept All
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showSettings && (
+          <motion.div
+            key="cookie-settings-backdrop"
+            className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-[#03212D]/40 backdrop-blur-[2px]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setShowSettings(false);
+            }}
+          >
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="cookie-settings-title"
+              initial={{ opacity: 0, y: 12, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 12, scale: 0.97 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-sm bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden"
+            >
+              <div className="absolute left-0 right-0 top-0 h-1 bg-gradient-to-r from-[#FF6B1A] to-[#FFB366]" />
+
+              <div className="p-5 sm:p-6 relative">
+                <div className="flex items-start justify-between gap-4">
+                  <h2 id="cookie-settings-title" className="text-base font-black text-[#1E3A8A]">
+                    Cookie Settings
+                  </h2>
+                  <button
+                    type="button"
+                    onClick={() => setShowSettings(false)}
+                    autoFocus
+                    aria-label="Close cookie settings"
+                    className="text-slate-400 hover:text-[#1E3A8A] p-1 rounded-lg border border-transparent hover:border-slate-200 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A]"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+                  Manage which cookies we may use. Essential cookies are always
+                  active because the website needs them to function.
+                </p>
+
+                <div className="mt-5 space-y-3">
+                  <div className="flex items-center justify-between gap-3 border border-slate-200 rounded-xl px-4 py-3 bg-slate-50">
+                    <div>
+                      <p className="text-xs font-bold text-[#1E3A8A]">Essential Cookies</p>
+                      <p className="text-[10px] text-slate-500">Always active</p>
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">
+                      On
+                    </span>
+                  </div>
+
+                  <CookieToggle
+                    label="Analytics Cookies"
+                    description="Understand website usage to improve your experience."
+                    checked={draft.analytics}
+                    onChange={(value) => setDraft((prev) => ({ ...prev, analytics: value }))}
+                  />
+
+                  <CookieToggle
+                    label="Marketing Cookies"
+                    description="Personalise promotional content."
+                    checked={draft.marketing}
+                    onChange={(value) => setDraft((prev) => ({ ...prev, marketing: value }))}
+                  />
+                </div>
+
+                <div className="mt-6 flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={savePreferences}
+                    className="w-full py-3 bg-[#FF7A00] hover:bg-[#E56D00] text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A00] focus-visible:ring-offset-2"
+                  >
+                    Save Preferences
+                  </button>
+                  <button
+                    type="button"
+                    onClick={acceptAll}
+                    className="w-full py-3 border border-slate-300 text-[#1E3A8A] hover:bg-slate-50 text-xs font-bold uppercase tracking-widest rounded-xl transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2"
+                  >
+                    Accept All
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
@@ -273,7 +304,7 @@ function CookieToggle({ label, description, checked, onChange }: CookieTogglePro
         onClick={() => onChange(!checked)}
         className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
           checked ? "bg-[#FF7A00]" : "bg-slate-300"
-        }`}
+        } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2`}
       >
         <span
           className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${

@@ -1,6 +1,7 @@
 import { CASE_STUDIES } from "../data/logisticsData";
 import MasonryGallery from "../components/MasonryGallery";
 import SEOMeta from "../components/SEOMeta";
+import Reveal from "../components/Reveal";
 import { CheckCircle2, AlertTriangle, ShieldCheck, Award } from "lucide-react";
 
 export default function Gallery() {
@@ -17,7 +18,7 @@ export default function Gallery() {
           <span>/</span>
           <span className="text-[#1E3A8A]">Case Studies & Gallery</span>
         </nav>
-        <div className="space-y-2 max-w-3xl">
+        <Reveal className="space-y-2 max-w-3xl">
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#FF7A00] block">
             Proven Performance
           </span>
@@ -27,22 +28,23 @@ export default function Gallery() {
           <p className="text-xs text-slate-600 leading-relaxed">
             Arrowline Logistics backs performance promises with audited results. Review detailed challenge-to-result logs of over-dimensional cargo moves, bulk loops, and quick express dispatches across India.
           </p>
-        </div>
+        </Reveal>
       </section>
 
       <section className="space-y-8">
-        <div className="space-y-1 bg-[#FEF9F0] p-4 border-l-4 border-[#FF7A00] rounded-r-xl">
+        <Reveal className="space-y-1 bg-[#FEF9F0] p-4 border-l-4 border-[#FF7A00] rounded-r-xl">
           <h2 className="text-sm font-bold text-[#1E3A8A] uppercase tracking-wider">
             Audited Logistical Case Studies
           </h2>
           <span className="text-[10.5px] text-slate-500 font-semibold">
             All records validated by our Mundra Port compliance agents
           </span>
-        </div>
+        </Reveal>
 
         <div className="space-y-10">
-          {CASE_STUDIES.map((study) => (
-            <div key={study.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 shadow-sm hover:shadow-lg transition-shadow">
+          {CASE_STUDIES.map((study, index) => (
+            <Reveal key={study.id} delay={index * 60} duration={500}>
+              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 shadow-sm hover:shadow-lg transition-shadow">
               <div className="lg:col-span-4 bg-slate-100 relative min-h-[220px] aspect-[4/3] lg:aspect-auto">
                 <img src={study.image} alt={study.title} loading="lazy"
                   className="object-cover w-full h-full" />
@@ -98,19 +100,21 @@ export default function Gallery() {
                     <span className="block text-[9px] font-black uppercase text-[#FF7A00] tracking-widest">
                       Quantifiable Result
                     </span>
-                    <p className="text-[11px] text-[#1E3A8A] leading-normal font-semibold">
+<p className="text-[11px] text-[#1E3A8A] leading-normal font-semibold">
                       {study.result}
                     </p>
                   </div>
                 </div>
+
               </div>
-            </div>
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
       <section className="space-y-6">
-        <div className="space-y-1.5 border-b border-slate-200 pb-4">
+        <Reveal className="space-y-1.5 border-b border-slate-200 pb-4">
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#FF7A00] block">
             Asset Catalog
           </span>
@@ -120,11 +124,11 @@ export default function Gallery() {
           <p className="text-xs text-slate-600 max-w-xl">
             Explore high-resolution photos of our coastal vessels, container trains, and custom operations yards.
           </p>
-        </div>
+        </Reveal>
         <MasonryGallery />
       </section>
 
-      <div className="bg-gradient-to-br from-[#FEF9F0] to-white rounded-2xl p-6 flex flex-col md:flex-row justify-between items-center border-2 border-[#FF7A00]/20 gap-6 text-center md:text-left shadow-sm">
+      <Reveal className="bg-gradient-to-br from-[#FEF9F0] to-white rounded-2xl p-6 flex flex-col md:flex-row justify-between items-center border-2 border-[#FF7A00]/20 gap-6 text-center md:text-left shadow-sm">
         <div className="space-y-1">
           <h4 className="text-sm font-bold text-[#1E3A8A] uppercase tracking-wide">
             Need similar secure logistics in India?
@@ -148,7 +152,7 @@ export default function Gallery() {
             Request Booking
           </button>
         </div>
-      </div>
+      </Reveal>
     </div>
   );
 }

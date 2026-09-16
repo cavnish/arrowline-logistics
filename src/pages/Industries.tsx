@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SEOMeta from "../components/SEOMeta";
 import ContactForm from "../components/ContactForm";
+import Reveal from "../components/Reveal";
 import { INDUSTRIES_SERVED, COMPANY_DETAILS } from "../data/logisticsData";
 import {
   Car, ShoppingBag, Cog, ShieldAlert, FlaskConical, HardHat, Sun, Layers,
@@ -102,6 +103,7 @@ export default function Industries({ onOpenQuote, onFormSuccess }: IndustriesPro
         <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-4">
+        <Reveal className="space-y-4">
           <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 bg-[#EAF3F6] border border-[#062B3A]/20 rounded-full text-xs font-bold text-[#062B3A] tracking-wider uppercase">
             <span className="w-2 h-2 rounded-full bg-[#FF6B1A] animate-pulse" />
             <span>INDUSTRY-SPECIFIC LOGISTICS SOLUTIONS</span>
@@ -131,7 +133,8 @@ export default function Industries({ onOpenQuote, onFormSuccess }: IndustriesPro
               <span>Talk to Sector Specialist</span>
             </a>
           </div>
-        </div>
+        </Reveal>
+      </div>
       </section>
 
       {/* Main Interactive Industry Showcase */}
@@ -156,7 +159,8 @@ export default function Industries({ onOpenQuote, onFormSuccess }: IndustriesPro
         </div>
 
         {/* Active Industry Deep-Dive Card */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 lg:p-12 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <Reveal duration={500}>
+        <div key={selectedIndustryId} className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 lg:p-12 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start animate-in fade-in duration-300">
 
           {/* Left Column: Image & Overview */}
           <div className="lg:col-span-5 space-y-6">
@@ -258,11 +262,13 @@ export default function Industries({ onOpenQuote, onFormSuccess }: IndustriesPro
           </div>
 
         </div>
+
+        </Reveal>
       </section>
 
       {/* Quote Form Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <div className="bg-white border border-slate-200 rounded-3xl shadow-xl p-6 sm:p-8 lg:p-12">
+        <Reveal className="bg-white border border-slate-200 rounded-3xl shadow-xl p-6 sm:p-8 lg:p-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-5 space-y-4">
               <div className="inline-flex items-center space-x-2 px-3 py-1 bg-[#EAF3F6] rounded-full text-xs font-bold text-[#062B3A]">
@@ -285,7 +291,7 @@ export default function Industries({ onOpenQuote, onFormSuccess }: IndustriesPro
               <ContactForm onSuccess={onFormSuccess} />
             </div>
           </div>
-        </div>
+        </Reveal>
       </section>
     </div>
   );

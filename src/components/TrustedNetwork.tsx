@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Reveal from "./Reveal";
 
 interface Partner {
   id: string;
@@ -36,8 +37,9 @@ export default function TrustedNetwork() {
     <section className="py-12 sm:py-16 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex overflow-x-auto gap-4 sm:gap-6 pb-4 no-scrollbar items-center justify-center sm:justify-start">
-          {partners.map((partner) => (
-            <div key={partner.id} className="shrink-0">
+          {partners.map((partner, index) => (
+            <Reveal key={partner.id} delay={index * 50} duration={400}>
+            <div className="shrink-0">
               <img
                 src={partner.logo}
                 alt={partner.logo_alt || "Client logo"}
@@ -47,6 +49,7 @@ export default function TrustedNetwork() {
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
             </div>
+            </Reveal>
           ))}
         </div>
       </div>

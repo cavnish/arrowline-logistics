@@ -5,6 +5,8 @@ import {
   Truck,
   Zap,
 } from "lucide-react";
+import { useRef, type CSSProperties } from "react";
+import { useInView } from "framer-motion";
 
 const projects = [
   {
@@ -48,9 +50,18 @@ const advantages = [
 ];
 
 export default function CoreAdvantages() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-120px" });
+
+  const animUp = (delay: number): CSSProperties => ({
+    animation: isInView ? `fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) ${delay}ms both` : "none",
+    opacity: isInView ? 1 : 0,
+  });
+
   return (
     <section
       id="advantages"
+      ref={sectionRef}
       className="relative overflow-hidden bg-[#071C27] py-14 sm:py-16 lg:py-20"
     >
       {/* Background glow */}
@@ -69,9 +80,7 @@ export default function CoreAdvantages() {
             {/* Label */}
             <div
               className="mb-4 flex items-center gap-2"
-              style={{
-                animation: "fadeUp 0.7s ease-out both",
-              }}
+              style={animUp(0)}
             >
               <span className="h-[2px] w-7 bg-[#FF6B1A]" />
 
@@ -83,9 +92,7 @@ export default function CoreAdvantages() {
             {/* Heading */}
             <h2
               className="max-w-lg text-3xl font-black leading-[1.08] tracking-tight text-white sm:text-4xl lg:text-5xl"
-              style={{
-                animation: "fadeUp 0.7s ease-out 100ms both",
-              }}
+              style={animUp(100)}
             >
               Why Corporate India
               <span className="block text-[#FF6B1A]">
@@ -96,9 +103,7 @@ export default function CoreAdvantages() {
             {/* Description */}
             <p
               className="mt-5 max-w-md text-sm leading-6 text-white/55 sm:text-base"
-              style={{
-                animation: "fadeUp 0.7s ease-out 200ms both",
-              }}
+              style={animUp(200)}
             >
               Strong port access, reliable transport and complete
               shipment visibility — built for modern Indian businesses.
@@ -118,9 +123,7 @@ export default function CoreAdvantages() {
                 hover:-translate-y-1
                 hover:bg-[#ff7a32]
               "
-              style={{
-                animation: "fadeUp 0.7s ease-out 300ms both",
-              }}
+              style={animUp(300)}
             >
               Explore Our Network
 
@@ -132,9 +135,7 @@ export default function CoreAdvantages() {
             {/* PROJECT IMAGES */}
             <div
               className="mt-10 grid grid-cols-3 gap-2 sm:gap-3"
-              style={{
-                animation: "fadeUp 0.8s ease-out 400ms both",
-              }}
+              style={animUp(400)}
             >
               {projects.map((project) => (
                 <div
@@ -176,7 +177,8 @@ export default function CoreAdvantages() {
           <div
             className="relative flex min-h-[320px] items-center justify-center lg:col-span-4"
             style={{
-              animation: "mapReveal 1s ease-out 300ms both",
+              animation: isInView ? "mapReveal 1s cubic-bezier(0.16,1,0.3,1) 300ms both" : "none",
+              opacity: isInView ? 1 : 0,
             }}
           >
             {/* Map glow */}
@@ -270,9 +272,8 @@ export default function CoreAdvantages() {
                       hover:bg-white/[0.07]
                     "
                     style={{
-                      animation: `slideRight 0.6s ease-out ${
-                        200 + index * 100
-                      }ms both`,
+                      animation: isInView ? `slideRight 0.6s cubic-bezier(0.16,1,0.3,1) ${200 + index * 100}ms both` : "none",
+                      opacity: isInView ? 1 : 0,
                     }}
                   >
                     {/* Icon */}
@@ -325,6 +326,7 @@ export default function CoreAdvantages() {
                 grid grid-cols-2
                 gap-2
               "
+              style={animUp(600)}
             >
               <div className="rounded-xl border border-white/10 bg-white/[0.035] p-3">
                 <p className="text-xl font-black text-white">

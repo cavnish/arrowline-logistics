@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 
 import Lenis from "lenis";
+import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 
 import { COMPANY_DETAILS } from "./data/logisticsData";
 
@@ -9,6 +10,7 @@ import Footer from "./components/Footer";
 import LeadModal from "./components/LeadModal";
 import ContactForm from "./components/ContactForm";
 import CookieConsent from "./components/CookieConsent";
+import PageLoader from "./components/PageLoader";
 
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -56,6 +58,9 @@ export default function App() {
     isAdminRoute,
     setIsAdminRoute,
   ] = useState(false);
+
+  const [isAppReady, setIsAppReady] =
+    useState(false);
 
   // ===================================================
   // DETECT ADMIN ROUTE
@@ -424,7 +429,18 @@ export default function App() {
   // ===================================================
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="min-h-screen bg-[#F5F8FA] text-[#102A36] flex flex-col justify-between selection:bg-[#FF6B1A] selection:text-white">
+
+      {/* INITIAL LOADER (public site only) */}
+
+      {!isAppReady && !isAdminRoute && (
+        <PageLoader
+          onComplete={() =>
+            setIsAppReady(true)
+          }
+        />
+      )}
 
       <Header
         activePage={
@@ -464,9 +480,17 @@ export default function App() {
               : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
           }
         >
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-            {renderCurrentView()}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activePage}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {renderCurrentView()}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
 
@@ -609,5 +633,6 @@ export default function App() {
       )}
 
     </div>
+    </MotionConfig>
   );
 }

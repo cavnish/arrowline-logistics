@@ -1,6 +1,7 @@
 import { COMPANY_DETAILS } from "../data/logisticsData";
 import ContactForm from "../components/ContactForm";
 import SEOMeta from "../components/SEOMeta";
+import Reveal from "../components/Reveal";
 import { ContactChoiceMenu } from "../components/ContactLink";
 import { buildMailto, buildTel } from "../utils/contactLinks";
 import { Mail, Phone, MapPin, Anchor, Clock, ExternalLink, HelpCircle, AlertCircle } from "lucide-react";
@@ -23,7 +24,7 @@ export default function Contact({ onFormSuccess }: ContactProps) {
           <span>/</span>
           <span className="text-[#1E3A8A]">Contact Us</span>
         </nav>
-        <div className="space-y-2 max-w-3xl">
+        <Reveal className="space-y-2 max-w-3xl">
           <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#FF7A00] block">
             Direct Communication Channels
           </span>
@@ -33,11 +34,11 @@ export default function Contact({ onFormSuccess }: ContactProps) {
           <p className="text-xs text-slate-600 leading-relaxed">
             Get instant shipping rates, status on active transits, or coordinate customs documentation with our dedicated planners. Available 24/7.
           </p>
-        </div>
+        </Reveal>
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-        <div className="lg:col-span-6 space-y-6">
+        <Reveal direction="left" className="lg:col-span-6 space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-white border border-slate-200 p-5 rounded-2xl space-y-3 shadow-sm relative overflow-hidden hover:shadow-md transition-shadow">
               <div className="absolute right-0 top-0 -mr-4 -mt-4 w-12 h-12 bg-blue-100 rounded-full blur-xl" />
@@ -133,17 +134,17 @@ export default function Contact({ onFormSuccess }: ContactProps) {
               />
             </div>
           </div>
-        </div>
+        </Reveal>
 
-        <div className="lg:col-span-6 relative">
+        <Reveal direction="right" className="lg:col-span-6 relative">
           <div className="absolute -inset-4 bg-gradient-to-tr from-[#FF7A00]/20 via-transparent to-[#1E3A8A]/20 rounded-3xl blur-2xl pointer-events-none" />
           <div className="relative">
             <ContactForm onSuccess={onFormSuccess} />
           </div>
-        </div>
+        </Reveal>
       </div>
 
-      <section className="bg-gradient-to-br from-[#FEF9F0] via-white to-[#FFF4DC] border-2 border-[#FF7A00]/20 rounded-2xl p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 relative overflow-hidden shadow-sm">
+      <Reveal className="bg-gradient-to-br from-[#FEF9F0] via-white to-[#FFF4DC] border-2 border-[#FF7A00]/20 rounded-2xl p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 relative overflow-hidden shadow-sm">
         <div className="space-y-4">
           <h3 className="text-sm font-bold text-[#1E3A8A] uppercase tracking-wider flex items-center space-x-2">
             <HelpCircle className="w-5 h-5 text-[#FF7A00]" />
@@ -206,7 +207,7 @@ export default function Contact({ onFormSuccess }: ContactProps) {
             />
           </div>
         </div>
-      </section>
+      </Reveal>
     </div>
   );
 }

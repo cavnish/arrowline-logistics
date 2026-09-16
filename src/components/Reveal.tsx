@@ -13,6 +13,7 @@ interface RevealProps {
 /**
  * Wraps children in a div that fades / slides in when it scrolls into view.
  * `direction` controls entry motion; `delay` staggers multiple items.
+ * GPU-friendly (opacity + transform only) and respects reduced motion.
  */
 export default function Reveal({
   children,
@@ -30,9 +31,12 @@ export default function Reveal({
     scale: "reveal-scale",
   };
 
-  const style: React.CSSProperties = {};
-  if (delay) style.animationDelay = `${delay}ms`;
-  if (duration) style.animationDuration = `${duration}ms`;
+  const style = {
+    // CSS custom props drive stagger, matching the reveal classes in index.css
+    "--reveal-delay": delay ? `${delay}ms` : undefined,
+    "--reveal-duration": duration ? `${duration}ms` : undefined,
+    animationDelay: delay ? `${delay}ms` : undefined,
+  } as React.CSSProperties;
 
   return (
     <div

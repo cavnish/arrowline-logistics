@@ -10,6 +10,7 @@ import TestimonialsSection from "../components/TestimonialsSection";
 import FAQSection from "../components/FAQSection";
 import TrackTraceBar from "../components/TrackTraceBar";
 import ArrowlineLogo from "../components/ArrowlineLogo";
+import Reveal from "../components/Reveal";
 import { Sparkles } from "lucide-react";
 
 interface HomeProps {
@@ -84,6 +85,7 @@ export default function Home({
       {/* 12. Final CTA */}
       <section className="py-12 sm:py-14 lg:py-16 bg-[#03212D] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Reveal duration={600}>
           <div className="relative bg-gradient-to-r from-[#062B3A] via-[#0C4A60] to-[#062B3A] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl p-6 sm:p-8 lg:p-14 border border-white/15">
 
             {/* Background Glow */}
@@ -148,6 +150,7 @@ export default function Home({
 
             </div>
           </div>
+          </Reveal>
         </div>
       </section>
     </div>

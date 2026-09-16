@@ -5,6 +5,7 @@ import type { FAQItem } from "../data/logisticsData";
 import { ChevronDown, HelpCircle, Phone } from "lucide-react";
 import { COMPANY_DETAILS } from "../data/logisticsData";
 import { buildTel } from "../utils/contactLinks";
+import Reveal from "./Reveal";
 
 export default function FAQSection() {
   const [faqs, setFaqs] = useState<FAQItem[]>(FAQ_ITEMS);
@@ -49,7 +50,7 @@ export default function FAQSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
 
           {/* Left Column: Title & Contact Help (Matching Reference Image) */}
-          <div className="lg:col-span-5 space-y-6">
+          <Reveal direction="left" className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
               <div className="inline-flex items-center space-x-2 px-3 py-1 bg-white border border-[#062B3A]/15 rounded-full text-xs font-bold text-[#FF6B1A] tracking-widest uppercase shadow-sm">
                 <HelpCircle className="w-3.5 h-3.5" />
@@ -85,15 +86,15 @@ export default function FAQSection() {
                 <span>Call {COMPANY_DETAILS.phone}</span>
               </a>
             </div>
-          </div>
+          </Reveal>
 
           {/* Right Column: Accordion List (Matching Reference Image) */}
           <div className="lg:col-span-7 space-y-3.5">
-            {faqs.map((item) => {
+            {faqs.map((item, index) => {
               const isOpen = openFaqId === item.id;
               return (
+                <Reveal key={item.id} delay={index * 50} duration={400}>
                 <div
-                  key={item.id}
                   className={`border rounded-2xl transition-all duration-200 overflow-hidden ${isOpen
                       ? "bg-white border-[#FF6B1A] shadow-md"
                       : "bg-white border-slate-200 hover:border-slate-300"
@@ -121,6 +122,7 @@ export default function FAQSection() {
                     </div>
                   )}
                 </div>
+                </Reveal>
               );
             })}
           </div>

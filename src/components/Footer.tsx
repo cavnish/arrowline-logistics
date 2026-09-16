@@ -2,6 +2,7 @@ import { Phone, MapPin, Mail, ShieldCheck } from "lucide-react";
 import { COMPANY_DETAILS, REGIONAL_HUBS } from "../data/logisticsData";
 import { getAllMainServices, getAllSubServices } from "../data/servicesData";
 import ArrowlineLogo from "./ArrowlineLogo";
+import Reveal from "./Reveal";
 import { buildMailto, buildTel } from "../utils/contactLinks";
 
 export default function Footer({ setActivePage }: { setActivePage: (page: string) => void }) {
@@ -25,7 +26,7 @@ export default function Footer({ setActivePage }: { setActivePage: (page: string
   return (
     <footer className="bg-[#03212D] text-slate-300 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-
+        <Reveal duration={600}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-6">
 
           {/* Company Info */}
@@ -132,6 +133,7 @@ export default function Footer({ setActivePage }: { setActivePage: (page: string
             <span className="hover:text-slate-300 cursor-pointer transition-colors">Customs Guidelines</span>
           </div>
         </div>
+        </Reveal>
       </div>
     </footer>
   );
