@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { MainServiceData, SubServiceData } from "../../data/servicesData";
 import { COMPANY_DETAILS } from "../../data/logisticsData";
+import { SITE_URL } from "../../utils/navigation";
 
 interface ServiceSchemaProps {
   service: MainServiceData | SubServiceData;
@@ -16,52 +17,11 @@ export default function ServiceSchema({
   canonicalUrl,
 }: ServiceSchemaProps) {
   useEffect(() => {
-    const siteUrl = "https://www.arrowlinelogistics.in";
-    const pageUrl = canonicalUrl || `${siteUrl}/#/services/${
+    const pageUrl = canonicalUrl || `${SITE_URL}/services/${
       isSubService ? `${parentService?.slug || (service as SubServiceData).parentSlug}/${service.slug}` : service.slug
     }`;
 
-    // 1. Organization Schema
-    const organizationSchema = {
-      "@context": "https://schema.org",
-      "@type": "LogisticsService",
-      "name": "Arrowline Logistics",
-      "legalName": "Arrowline Logistics Private Limited",
-      "url": siteUrl,
-      "logo": "https://res.cloudinary.com/uorctww6/image/upload/v1789377037/arrowline/general/favicon.png",
-      "image": service.heroImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg",
-      "description": COMPANY_DETAILS.aboutShort,
-      "telephone": COMPANY_DETAILS.phone,
-      "email": COMPANY_DETAILS.primaryEmail,
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Office 204, Portview Commercial Complex, Near Adani House, Mundra Port Road",
-        "addressLocality": "Mundra",
-        "addressRegion": "Gujarat",
-        "postalCode": "370421",
-        "addressCountry": "IN"
-      },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": 22.8394,
-        "longitude": 69.7258
-      },
-      "areaServed": {
-        "@type": "Country",
-        "name": "India"
-      },
-      "knowsAbout": [
-        "Multimodal Freight Transportation",
-        "Container Trucking",
-        "Full Truckload Haulage",
-        "Rail Logistics",
-        "ODC and Heavy Lift Cargo",
-        "Mundra Port Customs Clearance",
-        "Industrial Warehousing"
-      ]
-    };
-
-    // 2. Service Schema
+    // 1. Service Schema
     const serviceSchema = {
       "@context": "https://schema.org",
       "@type": "Service",
@@ -69,17 +29,25 @@ export default function ServiceSchema({
       "serviceType": isSubService ? `${parentService?.title || "Logistics"} Sub-Service` : "Core Logistics Service",
       "description": service.shortDesc || service.aboutDescription,
       "provider": {
-        "@type": "LogisticsService",
-        "name": "Arrowline Logistics",
-        "url": siteUrl,
-        "telephone": COMPANY_DETAILS.phone
+        "@type": "Organization",
+        "name": COMPANY_DETAILS.name,
+        "url": SITE_URL,
+        "telephone": COMPANY_DETAILS.phone,
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Office 204, Portview Commercial Complex, Near Adani House, Mundra Port Road",
+          "addressLocality": "Mundra",
+          "addressRegion": "Gujarat",
+          "postalCode": "370421",
+          "addressCountry": "IN"
+        }
       },
       "areaServed": {
         "@type": "Country",
         "name": "India"
       },
       "url": pageUrl,
-      "termsOfService": `${siteUrl}/#/contact`,
+      "termsOfService": `${SITE_URL}/contact`,
       "serviceAudience": {
         "@type": "Audience",
         "audienceType": "Industrial Manufacturers, Exporters, Importers, EPC Contractors, Infrastructure Developers"
@@ -103,14 +71,14 @@ export default function ServiceSchema({
                 "@type": "Service",
                 "name": sub.title,
                 "description": sub.shortDesc,
-                "url": `${siteUrl}/#/services/${service.slug}/${sub.slug}`
+                "url": `${SITE_URL}/services/${service.slug}/${sub.slug}`
               },
               "position": idx + 1
             })) || []
       }
     };
 
-    // 3. BreadcrumbList Schema
+    // 2. BreadcrumbList Schema
     const breadcrumbSchema = {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
@@ -120,19 +88,19 @@ export default function ServiceSchema({
               "@type": "ListItem",
               "position": 1,
               "name": "Home",
-              "item": `${siteUrl}/#/`
+              "item": `${SITE_URL}/`
             },
             {
               "@type": "ListItem",
               "position": 2,
               "name": "Services",
-              "item": `${siteUrl}/#/services`
+              "item": `${SITE_URL}/services`
             },
             {
               "@type": "ListItem",
               "position": 3,
               "name": parentService?.title || (service as SubServiceData).parentName || "Service",
-              "item": `${siteUrl}/#/services/${parentService?.slug || (service as SubServiceData).parentSlug}`
+              "item": `${SITE_URL}/services/${parentService?.slug || (service as SubServiceData).parentSlug}`
             },
             {
               "@type": "ListItem",
@@ -146,13 +114,13 @@ export default function ServiceSchema({
               "@type": "ListItem",
               "position": 1,
               "name": "Home",
-              "item": `${siteUrl}/#/`
+              "item": `${SITE_URL}/`
             },
             {
               "@type": "ListItem",
               "position": 2,
               "name": "Services",
-              "item": `${siteUrl}/#/services`
+              "item": `${SITE_URL}/services`
             },
             {
               "@type": "ListItem",
@@ -163,7 +131,7 @@ export default function ServiceSchema({
           ]
     };
 
-    // 4. FAQPage Schema (if FAQs are present)
+    // 3. FAQPage Schema (if FAQs are present)
     const faqSchema = service.faqs && service.faqs.length > 0
       ? {
           "@context": "https://schema.org",
@@ -189,7 +157,7 @@ export default function ServiceSchema({
       document.head.appendChild(scriptTag);
     }
 
-    const schemasToInject: object[] = [organizationSchema, serviceSchema, breadcrumbSchema];
+    const schemasToInject: object[] = [serviceSchema, breadcrumbSchema];
     if (faqSchema) {
       schemasToInject.push(faqSchema);
     }

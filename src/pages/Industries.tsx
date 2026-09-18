@@ -96,6 +96,7 @@ export default function Industries({ onOpenQuote, onFormSuccess }: IndustriesPro
         title="Industries We Serve | Specialized Logistics & Transportation Solutions India"
         description="Tailored multimodal logistics, dedicated FTL fleets, material transport, and custom clearance for Automotive, FMCG, Manufacturing, Solar, Pharma, and Steel across India from Arrowline Logistics."
         keywords="FMCG logistics India, Automotive logistics India, Manufacturing logistics India, Solar equipment logistics, Steel transport India, Material transportation India, Pan-India industrial transport"
+        canonicalUrl="https://www.arrowlinelogistics.in/industries"
       />
 
       {/* Hero Header */}

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { MainServiceData, SubServiceData } from "../../data/servicesData";
 import ServiceHero from "./ServiceHero";
+import { FALLBACK_IMAGE } from "../ui/SmartImage";
 import ServiceAbout from "./ServiceAbout";
 import ServiceSubServices from "./ServiceSubServices";
 import ServiceApplications from "./ServiceApplications";
@@ -11,6 +12,7 @@ import ServiceRelated from "./ServiceRelated";
 import TrackTraceBar from "../TrackTraceBar";
 import ServiceCTA from "./ServiceCTA";
 import ServiceSchema from "./ServiceSchema";
+import { SITE_URL } from "../../utils/navigation";
 
 // ── Common Home-Page Sections (shared across ALL service pages) ──
 import TrustStrip from "../TrustStrip";
@@ -40,16 +42,50 @@ export default function ServicePageTemplate({
   onNavigateToService,
   onNavigateTo,
 }: ServicePageTemplateProps) {
-  // Update browser document title and meta description dynamically
+  // Update browser document title, meta description, canonical and OG tags
   useEffect(() => {
     const pageTitle = service.seoTitle || `${service.title} | Arrowline Logistics India`;
     document.title = pageTitle;
+
+    const cleanCanonical = (service.canonicalUrl || `${SITE_URL}/services/${
+      isSubService ? `${parentService?.slug || (service as SubServiceData).parentSlug}/${service.slug}` : service.slug
+    }`).split("#")[0];
 
     const metaDescTag = document.querySelector('meta[name="description"]');
     if (metaDescTag) {
       metaDescTag.setAttribute("content", service.seoDesc || service.shortDesc || "");
     }
-  }, [service]);
+
+    const canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (canonicalLink) {
+      canonicalLink.setAttribute("href", cleanCanonical);
+    }
+
+    const ogUrlTag = document.querySelector('meta[property="og:url"]');
+    if (ogUrlTag) {
+      ogUrlTag.setAttribute("content", cleanCanonical);
+    }
+
+    const ogTitleTag = document.querySelector('meta[property="og:title"]');
+    if (ogTitleTag) {
+      ogTitleTag.setAttribute("content", pageTitle);
+    }
+
+    const ogDescTag = document.querySelector('meta[property="og:description"]');
+    if (ogDescTag) {
+      ogDescTag.setAttribute("content", service.seoDesc || service.shortDesc || "");
+    }
+
+    const twitterTitleTag = document.querySelector('meta[name="twitter:title"]');
+    if (twitterTitleTag) {
+      twitterTitleTag.setAttribute("content", pageTitle);
+    }
+
+    const twitterDescTag = document.querySelector('meta[name="twitter:description"]');
+    if (twitterDescTag) {
+      twitterDescTag.setAttribute("content", service.seoDesc || service.shortDesc || "");
+    }
+  }, [service, isSubService, parentService]);
 
   const subServiceData = isSubService ? (service as SubServiceData) : null;
   const mainServiceData = !isSubService ? (service as MainServiceData) : null;
@@ -67,16 +103,28 @@ export default function ServicePageTemplate({
       {/* 1. HERO SECTION */}
       <ServiceHero
         badge={
-          isSubService
+          service.heroBadge ||
+          (isSubService
             ? `${(subServiceData?.parentName || "ARROWLINE").toUpperCase()} • SPECIALIZED SERVICE`
-            : `${service.title.toUpperCase()} • PAN-INDIA`
+            : `${service.title.toUpperCase()} • PAN-INDIA`)
+        }
+        breadcrumb={
+          isSubService
+            ? [
+                "Home",
+                "Services",
+                parentService?.title || subServiceData?.parentName || "Road Freight",
+                service.title,
+              ]
+            : ["Home", "Services", service.title]
         }
         headline={service.heroHeadline || service.title}
         subheadline={service.heroSubheadline}
         description={(service as any).heroDescription || service.heroSubheadline || service.shortDesc}
-        image={service.heroImage || service.aboutImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg"}
+        image={service.heroImage || service.aboutImage || FALLBACK_IMAGE}
         videoUrl={service.heroVideo || service.videoUrl}
         fallbackImage={service.heroFallbackImage || service.aboutImage}
+        imageAlt={service.imageAlt || service.title}
         onOpenQuote={onOpenQuote}
       />
 
@@ -165,7 +213,7 @@ export default function ServicePageTemplate({
               if (onNavigateToService) {
                 onNavigateToService(mainServiceData?.slug || service.slug, subSlug);
               } else {
-                window.location.hash = `#/services/${mainServiceData?.slug || service.slug}/${subSlug}`;
+                window.location.pathname = `/services/${mainServiceData?.slug || service.slug}/${subSlug}`;
               }
             }}
           />
@@ -215,7 +263,7 @@ export default function ServicePageTemplate({
           if (onNavigateTo) {
             onNavigateTo("industries");
           } else {
-            window.location.hash = "#/industries";
+            window.location.pathname = "/industries";
           }
         }}
       />

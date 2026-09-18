@@ -20,3 +20,6 @@ _server.out.log
 .scratch/
 .claude/
 .kilo/
+
+# --- TS incremental cache ---
+*.tsbuildinfo

@@ -16,6 +16,7 @@ export default function Contact({ onFormSuccess }: ContactProps) {
       <SEOMeta
         title="Contact Us | Operations Desk Mundra Port Gujarat"
         description="Connect with Arrowline Logistics in Mundra, Kutch, Gujarat. Live logistics support, customs clearance agent (CHA), and direct FTL cargo dispatch hotlines."
+        canonicalUrl="https://www.arrowlinelogistics.in/contact"
       />
 
       <section className="space-y-4">

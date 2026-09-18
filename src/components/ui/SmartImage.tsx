@@ -10,6 +10,10 @@ interface SmartImageProps {
   className?: string;
   style?: React.CSSProperties;
   loading?: "lazy" | "eager";
+  decoding?: "async" | "sync" | "auto";
+  fetchPriority?: "high" | "low" | "auto";
+  srcSet?: string;
+  sizes?: string;
   width?: number | string;
   height?: number | string;
   onError?: () => void;
@@ -26,6 +30,10 @@ export default function SmartImage({
   className,
   style,
   loading = "lazy",
+  decoding = "async",
+  fetchPriority,
+  srcSet,
+  sizes,
   width,
   height,
   onError,
@@ -40,8 +48,12 @@ export default function SmartImage({
   return (
     <img
       src={resolved}
+      srcSet={srcSet}
+      sizes={sizes}
       alt={alt}
       loading={loading}
+      decoding={decoding}
+      fetchPriority={fetchPriority}
       width={width}
       height={height}
       onError={() => {

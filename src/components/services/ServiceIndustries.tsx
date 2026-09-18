@@ -47,7 +47,7 @@ export default function ServiceIndustries({
               <div
                 onClick={() => {
                   if (onNavigateToIndustries) onNavigateToIndustries();
-                  else window.location.hash = "#/industries";
+                  else window.location.pathname = "/industries";
                 }}
                 className="group p-7 rounded-3xl border border-slate-200 bg-[#F8FAFC] hover:bg-white hover:border-[#FF6B1A]/50 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between h-full hover:-translate-y-1"
                 role="button"

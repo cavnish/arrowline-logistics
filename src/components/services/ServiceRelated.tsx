@@ -59,7 +59,7 @@ export default function ServiceRelated({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {siblingSubServices.slice(0, 3).map((sub, index) => {
-                    const targetUrl = `#/services/${sub.parentSlug}/${sub.slug}`;
+                    const targetUrl = `/services/${sub.parentSlug}/${sub.slug}`;
                     return (
                       <Reveal key={sub.slug} delay={index * 70}>
                         <a
@@ -105,7 +105,7 @@ export default function ServiceRelated({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {otherMainServices.map((main, index) => {
-                  const targetUrl = `#/services/${main.slug}`;
+const targetUrl = `/services/${main.slug}`;
                   return (
                     <Reveal key={main.slug} delay={index * 70}>
                       <a
@@ -153,7 +153,7 @@ export default function ServiceRelated({
         {!isSubService && otherMainServices.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {otherMainServices.map((main, index) => {
-              const targetUrl = `#/services/${main.slug}`;
+              const targetUrl = `/services/${main.slug}`;
               return (
                 <Reveal key={main.slug} delay={index * 80}>
                   <a

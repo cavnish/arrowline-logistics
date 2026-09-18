@@ -76,19 +76,6 @@ export default function CoreAdvantages() {
 
           {/* LEFT CONTENT */}
           <div className="lg:col-span-5">
-
-            {/* Label */}
-            <div
-              className="mb-4 flex items-center gap-2"
-              style={animUp(0)}
-            >
-              <span className="h-[2px] w-7 bg-[#FF6B1A]" />
-
-              <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#FF6B1A]">
-                Our Core Advantages
-              </span>
-            </div>
-
             {/* Heading */}
             <h2
               className="max-w-lg text-3xl font-black leading-[1.08] tracking-tight text-white sm:text-4xl lg:text-5xl"
@@ -244,13 +231,13 @@ export default function CoreAdvantages() {
           {/* ───────────────── RIGHT ADVANTAGES ───────────────── */}
           <div className="lg:col-span-3">
 
-            <div className="mb-5 flex items-center gap-2">
+            {/* <div className="mb-5 flex items-center gap-2">
               <span className="h-px w-6 bg-[#FF6B1A]" />
 
               <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-white/40">
                 Why Arrowline
               </span>
-            </div>
+            </div> */}
 
             <div className="space-y-2">
               {advantages.map((item, index) => {

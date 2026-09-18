@@ -11,7 +11,6 @@ interface Partner {
 export default function TrustedNetwork() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
-  const [failedLogos, setFailedLogos] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const fetchPartners = async () => {

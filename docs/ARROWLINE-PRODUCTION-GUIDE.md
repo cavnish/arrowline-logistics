@@ -9,7 +9,7 @@ No production secret values are stored in the repository.
 
 - Frontend: React 19 + Vite + Tailwind CSS v4 (single-file build)
 - Backend: Express (Node.js) + Supabase + Cloudinary + Resend
-- Admin: Client-side CMS (`#/arrowline-admin`) backed by `/api/admin`
+- Admin: Client-side CMS (`/arrowline-admin` or legacy `#/arrowline-admin`) backed by `/api/admin`
 
 ---
 
@@ -59,7 +59,7 @@ Resend      ---- team notification email + customer confirmation
 ### Admin flow
 ```
 Admin (browser)
-    |  https://www.arrowlinelogistics.in/#/arrowline-admin
+    |  https://www.arrowlinelogistics.in/arrowline-admin
     v
 Admin Authentication  (POST /api/admin/login -> httpOnly cookie `admin_token`)
     v
@@ -79,27 +79,30 @@ Public Website ---- React renders DB data (overrides static fallbacks)
 ## 3. Frontend Structure
 
 - **Framework:** React 19 + Vite 7 + Tailwind CSS v4 (`@tailwindcss/vite`).
-- **Routing:** Custom **hash-based routing** in `src/App.tsx`. A `hashchange`
-  listener maps `window.location.hash`. Any hash starting with
-  `#/arrowline-admin` renders `<AdminRouter/>`; everything else renders the
-  public site.
-- **Public pages:** Home (`#/`, `#/home`), About (`#/about`), Industries
-  (`#/industries`), Gallery/Case Studies (`#/gallery`), Contact (`#/contact`),
-  and service pages under `#/services/...` rendered by `ServiceRouteView`.
+- **Routing:** Custom **clean-path routing** in `src/App.tsx` (a `popstate`
+  listener maps `window.location.pathname`). Any path starting with
+  `/arrowline-admin` renders `<AdminRouter/>`; everything else renders the
+  public site. Legacy hash URLs like `/#/about` are still understood (they are
+  treated as the same route) so old indexed links keep working.
+- **Public pages:** Home (`/`), About (`/about`), Industries
+  (`/industries`), Gallery/Case Studies (`/gallery`), Contact (`/contact`),
+  and service pages under `/services/...` rendered by `ServiceRouteView`.
 - **Service pages:** `ServicePageTemplate` + `ServiceSchema` (JSON-LD
-  LogisticsService, Service, BreadcrumbList, FAQPage). SEO title/description
+  Service, BreadcrumbList, FAQPage). SEO title/description/canonical
   are set per service from CMS data.
 - **API communication:** `axios` helpers - `src/services/contentService.ts`
   (public content) and `src/services/adminApi.js` (admin API,
   `withCredentials`). API base URL comes from `VITE_API_URL` (empty in
   production = same origin).
 - **Admin pages:** `src/admin/AdminRouter.tsx` + `src/pages/Admin*.jsx`
-  panels, layout in `src/components/admin/AdminLayout.jsx`.
+  panels, layout in `src/components/admin/AdminLayout.jsx`. The admin app
+  mounts at `/arrowline-admin` (or legacy `#/arrowline-admin`) and uses its
+  own internal HashRouter.
 - **SEO meta:** `src/components/SEOMeta.tsx` (title, description, keywords,
   Open Graph, Twitter cards, canonical, JSON-LD Organization + LocalBusiness).
-- **Build output:** `npm run build` -> `dist/index.html` (all JS/CSS inlined
-  by `vite-plugin-singlefile`, ~1.3 MB) + copies of `public/` files
-  (`robots.txt`, `sitemap.xml`, `site.txt`, `images/`, favicon).
+- **Build output:** `npm run build` -> `dist/` (Vite multi-chunk output).
+  `server/index.js` serves `dist/` and falls back to `index.html` for any
+  non-`/api` path so clean URLs deep-link correctly.
 
 ---
 
@@ -286,22 +289,22 @@ Cloudinary for any image-bearing resource.
 
 ## 9. Public Website Routes
 
-All public URLs use `https://www.arrowlinelogistics.in` + hash router.
+All public URLs use `https://www.arrowlinelogistics.in` with clean paths.
 
 ### Core pages
 | Route | Page |
 |-------|------|
-| `#/` | Home |
-| `#/about` | About |
-| `#/industries` | Industries |
-| `#/gallery` | Gallery / Case Studies |
-| `#/contact` | Contact |
+| `/` | Home |
+| `/about` | About |
+| `/industries` | Industries |
+| `/gallery` | Gallery / Case Studies |
+| `/contact` | Contact |
 
 ### Main services (4)
-- `#/services/road-transportation`
-- `#/services/rail-transportation`
-- `#/services/project-cargo-transportation`
-- `#/services/warehousing-storage`
+- `/services/road-transportation`
+- `/services/rail-transportation`
+- `/services/project-cargo-transportation`
+- `/services/warehousing-storage`
 
 ### Sub-services (22)
 Road: `container-transportation`, `ftl-ltl-transportation`,
@@ -319,7 +322,8 @@ Warehousing: `general-industrial-warehousing`, `distribution-fulfillment`,
 `inventory-management`, `container-storage-handling`, `loading-unloading`
 
 > Unknown service slugs render an inline "Service Not Found" state; unknown
-> hashes fall back to Home.
+> paths fall back to Home. Legacy hash URLs (e.g. `/#/contact`) are resolved
+> to the same routes for backward compatibility.
 
 ---
 
@@ -489,22 +493,22 @@ curl -k https://www.arrowlinelogistics.in/health
    request indexing.
 6. **Monitor** - Index Coverage, Page Experience, Core Web Vitals.
 
-> **Hash URLs:** the site uses `#/...` fragments, so Google fetches the root
-> URL and renders the JS; the fragment pages are discoverable from the
-> sitemap. If clean URLs are ever required, routing must be extended to
-> pathname-based routes (out of scope for this package).
+> **URLs:** the site now uses clean pathname URLs (`/about`, `/services/...`)
+> which are served by `server/index.js`'s SPA fallback. Legacy `#/...`
+> fragments are still accepted by the router and resolve to the same routes.
+> `sitemap.xml` lists only clean URLs; canonical tags match them exactly.
 
 ### SEO / GEO / AEO audit status (verified against the code)
 
 | Page | Title + meta description | Canonical | H1 | OG + Twitter | Structured data |
 |------|--------------------------|-----------|----|--------------|-----------------|
-| Home | Yes (SEOMeta) | Yes (`window.location.href`) | Yes | Yes (SEOMeta) | Organization + LocalBusiness JSON-LD |
-| About | Yes (SEOMeta) | Yes | Yes | Yes | Organization + LocalBusiness + leadership/core-values via CMS |
-| Industries | Yes (SEOMeta) | Yes | Yes | Yes | Organization + LocalBusiness |
-| Gallery | Yes (SEOMeta) | Yes | Yes | Yes | Organization + LocalBusiness |
-| Contact | Yes (SEOMeta) | Yes | Yes | Yes | Organization + LocalBusiness |
-| 4 Main services | Yes (`ServicePageTemplate` sets service `seoTitle`/`seoDesc`) | Yes (`ServiceSchema`) | Yes (hero headline) | Inherited | LogisticsService + Service + BreadcrumbList + FAQPage JSON-LD |
-| 22 Sub-services | Yes (per-service SEO fields) | Yes | Yes | Inherited | Same JSON-LD set, sub-service variant |
+| Home | Yes (SEOMeta) | Yes (clean `/`) | Yes | Yes (SEOMeta) | Organization + LocalBusiness JSON-LD |
+| About | Yes (SEOMeta) | Yes (clean `/about`) | Yes | Yes | Organization + LocalBusiness + leadership/core-values via CMS |
+| Industries | Yes (SEOMeta) | Yes (clean `/industries`) | Yes | Yes | Organization + LocalBusiness |
+| Gallery | Yes (SEOMeta) | Yes (clean `/gallery`) | Yes | Yes | Organization + LocalBusiness |
+| Contact | Yes (SEOMeta) | Yes (clean `/contact`) | Yes | Yes | Organization + LocalBusiness |
+| 4 Main services | Yes (`ServicePageTemplate` sets service `seoTitle`/`seoDesc`) | Yes (`ServiceSchema`, clean `/services/...`) | Yes (hero headline) | Yes (ServicePageTemplate syncs OG/Twitter) | Service + BreadcrumbList + FAQPage JSON-LD |
+| 22 Sub-services | Yes (per-service SEO fields) | Yes | Yes | Yes | Same JSON-LD set, sub-service variant |
 
 - Unique titles/descriptions: every page has its own; services use
   per-service CMS SEO fields (keyword-stuffing avoided).

@@ -327,6 +327,7 @@ export default function About() {
       <SEOMeta
         title="About Us | Arrowline Logistics India Story & Hubs"
         description="Learn about Arrowline Logistics, India's trusted multimodal carrier. From Adani Mundra Port to national highway FTL, rail freight, and custom clearance."
+        canonicalUrl="https://www.arrowlinelogistics.in/about"
       />
 
       {/* ============================================================
@@ -657,7 +658,7 @@ export default function About() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 lg:justify-end">
               <a
-                href="#/contact"
+                href="/contact"
                 className="px-6 py-3 bg-[#FF7A00] hover:bg-[#E56D00] text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
               >
                 <MapPin className="w-4 h-4" />

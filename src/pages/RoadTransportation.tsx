@@ -94,6 +94,7 @@ export default function RoadTransportation({ onOpenQuote, onNavigateTo }: RoadTr
       <SEOMeta
         title="Road Transportation Services India | Pan-India Freight | Arrowline Logistics"
         description="Premium road transportation services across India. Specializing in FTL, LTL, ODC, and Project Cargo from Mundra Port to any destination."
+        canonicalUrl="https://www.arrowlinelogistics.in/services/road-transportation"
       />
 
       {/* HERO SECTION */}

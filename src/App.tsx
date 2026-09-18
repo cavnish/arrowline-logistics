@@ -31,7 +31,51 @@ import {
   buildWhatsApp,
 } from "./utils/contactLinks";
 
+import { pathToPageId, pageIdToPath } from "./utils/navigation";
+
 const AdminRouter = lazy(() => import("./admin/AdminRouter"));
+
+// Extract a pageId from a hash like "#/about" or "#/services/road-transportation"
+const pageIdFromHash = (
+  hash: string
+): string | null => {
+  if (!hash || hash === "#/" || hash === "#/home") {
+    return "home";
+  }
+  if (hash.startsWith("#/arrowline-admin")) {
+    return null;
+  }
+  if (hash.startsWith("#/about")) return "about";
+  if (hash.startsWith("#/industries")) return "industries";
+  if (hash.startsWith("#/gallery")) return "gallery";
+  if (hash.startsWith("#/contact")) return "contact";
+  if (hash.startsWith("#/services")) {
+    const raw = hash.replace("#/services", "");
+    const clean = raw.startsWith("/") ? raw.slice(1) : raw;
+    return clean
+      ? `services/${clean}`
+      : "services/road-transportation";
+  }
+  return "home";
+};
+
+// Determine the effective route from pathname (clean URLs), falling back to
+// the legacy hash format so old indexed links like `/#/about` keep working.
+const routeFromUrl = (): string => {
+  const path = window.location.pathname;
+  if (path === "/" || path === "") {
+    const hash = window.location.hash || "";
+    if (hash.startsWith("#/arrowline-admin")) {
+      return "admin";
+    }
+    const pageId = pageIdFromHash(hash);
+    return pageId ? pageId : "admin";
+  }
+  if (path.startsWith("/arrowline-admin")) {
+    return "admin";
+  }
+  return pathToPageId(path);
+};
 
 export default function App() {
   const [activePage, setActivePage] =
@@ -59,39 +103,48 @@ export default function App() {
     setIsAdminRoute,
   ] = useState(false);
 
-  const [isAppReady, setIsAppReady] =
-    useState(false);
+  // Show the full-screen logo loader only once on the very first full page
+  // load (App mounts once per hard refresh; internal navigation via
+  // pushState/popstate never remounts it, so it won't reappear).
+  const [
+    showLoader,
+    setShowLoader,
+  ] = useState<boolean>(
+    () => routeFromUrl() !== "admin"
+  );
 
   // ===================================================
-  // DETECT ADMIN ROUTE
+  // ROUTING (clean path URLs + legacy hash fallback)
   // ===================================================
 
   useEffect(() => {
-    const checkRoute = () => {
-      const hash =
-        window.location.hash ||
-        "";
-
-      setIsAdminRoute(
-        hash.startsWith(
-          "#/arrowline-admin"
-        )
-      );
+    const applyRoute = () => {
+      const route = routeFromUrl();
+      if (route === "admin") {
+        setIsAdminRoute(true);
+        return;
+      }
+      setIsAdminRoute(false);
+      setActivePage(route);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    checkRoute();
+    applyRoute();
 
-    window.addEventListener(
-      "hashchange",
-      checkRoute
-    );
+    window.addEventListener("popstate", applyRoute);
+    window.addEventListener("hashchange", applyRoute);
 
     return () => {
-      window.removeEventListener(
-        "hashchange",
-        checkRoute
-      );
+      window.removeEventListener("popstate", applyRoute);
+      window.removeEventListener("hashchange", applyRoute);
     };
+  }, []);
+
+  // Remove the static index.html boot splash as soon as React has mounted so
+  // the React PageLoader (identical visuals) takes over with no flash/blink.
+  useEffect(() => {
+    const splash = document.getElementById("boot-splash");
+    if (splash) splash.remove();
   }, []);
 
   // ===================================================
@@ -146,94 +199,6 @@ export default function App() {
   }, [isAdminRoute]);
 
   // ===================================================
-  // PUBLIC ROUTING
-  // ===================================================
-
-  useEffect(() => {
-    if (isAdminRoute) {
-      return;
-    }
-
-    const handleHashChange =
-      () => {
-        const hash =
-          window.location.hash ||
-          "";
-
-        if (
-          hash.startsWith(
-            "#/arrowline-admin"
-          )
-        ) {
-          return;
-        }
-
-        if (
-          !hash ||
-          hash === "#/" ||
-          hash === "#/home"
-        ) {
-          setActivePage("home");
-        } else if (
-          hash.startsWith(
-            "#/about"
-          )
-        ) {
-          setActivePage("about");
-        } else if (
-          hash.startsWith(
-            "#/industries"
-          )
-        ) {
-          setActivePage(
-            "industries"
-          );
-        } else if (
-          hash.startsWith(
-            "#/gallery"
-          )
-        ) {
-          setActivePage("gallery");
-        } else if (
-          hash.startsWith(
-            "#/contact"
-          )
-        ) {
-          setActivePage("contact");
-        } else if (
-          hash.startsWith(
-            "#/services"
-          )
-        ) {
-          const raw = hash.replace("#/services", "");
-          const clean = raw.startsWith("/") ? raw.slice(1) : raw;
-          setActivePage(clean ? `services/${clean}` : "services/road-transportation");
-        } else {
-          setActivePage("home");
-        }
-
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        });
-      };
-
-    handleHashChange();
-
-    window.addEventListener(
-      "hashchange",
-      handleHashChange
-    );
-
-    return () => {
-      window.removeEventListener(
-        "hashchange",
-        handleHashChange
-      );
-    };
-  }, [isAdminRoute]);
-
-  // ===================================================
   // NAVIGATION
   // ===================================================
 
@@ -242,10 +207,20 @@ export default function App() {
   ) => {
     setActivePage(pageId);
 
-    window.location.hash =
-      pageId === "home"
-        ? "#/"
-        : `#/${pageId}`;
+    const path = pageIdToPath(pageId);
+
+    if (window.location.pathname !== path) {
+      window.history.pushState(
+        { pageId },
+        "",
+        path
+      );
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   // ===================================================
@@ -432,12 +407,11 @@ export default function App() {
     <MotionConfig reducedMotion="user">
     <div className="min-h-screen bg-[#F5F8FA] text-[#102A36] flex flex-col justify-between selection:bg-[#FF6B1A] selection:text-white">
 
-      {/* INITIAL LOADER (public site only) */}
-
-      {!isAppReady && !isAdminRoute && (
+      {/* Full-screen logo loader — initial full page load only */}
+      {showLoader && (
         <PageLoader
           onComplete={() =>
-            setIsAppReady(true)
+            setShowLoader(false)
           }
         />
       )}
@@ -565,7 +539,7 @@ export default function App() {
 
       {/* FLOATING BUTTONS */}
 
-      <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 flex flex-col space-y-3 items-end">
+      <div className="fixed bottom-4 right-4 z-40 flex flex-col space-y-2.5 items-end sm:bottom-6 sm:right-6 sm:space-y-3">
 
         {/* CALL */}
 
@@ -573,11 +547,11 @@ export default function App() {
           href={buildTel(
             COMPANY_DETAILS.phone
           )}
-          className="w-13 h-13 sm:w-14 sm:h-14 bg-white hover:bg-[#F5F8FA] text-[#062B3A] rounded-full flex items-center justify-center shadow-[0_6px_20px_rgba(6,43,58,0.2)] hover:-translate-y-0.5 active:scale-95 transition-all group relative border border-slate-200"
+          className="w-11 h-11 sm:w-14 sm:h-14 bg-white hover:bg-[#F5F8FA] text-[#062B3A] rounded-full flex items-center justify-center shadow-[0_6px_20px_rgba(6,43,58,0.2)] hover:-translate-y-0.5 active:scale-95 transition-all group relative border border-slate-200"
           aria-label={`Call ${COMPANY_DETAILS.phone}`}
           title="Direct Dial Dispatch Desk"
         >
-          <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-[#FF6B1A]" />
+          <Phone className="w-[18px] h-[18px] sm:w-6 sm:h-6 text-[#FF6B1A]" />
         </a>
 
         {/* WHATSAPP */}
@@ -593,12 +567,12 @@ export default function App() {
           )}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-13 h-13 sm:w-14 sm:h-14 bg-[#25D366] hover:bg-[#20BA5A] text-white rounded-full flex items-center justify-center shadow-[0_6px_20px_rgba(37,211,102,0.4)] hover:-translate-y-0.5 active:scale-95 transition-all group relative animate-whatsapp-pulse"
+          className="w-11 h-11 sm:w-14 sm:h-14 bg-[#25D366] hover:bg-[#20BA5A] text-white rounded-full flex items-center justify-center shadow-[0_6px_20px_rgba(37,211,102,0.4)] hover:-translate-y-0.5 active:scale-95 transition-all group relative animate-whatsapp-pulse"
           aria-label="Chat with Arrowline Logistics on WhatsApp"
           title="WhatsApp"
         >
           <svg
-            className="w-6 h-6 sm:w-7 sm:h-7"
+            className="w-5 h-5 sm:w-7 sm:h-7"
             viewBox="0 0 32 32"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"

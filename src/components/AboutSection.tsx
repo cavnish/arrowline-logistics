@@ -30,17 +30,16 @@ export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
           {/* Left Column: Text & Benefits */}
           <Reveal direction="left" className="lg:col-span-6 space-y-6">
 
-            {/* Small Orange Eyebrow Label */}
-            <div className="inline-flex items-center space-x-2 px-3 py-1 bg-[#EAF3F6] border border-[#062B3A]/20 rounded-full text-[11px] font-extrabold text-[#062B3A] tracking-wider uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B1A]" />
-              <span>ABOUT ARROWLINE</span>
+           
+            {/* Main Section Heading — always two rows, fluid sized to its column.
+                Tagged h2: AboutSection is only mounted on the home page, where the
+                hero already owns the single h1. */}
+            <div style={{ containerType: "inline-size" }}>
+              <h2 className="max-w-full whitespace-nowrap font-black text-[#062B3A] tracking-tight leading-[1.15] text-[clamp(1.25rem,7.6cqw,3rem)]">
+                <span className="block">Connecting Ports,Roads,</span>
+                <span className="block text-[#FF6B1A]">Rail &amp; Businesses.</span>
+              </h2>
             </div>
-
-            {/* Main Section Heading */}
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight leading-[1.15]">
-              Connecting Ports, Roads, <br />
-              <span className="text-[#FF6B1A]">Rail & Businesses.</span>
-            </h2>
 
             {/* Core Paragraph */}
             <p className="text-base text-slate-600 leading-relaxed">

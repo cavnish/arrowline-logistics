@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { GalleryMediaItem } from "../../data/servicesData";
-import { X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import SmartImage from "../ui/SmartImage";
 
 interface ServiceGalleryProps {

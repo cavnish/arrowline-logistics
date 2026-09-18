@@ -23,11 +23,18 @@
   --color-text-primary: #102A36;
 }
 
+html,
+body {
+  /* `clip` (not `hidden`) trims horizontal overflow from Reveal's slide-in
+     transforms without creating a scroll container, so position:sticky
+     sections keep working. */
+  overflow-x: clip;
+}
+
 body {
   background-color: #F5F8FA;
   color: #102A36;
   font-family: 'Inter', 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -211,6 +218,40 @@ html.lenis, html.lenis body {
 }
 
 /* ----------------------------------------------------
+   HOME HERO SIZING & MOTION
+   Content-driven on mobile (never crops CTAs), fixed
+   70–80vh tablets, 75–90vh desktop with an upper cap.
+   Mobile uses content-driven height so the hero ends
+   right after the CTAs with no empty dark space.
+   ---------------------------------------------------- */
+.hero-min {
+  min-height: auto;
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .hero-min {
+    min-height: clamp(660px, 78svh, 900px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-min {
+    min-height: clamp(720px, 88svh, 1000px);
+  }
+}
+
+/* Very subtle slow Ken Burns zoom on the hero photo only. */
+@keyframes hero-kenburns {
+  from { transform: scale(1); }
+  to   { transform: scale(1.06); }
+}
+
+.hero-bg-zoom {
+  animation: hero-kenburns 40s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* ----------------------------------------------------
    SCROLL REVEAL SYSTEM
    Reveal.tsx toggles `.is-visible` on these elements
    via IntersectionObserver. GPU-friendly transform +
@@ -278,6 +319,39 @@ html.lenis, html.lenis body {
 }
 
 /* ----------------------------------------------------
+   CARGO & APPLICATIONS SEAMLESS MARQUEE (RIGHT → LEFT)
+   One horizontal row; the track holds 2 identical copies
+   and shifts -50% to loop invisibly. GPU-friendly
+   transform-only animation. Pauses on hover/focus/touch.
+   ---------------------------------------------------- */
+@keyframes cargo-marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.cargo-marquee {
+  --cargo-duration: 45s;
+}
+
+.cargo-marquee__track {
+  animation: cargo-marquee-scroll var(--cargo-duration, 45s) linear infinite;
+  will-change: transform;
+}
+
+.cargo-marquee:hover .cargo-marquee__track,
+.cargo-marquee:focus-within .cargo-marquee__track,
+.cargo-marquee.is-paused .cargo-marquee__track {
+  animation-play-state: paused;
+}
+
+/* Mobile fallback when motion is reduced: allow a normal swipe/scroll row. */
+@media (prefers-reduced-motion: reduce) {
+  .cargo-marquee__track {
+    animation: none;
+  }
+}
+
+/* ----------------------------------------------------
    MOTION SAFETY
    Respect users who prefer reduced motion globally.
    ---------------------------------------------------- */
@@ -290,6 +364,10 @@ html.lenis, html.lenis body {
     transform: none;
     transition: none;
     animation: none;
+  }
+  .hero-bg-zoom {
+    animation: none;
+    transform: none;
   }
   *,
   *::before,

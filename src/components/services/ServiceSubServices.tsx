@@ -109,7 +109,7 @@ export default function ServiceSubServices({
         {/* Sub-Service Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {subServices.map((sub, index) => {
-            const targetUrl = `#/services/${parentSlug || sub.parentSlug}/${sub.slug}`;
+            const targetUrl = `/services/${parentSlug || sub.parentSlug}/${sub.slug}`;
             return (
               <Reveal key={sub.id || sub.slug} delay={index * 70}>
                 <a

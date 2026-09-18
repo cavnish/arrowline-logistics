@@ -40,3 +40,17 @@ export function buildImageAlt(title: string, parentName?: string): string {
   }
   return `Arrowline Logistics ${title} service in India`;
 }
+
+/**
+ * Builds an HTML `srcset` (candidate widths) for responsive rendering.
+ * Only Cloudinary URLs support the on-the-fly width transform; for any
+ * other source the srcset is empty and the caller falls back to `src`.
+ */
+export function buildImageSrcSet(url: string, widths: number[]): string {
+  if (!url || !Array.isArray(widths) || widths.length === 0) return "";
+  const optimized = getOptimizedImageUrl(url, { width: widths[0] });
+  if (optimized === url) return "";
+  return widths
+    .map((w) => `${getOptimizedImageUrl(url, { width: w })} ${w}w`)
+    .join(", ");
+}

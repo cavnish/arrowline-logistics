@@ -70,10 +70,6 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
 
         {/* Section Header */}
         <Reveal className="text-center max-w-3xl mx-auto space-y-3 mb-10 lg:mb-14">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1 bg-white border border-[#062B3A]/15 rounded-full text-xs font-bold text-[#FF6B1A] tracking-widest uppercase shadow-sm">
-            <span>OUR SERVICES</span>
-          </div>
-
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight">
             Complete Multimodal <span className="text-[#FF6B1A]">Logistics Solutions</span>
           </h2>
@@ -88,7 +84,7 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
           {services.map((service, index) => (
             <Reveal key={service.id || service.slug} delay={index * 80} duration={500} className="h-full">
             <a
-              href={`#/services/${service.slug}`}
+              href={`/services/${service.slug}`}
               onClick={(event) => {
                 event.preventDefault();
                 onSelectService(service.slug);

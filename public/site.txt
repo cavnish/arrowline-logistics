@@ -93,15 +93,15 @@ Instagram - https://www.instagram.com/arrowline_logistics
 IMPORTANT PUBLIC URLS
 ----------------------------------------------------------------
 Homepage:        https://www.arrowlinelogistics.in/
-About Us:        https://www.arrowlinelogistics.in/#/about
-Industries:      https://www.arrowlinelogistics.in/#/industries
-Case Studies:    https://www.arrowlinelogistics.in/#/gallery
-Contact:         https://www.arrowlinelogistics.in/#/contact
+About Us:        https://www.arrowlinelogistics.in/about
+Industries:      https://www.arrowlinelogistics.in/industries
+Case Studies:    https://www.arrowlinelogistics.in/gallery
+Contact:         https://www.arrowlinelogistics.in/contact
 
 Services:
-Road Transportation:     https://www.arrowlinelogistics.in/#/services/road-transportation
-Rail Transportation:    https://www.arrowlinelogistics.in/#/services/rail-transportation
-Project Cargo:          https://www.arrowlinelogistics.in/#/services/project-cargo-transportation
-Warehousing & Storage:  https://www.arrowlinelogistics.in/#/services/warehousing-storage
+Road Transportation:     https://www.arrowlinelogistics.in/services/road-transportation
+Rail Transportation:    https://www.arrowlinelogistics.in/services/rail-transportation
+Project Cargo:          https://www.arrowlinelogistics.in/services/project-cargo-transportation
+Warehousing & Storage:  https://www.arrowlinelogistics.in/services/warehousing-storage
 
 Sitemap:         https://www.arrowlinelogistics.in/sitemap.xml

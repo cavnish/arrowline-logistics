@@ -200,7 +200,7 @@ faqs: [
 ]
 ```
 4. Run `npm run build`
-5. Test at `#/services/full-truck-load-ftl`
+5. Test at `/services/full-truck-load-ftl`
 
 **Time**: < 2 minutes
 
@@ -243,7 +243,7 @@ faqs: [
 
 2. Add hero image to `/public/images/warehouse.jpg`
 3. Run `npm run build`
-4. Test at `#/services/warehousing-storage`
+4. Test at `/services/warehousing-storage`
 5. Verify navigation shows new service
 
 **Time**: < 5 minutes
@@ -462,7 +462,7 @@ git checkout -b add-warehousing-service
 
 # 4. Test locally
 npm run dev
-# Visit #/services/warehousing-storage
+# Visit /services/warehousing-storage
 
 # 5. Build
 npm run build
@@ -518,7 +518,7 @@ feat: add Warehousing & Storage service page
 - **Component Library**: Lucide React icons (lucide.dev)
 - **Styling**: Tailwind CSS (tailwindcss.com)
 - **Animation**: Custom Reveal component in codebase
-- **Router**: Hash routing via window.location.hash
+- **Router**: Clean-path routing via window.location.pathname in src/App.tsx (legacy hash URLs still supported)
 - **Data Fetch**: App.tsx handles service lookup
 
 ---

@@ -17,7 +17,7 @@ export default function FAQSection() {
     axios
       .get(`${apiUrl}/api/faqs`)
       .then((response) => {
-        const fetched = (response.data?.data || [])
+        const fetched: FAQItem[] = (response.data?.data || [])
           .filter((item: any) => item.question && item.answer)
           .map((item: any): FAQItem => ({
             id: String(item.id),

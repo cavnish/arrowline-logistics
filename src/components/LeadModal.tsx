@@ -1,5 +1,6 @@
-import { useEffect } from "react";
-import { Check } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, FileDown, Loader2 } from "lucide-react";
+import { generateLeadPDF } from "../utils/generateLeadPDF";
 
 interface LeadModalProps {
   isOpen: boolean;
@@ -22,6 +23,8 @@ interface LeadModalProps {
 const AUTO_CLOSE_MS = 5000;
 
 export default function LeadModal({ isOpen, onClose, leadData }: LeadModalProps) {
+  const [pdfBusy, setPdfBusy] = useState(false);
+
   useEffect(() => {
     if (!isOpen || !leadData) return;
 
@@ -40,6 +43,24 @@ export default function LeadModal({ isOpen, onClose, leadData }: LeadModalProps)
   }, [isOpen, leadData, onClose]);
 
   if (!isOpen || !leadData) return null;
+
+  const handleDownloadPdf = async () => {
+    if (pdfBusy) return;
+    setPdfBusy(true);
+    try {
+      await generateLeadPDF({
+        name: leadData.name,
+        company: leadData.company,
+        email: leadData.email,
+        phone: leadData.phone,
+        service: leadData.service,
+        message: leadData.message,
+        referenceNumber: leadData.referenceNumber,
+      });
+    } finally {
+      setPdfBusy(false);
+    }
+  };
 
   return (
     <div
@@ -82,14 +103,32 @@ export default function LeadModal({ isOpen, onClose, leadData }: LeadModalProps)
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={onClose}
-            autoFocus
-            className="w-full py-3 bg-[#FF7A00] hover:bg-[#E56D00] text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 hover:shadow-[0_4px_15px_rgba(255,122,0,0.3)]"
-          >
-            Done
-          </button>
+          <div className="space-y-2.5">
+            <button
+              type="button"
+              onClick={handleDownloadPdf}
+              disabled={pdfBusy}
+              className="w-full py-3 bg-white border-2 border-[#FF7A00] text-[#FF7A00] hover:bg-[#FFF3E6] disabled:opacity-60 disabled:cursor-wait text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95"
+            >
+              <span className="inline-flex items-center justify-center gap-2">
+                {pdfBusy ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <FileDown className="w-4 h-4" />
+                )}
+                {pdfBusy ? "Preparing PDF…" : "Download Inquiry PDF"}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onClose}
+              autoFocus
+              className="w-full py-3 bg-[#FF7A00] hover:bg-[#E56D00] text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 hover:shadow-[0_4px_15px_rgba(255,122,0,0.3)]"
+            >
+              Done
+            </button>
+          </div>
         </div>
       </div>
     </div>
