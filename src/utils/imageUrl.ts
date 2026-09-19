@@ -30,6 +30,29 @@ export function getOptimizedImageUrl(url: string, options: ImageOptions = {}): s
 }
 
 /**
+ * Builds a Cloudinary URL pre-processed for ghosted, low-key background
+ * use (e.g. the deep logistics imagery behind the services grid): the
+ * derivative is monochrome, navy-tinted, heavily blurred and served small
+ * (~15-30KB) so decorative backgrounds add almost nothing to page weight.
+ */
+export function getGhostImageUrl(url: string, width = 700): string {
+  if (!url) return url;
+  const match = url.match(CLOUDINARY_PATH_RE);
+  if (!match) return url;
+  if (match[2].toLowerCase().includes(".svg")) return url;
+
+  const transforms = [
+    "f_auto",
+    "q_auto:low",
+    `w_${width}`,
+    "e_grayscale",
+    "e_blur:600",
+    "e_colorize:50,co_rgb:062B3A",
+  ];
+  return `${match[1]}${transforms.join(",")}/${match[2]}`;
+}
+
+/**
  * Human-readable alt text for a service/sub-service image. Stored CMS alt
  * text (image_alt) wins when present; this is only the fallback used when
  * no alt text has been configured.

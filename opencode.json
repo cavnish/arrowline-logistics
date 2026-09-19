@@ -1,20 +1,296 @@
 {
-  "$schema": "https://app.kilo.ai/config.json",
-  "provider": {
-    "ollama": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama",
-      "options": {
-        "baseURL": "http://127.0.0.1:11434/v1"
-      },
-      "models": {
-        "qwen2.5-coder:7b": {
-          "name": "Qwen 2.5 Coder 7B"
-        },
-        "qwen2.5-coder:3b": {
-          "name": "Qwen 2.5 Coder 3B"
-        }
-      }
-    }
-  }
+    "$schema":  "https://app.kilo.ai/config.json",
+    "provider":  {
+                     "ollama":  {
+                                    "npm":  "@ai-sdk/openai-compatible",
+                                    "name":  "Ollama",
+                                    "options":  {
+                                                    "baseURL":  "http://127.0.0.1:11434/v1"
+                                                },
+                                    "models":  {
+                                                   "qwen2.5-coder:7b":  {
+                                                                            "name":  "Qwen 2.5 Coder 7B"
+                                                                        },
+                                                   "qwen2.5-coder:3b":  {
+                                                                            "name":  "Qwen 2.5 Coder 3B"
+                                                                        }
+                                               }
+                                },
+                     "ashna":  {
+                                   "models":  {
+                                                  "kimi-2.6":  {
+                                                                   "name":  "Kimi 2.6"
+                                                               },
+                                                  "gpt-5.4-thinking":  {
+                                                                           "name":  "GPT 5.4 Thinking"
+                                                                       },
+                                                  "claude-opus-4-20250514":  {
+                                                                                 "name":  "Claude Opus 4.5"
+                                                                             },
+                                                  "claude-sonnet-4.5":  {
+                                                                            "name":  "Claude Sonnet 4.5"
+                                                                        },
+                                                  "claude-haiku-4-5-20251001":  {
+                                                                                    "name":  "Claude Haiku 4.5"
+                                                                                },
+                                                  "gpt-5-codex":  {
+                                                                      "name":  "GPT 5 Codex"
+                                                                  },
+                                                  "kimi-k2-thinking":  {
+                                                                           "name":  "Kimi-K2 Thinking"
+                                                                       },
+                                                  "claude-opus-4-6":  {
+                                                                          "name":  "Opus 5"
+                                                                      },
+                                                  "deepseek-v4.1-flash":  {
+                                                                              "name":  "DeepSeek V4.1 Flash"
+                                                                          },
+                                                  "gpt-4o-mini":  {
+                                                                      "name":  "GPT 4o Mini"
+                                                                  },
+                                                  "claude-opus-4-8":  {
+                                                                          "name":  "Opus 5"
+                                                                      },
+                                                  "claude-sonnet-4-6":  {
+                                                                            "name":  "Sonnet 5"
+                                                                        },
+                                                  "gemini-3.1-Pro":  {
+                                                                         "name":  "Gemini 3.1 Pro Preview"
+                                                                     },
+                                                  "gpt-5":  {
+                                                                "name":  "GPT 5"
+                                                            },
+                                                  "gpt-5.2":  {
+                                                                  "name":  "GPT 5.2"
+                                                              },
+                                                  "grok-4.3":  {
+                                                                   "name":  "Grok 4.3"
+                                                               },
+                                                  "claude-3-7-sonnet":  {
+                                                                            "name":  "Claude Sonnet 4.5"
+                                                                        },
+                                                  "deepseek-v4-flash":  {
+                                                                            "name":  "DeepSeek V4 Flash"
+                                                                        },
+                                                  "claude-3-5-haiku-20241022":  {
+                                                                                    "name":  "Claude Haiku 4.5"
+                                                                                },
+                                                  "auto":  {
+                                                               "name":  "Auto (dynamic routing)"
+                                                           },
+                                                  "gpt-5.6-terra":  {
+                                                                        "name":  "GPT 5.6 Terra"
+                                                                    },
+                                                  "gpt-4.1-nano":  {
+                                                                       "name":  "GPT 4.1 Nano"
+                                                                   },
+                                                  "gpt-o1":  {
+                                                                 "name":  "GPT o1"
+                                                             },
+                                                  "gpt-5.1":  {
+                                                                  "name":  "GPT 5.1"
+                                                              },
+                                                  "glm-4.7":  {
+                                                                  "name":  "GLM 4.7"
+                                                              },
+                                                  "nemotron-ultra":  {
+                                                                         "name":  "Nemotron Ultra"
+                                                                     },
+                                                  "gpt-5.6-sol":  {
+                                                                      "name":  "GPT 5.6 Sol"
+                                                                  },
+                                                  "gpt-5-mini":  {
+                                                                     "name":  "GPT 5 Mini"
+                                                                 },
+                                                  "ashna-x1":  {
+                                                                   "name":  "Ashna-X1"
+                                                               },
+                                                  "gpt-5.3-codex":  {
+                                                                        "name":  "GPT 5.3 Codex"
+                                                                    },
+                                                  "ashnaai":  {
+                                                                  "name":  "ashnaai"
+                                                              },
+                                                  "gpt-5.1-codex":  {
+                                                                        "name":  "GPT 5.1 Codex"
+                                                                    },
+                                                  "claude-haiku-4.5":  {
+                                                                           "name":  "Claude Haiku 4.5"
+                                                                       },
+                                                  "claude-opus-4-1":  {
+                                                                          "name":  "Claude Opus 4.1"
+                                                                      },
+                                                  "grok-4-1-non-reasoning":  {
+                                                                                 "name":  "Grok 4.1"
+                                                                             },
+                                                  "gemini-2.5-Pro":  {
+                                                                         "name":  "Gemini 2.5 Pro"
+                                                                     },
+                                                  "gemini-3.5-Flash":  {
+                                                                           "name":  "Gemini 3.5 Flash"
+                                                                       },
+                                                  "claude-3-5-sonnet-20241022":  {
+                                                                                     "name":  "Claude Sonnet 4.5"
+                                                                                 },
+                                                  "claude-opus-4.5":  {
+                                                                          "name":  "Claude Opus 4.5"
+                                                                      },
+                                                  "gpt-4.1-mini":  {
+                                                                       "name":  "GPT 4.1 Mini"
+                                                                   },
+                                                  "kimi-k2.5-thinking":  {
+                                                                             "name":  "Kimi-K2.5"
+                                                                         },
+                                                  "deepseek-v4-pro":  {
+                                                                          "name":  "DeepSeek V4 Pro"
+                                                                      },
+                                                  "claude-3-5-sonnet":  {
+                                                                            "name":  "Claude Sonnet 4.5"
+                                                                        },
+                                                  "gpt-o4-mini":  {
+                                                                      "name":  "GPT o4 Mini"
+                                                                  },
+                                                  "gpt-5.2-thinking":  {
+                                                                           "name":  "GPT 5.2 Thinking"
+                                                                       },
+                                                  "glm-5.3-flash":  {
+                                                                        "name":  "GLM 5.3 Flash"
+                                                                    },
+                                                  "gpt-6-astra":  {
+                                                                      "name":  "GPT 6 Astra"
+                                                                  },
+                                                  "gemini-3-Pro":  {
+                                                                       "name":  "gemini-3-Pro"
+                                                                   },
+                                                  "claude-opus-4.1":  {
+                                                                          "name":  "Claude Opus 4.1"
+                                                                      },
+                                                  "gpt-5.2-codex":  {
+                                                                        "name":  "GPT 5.2 Codex"
+                                                                    },
+                                                  "claude-sonnet-4":  {
+                                                                          "name":  "Claude Sonnet 4.5"
+                                                                      },
+                                                  "claude-sonnet-4-5":  {
+                                                                            "name":  "Claude Sonnet 4.5"
+                                                                        },
+                                                  "claude-opus-4-5":  {
+                                                                          "name":  "Claude Opus 4.5"
+                                                                      },
+                                                  "gpt-oss-120b":  {
+                                                                       "name":  "gpt-oss-reasoning-120b"
+                                                                   },
+                                                  "glm-5.2":  {
+                                                                  "name":  "GLM 5.2"
+                                                              },
+                                                  "claude-haiku-4-5":  {
+                                                                           "name":  "Claude Haiku 4.5"
+                                                                       },
+                                                  "glm-5.3":  {
+                                                                  "name":  "GLM 5.3"
+                                                              },
+                                                  "grok-4-reasoning":  {
+                                                                           "name":  "Grok 4 Reasoning"
+                                                                       },
+                                                  "kimi-k3":  {
+                                                                  "name":  "Kimi K3"
+                                                              },
+                                                  "kimi-k2.7-code":  {
+                                                                         "name":  "Kimi K2.7 Code"
+                                                                     },
+                                                  "mistral-3b-latest":  {
+                                                                            "name":  "mistral 3B"
+                                                                        },
+                                                  "gemini-2.5-Flash-Lite":  {
+                                                                                "name":  "Gemini 2.5 Flash-Lite"
+                                                                            },
+                                                  "opus":  {
+                                                               "name":  "Opus 5"
+                                                           },
+                                                  "sonnet":  {
+                                                                 "name":  "Sonnet 5"
+                                                             },
+                                                  "gemini-2.0-flash":  {
+                                                                           "name":  "gemini-2.0-flash"
+                                                                       },
+                                                  "gemini-2.5-Flash":  {
+                                                                           "name":  "Gemini 2.5 Flash"
+                                                                       },
+                                                  "gpt-5.6-luna":  {
+                                                                       "name":  "GPT 5.6 Luna"
+                                                                   },
+                                                  "claude-3-5-haiku":  {
+                                                                           "name":  "Claude Haiku 4.5"
+                                                                       },
+                                                  "claude-haiku-3-5":  {
+                                                                           "name":  "Claude Haiku 4.5"
+                                                                       },
+                                                  "gemini-3-Flash-Preview":  {
+                                                                                 "name":  "Gemini 3 Flash Preview"
+                                                                             },
+                                                  "claude-3-7-sonnet-20250219":  {
+                                                                                     "name":  "Claude Sonnet 4.5"
+                                                                                 },
+                                                  "mistral-open-8.22B":  {
+                                                                             "name":  "Mistral 8.22B"
+                                                                         },
+                                                  "claude-fable-5":  {
+                                                                         "name":  "Fable 5"
+                                                                     },
+                                                  "claude-opus-4":  {
+                                                                        "name":  "Claude Opus 4.5"
+                                                                    },
+                                                  "gpt-oss-20b":  {
+                                                                      "name":  "gpt-oss-reasoning-20b"
+                                                                  },
+                                                  "gemini-3.1-Flash-Lite":  {
+                                                                                "name":  "Gemini 3.1 Flash-Lite"
+                                                                            },
+                                                  "claude-opus-4-1-20250805":  {
+                                                                                   "name":  "Claude Opus 4.1"
+                                                                               },
+                                                  "claude-opus-5":  {
+                                                                        "name":  "Opus 5"
+                                                                    },
+                                                  "gpt-4o":  {
+                                                                 "name":  "GPT 4o"
+                                                             },
+                                                  "claude-sonnet-5":  {
+                                                                          "name":  "Sonnet 5"
+                                                                      },
+                                                  "gpt-5.4":  {
+                                                                  "name":  "GPT 5.4"
+                                                              },
+                                                  "claude-sonnet-4-20250514":  {
+                                                                                   "name":  "Claude Sonnet 4.5"
+                                                                               },
+                                                  "haiku":  {
+                                                                "name":  "Claude Haiku 4.5"
+                                                            },
+                                                  "gpt-5.5":  {
+                                                                  "name":  "GPT 5.5"
+                                                              },
+                                                  "ashna-diffusion-1":  {
+                                                                            "name":  "Ashna-Diffusion"
+                                                                        },
+                                                  "gpt-o3-mini":  {
+                                                                      "name":  "GPT o3 Mini"
+                                                                  },
+                                                  "mistral-large-3":  {
+                                                                          "name":  "Mistral Large 3"
+                                                                      },
+                                                  "gpt-4.1":  {
+                                                                  "name":  "GPT 4.1"
+                                                              },
+                                                  "inkling":  {
+                                                                  "name":  "Inkling"
+                                                              }
+                                              },
+                                   "name":  "AshnaAI",
+                                   "options":  {
+                                                   "baseURL":  "https://api.ashna.ai/v1/api"
+                                               },
+                                   "npm":  "@ai-sdk/openai-compatible"
+                               }
+                 }
 }

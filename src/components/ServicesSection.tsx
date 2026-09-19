@@ -2,9 +2,24 @@ import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { contentService } from "../services/contentService";
 import { getAllMainServices } from "../data/servicesData";
-import { getOptimizedImageUrl, buildImageAlt } from "../utils/imageUrl";
+import { getOptimizedImageUrl, buildImageAlt, getGhostImageUrl } from "../utils/imageUrl";
 import SmartImage from "./ui/SmartImage";
 import Reveal from "./Reveal";
+
+// Ghosted logistics visuals — modern monochrome, navy-tinted derivatives
+// processed via Cloudinary (see getGhostImageUrl) and faded behind the grid.
+const GHOST_PORT =
+  "https://res.cloudinary.com/uorctww6/image/upload/v1789377042/arrowline/general/project-port.jpg";
+const GHOST_TRAIN =
+  "https://res.cloudinary.com/uorctww6/image/upload/v1789377045/arrowline/general/rail-multimodal.jpg";
+const GHOST_TRUCK =
+  "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg";
+const GHOST_CONTAINERS =
+  "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg";
+const GHOST_WAREHOUSE =
+  "https://res.cloudinary.com/uorctww6/image/upload/v1789377044/arrowline/general/project-warehouse.jpg";
+const GHOST_FLEET =
+  "https://res.cloudinary.com/uorctww6/image/upload/v1789377039/arrowline/general/hero-trucks-city.jpg";
 
 interface ServicesSectionProps {
   onSelectService: (slug: string) => void;
@@ -63,10 +78,62 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
 
   return (
     <section id="services-section" className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden">
+      {/* Ghosted logistics imagery — deep monochrome visuals behind the grid */}
+      <div aria-hidden="true" className="ghost-logistics-layer hidden md:block">
+        <img
+          src={getGhostImageUrl(GHOST_PORT)}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          fetchPriority="low"
+          className="gm-tl w-[42vw] h-[34vh] top-[-12%] left-[-4%] opacity-[0.07]"
+        />
+        <img
+          src={getGhostImageUrl(GHOST_TRAIN)}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          fetchPriority="low"
+          className="gm-tr w-[44vw] h-[30vh] top-[-6%] right-[-8%] opacity-[0.06]"
+        />
+        <img
+          src={getGhostImageUrl(GHOST_TRUCK)}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          fetchPriority="low"
+          className="gm-l w-[36vw] h-[26vh] top-[34%] left-[-14%] opacity-[0.08]"
+        />
+        <img
+          src={getGhostImageUrl(GHOST_CONTAINERS)}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          fetchPriority="low"
+          className="gm-r w-[34vw] h-[26vh] top-[38%] right-[-10%] opacity-[0.07]"
+        />
+        <img
+          src={getGhostImageUrl(GHOST_WAREHOUSE)}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          fetchPriority="low"
+          className="gm-bl w-[38vw] h-[34vh] bottom-[-12%] left-[-6%] opacity-[0.07]"
+        />
+        <img
+          src={getGhostImageUrl(GHOST_FLEET)}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          fetchPriority="low"
+          className="gm-br w-[40vw] h-[32vh] bottom-[-8%] right-[-10%] opacity-[0.06]"
+        />
+      </div>
+
       {/* Background Decorative Pattern */}
       <div className="absolute inset-0 bg-grid-pattern opacity-50 pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[2]">
 
         {/* Section Header */}
         <Reveal className="text-center max-w-3xl mx-auto space-y-3 mb-10 lg:mb-14">
