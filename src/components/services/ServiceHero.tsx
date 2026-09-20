@@ -1,10 +1,12 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useState } from "react";
 import { ArrowRight, Phone } from "lucide-react";
-import Reveal from "../Reveal";
-import SmartImage, { FALLBACK_IMAGE } from "../ui/SmartImage";
+import { motion, useReducedMotion } from "framer-motion";
+import { FALLBACK_IMAGE } from "../ui/SmartImage";
 import { COMPANY_DETAILS } from "../../data/logisticsData";
 import { buildTel } from "../../utils/contactLinks";
 import { buildImageSrcSet, getOptimizedImageUrl } from "../../utils/imageUrl";
+import { AL_EASE } from "../motion/primitives";
+import ServiceTrustStrip from "./ServiceTrustStrip";
 
 interface ServiceHeroProps {
   badge: string;
@@ -17,6 +19,56 @@ interface ServiceHeroProps {
   fallbackImage?: string;
   imageAlt?: string;
   onOpenQuote: () => void;
+  serviceSlug?: string;
+  parentSlug?: string;
+}
+
+/* ── Scene configuration ──
+   Every service hero is a full-bleed photographic campaign shot with a dark
+   navy cinematic overlay. Dedicated photographs live in public/images/services
+   (hero-*-bg.jpg). Sub-services inherit their parent's scene. When a dedicated
+   photo has not been dropped in yet, the backdrop falls back to the service's
+   configured heroImage (Cloudinary) so the hero always shows a real
+   photograph, never a missing image. */
+interface HeroBackground {
+  bg?: string;
+  position?: string;
+}
+
+const HERO_BACKGROUNDS: Record<string, HeroBackground> = {
+  "road-transportation": {
+    bg: "/images/services/hero-road-bg.jpg",
+    position: "center",
+  },
+  "rail-transportation": {
+    bg: "/images/services/hero-rail-bg.jpg",
+    position: "center",
+  },
+  "project-cargo-transportation": {
+    bg: "/images/services/hero-project-cargo-bg.jpg",
+    position: "center",
+  },
+  "warehousing-storage": {
+    bg: "/images/services/hero-warehouse-bg.jpg",
+    position: "center",
+  },
+  "container-transportation": {
+    bg: "/images/services/hero-container-bg.jpg",
+    position: "center",
+  },
+};
+
+function getHeroBackground(
+  serviceSlug?: string,
+  parentSlug?: string
+): HeroBackground | undefined {
+  if (serviceSlug && HERO_BACKGROUNDS[serviceSlug]) {
+    return HERO_BACKGROUNDS[serviceSlug];
+  }
+  if (parentSlug && HERO_BACKGROUNDS[parentSlug]) {
+    return HERO_BACKGROUNDS[parentSlug];
+  }
+  return undefined;
 }
 
 /* Balanced split into exactly two headline rows (never more than two),
@@ -40,198 +92,148 @@ function splitHeadline(text: string): [string, string] {
   return [words.slice(0, best).join(" "), words.slice(best).join(" ")];
 }
 
+/* Full-bleed background: walks the candidate list (dedicated photograph →
+   service heroImage → branded fallback) and advances on load error so the
+   hero never shows a broken image. Fills the whole hero with
+   background-size: cover behaviour. */
+function HeroBackdrop({
+  srcs,
+  position,
+}: {
+  srcs: string[];
+  position: string;
+}) {
+  const [stage, setStage] = useState(0);
+  const reduceMotion = useReducedMotion();
+  const raw = srcs[Math.min(stage, srcs.length - 1)];
+  const src = getOptimizedImageUrl(raw, { width: 1920 });
+  const srcSet = buildImageSrcSet(raw, [640, 960, 1280, 1600, 1920]) || undefined;
+  return (
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, scale: 1.04 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 1.4, ease: AL_EASE }}
+      className="absolute inset-0"
+    >
+      <img
+        src={src}
+        srcSet={srcSet}
+        sizes="100vw"
+        alt=""
+        loading="eager"
+        decoding="async"
+        fetchPriority="high"
+        onError={() => setStage((s) => Math.min(s + 1, srcs.length - 1))}
+        style={{ objectPosition: position }}
+        className="h-full w-full object-cover"
+      />
+    </motion.div>
+  );
+}
+
 export default function ServiceHero({
-  badge,
-  breadcrumb = [],
   headline,
   description,
   image,
-  videoUrl,
   fallbackImage,
-  imageAlt,
   onOpenQuote,
+  serviceSlug,
+  parentSlug,
 }: ServiceHeroProps) {
-  const [loaded, setLoaded] = useState(false);
-  const [isVideoError, setIsVideoError] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setLoaded(true), 30);
-    return () => clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener?.("change", onChange);
-    return () => mq.removeEventListener?.("change", onChange);
-  }, []);
-
-  const heroMedia = fallbackImage || image || FALLBACK_IMAGE;
-  const heroSrc = getOptimizedImageUrl(heroMedia, { width: 1920 });
-  const heroSrcSet = buildImageSrcSet(heroMedia, [640, 960, 1280, 1600, 1920]);
-
-  /* Preload the LCP hero image on service pages (removed on unmount). */
-  useEffect(() => {
-    if (videoUrl && !isVideoError) return;
-    const link = document.createElement("link");
-    link.rel = "preload";
-    link.as = "image";
-    link.href = heroSrc;
-    link.fetchPriority = "high";
-    document.head.appendChild(link);
-    return () => {
-      document.head.removeChild(link);
-    };
-  }, [heroSrc, videoUrl, isVideoError]);
-
   const [headlineA, headlineB] = splitHeadline(headline);
-
-  const mediaStyle: CSSProperties = reducedMotion
-    ? { opacity: loaded ? 1 : 0, background: "#03121B" }
-    : {
-        opacity: loaded ? 1 : 0,
-        transform: loaded ? "scale(1)" : "scale(1.04)",
-        transition:
-          "opacity 0.9s ease, transform 1.8s cubic-bezier(0.16, 1, 0.3, 1)",
-        background: "#03121B",
-      };
-
-  const crumb = breadcrumb.length > 0 ? breadcrumb : [badge];
+  const reduceMotion = useReducedMotion();
+  const background = getHeroBackground(serviceSlug, parentSlug);
+  const heroMedia = fallbackImage || image || FALLBACK_IMAGE;
+  const backdropSrcs = [background?.bg, heroMedia, FALLBACK_IMAGE]
+    .filter((s): s is string => Boolean(s))
+    .filter((s, i, arr) => arr.indexOf(s) === i);
 
   return (
-    <section className="relative w-full overflow-hidden bg-[#03121B] text-white">
-      {/* ── Background Media Layer (covers the entire hero) ── */}
-      <div className="absolute inset-0">
-        {videoUrl && !isVideoError ? (
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster={heroSrc}
-            onError={() => setIsVideoError(true)}
-            className="absolute inset-0 h-full w-full object-cover object-center"
-            style={mediaStyle}
-          >
-            <source src={videoUrl} type="video/mp4" />
-            <source src={videoUrl} type="video/webm" />
-            <img
-              src={heroSrc}
-              alt={imageAlt || headline}
-              className="h-full w-full object-cover object-center"
-            />
-          </video>
-        ) : (
-          <SmartImage
-            src={heroSrc}
-            srcSet={heroSrcSet}
-            sizes="100vw"
-            alt={imageAlt || headline}
-            loading="eager"
-            fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover object-[50%_30%] md:object-[55%_center]"
-            style={mediaStyle}
-          />
-        )}
+    <section className="service-hero-min relative flex w-full flex-col overflow-hidden bg-[#062B3A] text-white">
+      {/* ── Layer 1 — full-bleed photograph + cinematic overlays ── */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <HeroBackdrop
+          srcs={backdropSrcs}
+          position={background?.position ?? "center"}
+        />
 
-        {/* Layered readability overlays — navy cinematic treatment keeps the
-            image clearly visible while text stays extremely legible. */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,27,38,0.93)_0%,rgba(3,27,38,0.78)_46%,rgba(3,27,38,0.35)_100%)]"
-        />
-        {/* Mobile: balanced vertical overlay so text never fights the photo */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 md:hidden bg-[linear-gradient(180deg,rgba(3,27,38,0.35)_0%,rgba(3,27,38,0.6)_48%,rgba(3,27,38,0.82)_100%)]"
-        />
-        {/* Soft bottom blend into the page background */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-[#03212D]/85 via-transparent to-transparent"
-        />
-        {/* Subtle orange atmospheric glow, top right */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_16%,rgba(255,107,26,0.16),transparent_58%)]"
-        />
+        {/* Navy scrim → transparent. Dark enough only behind the copy on the
+            left for white text readability, and near-clear on the right so the
+            photograph keeps its original look, colours and exposure. */}
+        <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(6,43,58,0.82)_0%,rgba(6,43,58,0.56)_36%,rgba(6,43,58,0.2)_64%,rgba(6,43,58,0.04)_86%)]" />
+        {/* Mobile/tablet readability veil — the copy spans the full width on
+            small screens, so a soft even navy veil keeps the text readable
+            without hiding the photograph (desktop stays nearly veil-free). */}
+        <div className="absolute inset-0 bg-[#062B3A]/35 md:hidden" />
+        {/* Warm orange atmospheric light — kept very subtle so it does not
+            shift the photograph's colours noticeably. */}
+        <div className="absolute inset-0 bg-[radial-gradient(1100px_at_78%_16%,rgba(255,122,45,0.1),transparent_62%)]" />
+        {/* Soft bottom scrim so the trust band sits on a stable base */}
+        <div className="absolute inset-x-0 bottom-0 h-[40%] bg-[linear-gradient(180deg,rgba(4,13,20,0)_0%,rgba(4,13,20,0.28)_100%)]" />
       </div>
 
-      {/* ── Content layer (left-aligned; image subject stays visible on the right) ──
-          Content-driven height: mobile clears the fixed header, no 100vh/min-h. */}
-      <div className="relative z-10 mx-auto w-full max-w-[1280px] px-4 pb-12 pt-32 sm:px-6 md:pt-36 md:pb-16 lg:px-8 lg:pt-40 lg:pb-20">
-        <div
-          className="flex max-w-2xl flex-col gap-5 sm:gap-6 md:gap-7"
-          style={{ containerType: "inline-size" }}
-        >
-          {/* Breadcrumb / service label */}
-          <Reveal delay={80} direction="up">
-            <nav
-              aria-label="Breadcrumb"
-              className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] font-black uppercase tracking-[0.2em] text-[#FF9A5B]/95 sm:text-[11px]"
+      {/* ── Layer 2 — copy over the photograph ── */}
+      <div className="relative z-20 mx-auto flex w-full max-w-[1280px] flex-1 flex-col justify-center px-4 pb-16 pt-24 sm:px-6 sm:pb-12 sm:pt-28 md:pt-32 lg:px-8 lg:pb-8 lg:pt-36">
+        <div className="max-w-[620px]">
+          {/* Main heading — white, accent row in brand orange */}
+          <motion.h1
+            initial={reduceMotion ? false : { opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: AL_EASE, delay: 0.15 }}
+            className="text-[clamp(1.8rem,4.5vw,3.9rem)] font-black leading-[1.02] tracking-tight text-white [text-wrap:balance]"
+          >
+            <span className="block">{headlineA}</span>
+            {headlineB && (
+              <span className="block bg-gradient-to-r from-[#FF8C2A] via-[#FF7A1F] to-[#FF6B1A] bg-clip-text text-transparent">
+                {headlineB}
+              </span>
+            )}
+          </motion.h1>
+
+          <motion.p
+            initial={reduceMotion ? false : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.75, ease: AL_EASE, delay: 0.3 }}
+            className="mt-3 max-w-[560px] text-[0.95rem] leading-[1.6] text-white/[0.88] sm:mt-4 sm:text-[1.05rem]"
+          >
+            {description}
+          </motion.p>
+
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: AL_EASE, delay: 0.45 }}
+            className="mt-5 flex w-full flex-col gap-2.5 sm:mt-7 sm:flex-row sm:flex-wrap sm:items-center md:gap-3.5"
+          >
+            <motion.button
+              type="button"
+              onClick={onOpenQuote}
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 400, damping: 22 }}
+              className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2.5 whitespace-nowrap rounded-xl bg-gradient-to-r from-[#FF6B1A] to-[#FF8C2A] px-6 text-[13px] font-black uppercase tracking-[0.14em] text-white shadow-[0_12px_24px_-10px_rgba(255,107,26,0.55)] transition-shadow duration-300 hover:shadow-[0_18px_34px_-10px_rgba(255,107,26,0.65)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#062B3A] sm:h-[52px] sm:w-auto sm:px-8"
             >
-              <span
-                aria-hidden="true"
-                className="h-px w-8 shrink-0 bg-gradient-to-r from-[#FF6B1A] to-transparent"
-              />
-              {crumb.map((item, index) => (
-                <span key={index} className="flex items-center gap-2.5">
-                  {index > 0 && (
-                    <span aria-hidden="true" className="text-white/30">
-                      /
-                    </span>
-                  )}
-                  <span className={index === crumb.length - 1 ? "text-white/90" : "text-[#FF9A5B]/85"}>
-                    {item}
-                  </span>
-                </span>
-              ))}
-            </nav>
-          </Reveal>
+              Get a Free Quote
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </motion.button>
 
-          {/* H1 — engineered two-row headline with orange accent on the second row */}
-          <Reveal delay={160} direction="up">
-            <h1 className="whitespace-nowrap text-[clamp(1rem,5.6cqw,3.35rem)] font-black leading-[1.1] tracking-tight text-white">
-              <span className="block">{headlineA}</span>
-              {headlineB && (
-                <span className="block bg-gradient-to-r from-[#FF8A3D] via-[#FF9552] to-[#FFB27D] bg-clip-text text-transparent">
-                  {headlineB}
-                </span>
-              )}
-            </h1>
-          </Reveal>
+            <motion.a
+              href={buildTel(COMPANY_DETAILS.phone)}
+              aria-label={`Talk to our logistics team on ${COMPANY_DETAILS.phone}`}
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 400, damping: 22 }}
+              className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2.5 whitespace-nowrap rounded-xl border border-white/40 bg-white/90 px-6 text-[13px] font-black uppercase tracking-[0.14em] text-[#062B3A] shadow-[0_12px_24px_-14px_rgba(0,0,0,0.5)] backdrop-blur-sm transition-shadow duration-300 hover:bg-white hover:shadow-[0_18px_34px_-14px_rgba(0,0,0,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#062B3A] sm:h-[52px] sm:w-auto sm:px-8"
+            >
+              <Phone className="h-4 w-4 text-[#FF6B1A]" aria-hidden="true" />
+              Talk to Our Logistics Team
+            </motion.a>
+          </motion.div>
 
-          {/* Short supporting description */}
-          <Reveal delay={240} direction="up">
-            <p className="max-w-xl text-[clamp(0.95rem,1.2vw,1.15rem)] leading-relaxed text-slate-200/95">
-              {description}
-            </p>
-          </Reveal>
-
-          {/* CTA buttons — full-width stacked on mobile, row on desktop */}
-          <Reveal delay={320} direction="up">
-            <div className="flex flex-col gap-2.5 pt-1 sm:flex-row sm:flex-wrap md:gap-3">
-              <button
-                type="button"
-                onClick={onOpenQuote}
-                className="btn-shine relative flex h-[52px] w-full cursor-pointer items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-gradient-to-r from-[#FF6B1A] to-[#FF8C2A] px-8 text-xs font-black uppercase tracking-[0.14em] text-white shadow-xl shadow-orange-950/40 transition-all duration-200 hover:-translate-y-0.5 hover:from-[#E55A0D] hover:to-[#FF7A00] active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#03121B] sm:w-auto sm:px-9"
-              >
-                Get a Free Quote
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </button>
-
-              <a
-                href={buildTel(COMPANY_DETAILS.phone)}
-                aria-label={`Talk to our logistics team on ${COMPANY_DETAILS.phone}`}
-                className="flex h-[52px] w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-white/25 bg-white/[0.08] px-8 text-xs font-black uppercase tracking-[0.14em] text-white backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:border-white/40 hover:bg-white/15 active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#03121B] sm:w-auto sm:px-9"
-              >
-                <Phone className="h-4 w-4 text-[#FF9A5B]" aria-hidden="true" />
-                Talk to Our Logistics Team
-              </a>
-            </div>
-          </Reveal>
+          {/* ── Credibility line — small, left-aligned, directly under the
+               CTAs (starts immediately below the buttons, never pinned to the
+               bottom edge of the hero) ── */}
+          <ServiceTrustStrip />
         </div>
       </div>
     </section>

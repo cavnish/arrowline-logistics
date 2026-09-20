@@ -5,7 +5,6 @@ import { FALLBACK_IMAGE } from "../ui/SmartImage";
 import ServiceAbout from "./ServiceAbout";
 import ServiceSubServices from "./ServiceSubServices";
 import ServiceApplications from "./ServiceApplications";
-import ServiceFAQ from "./ServiceFAQ";
 import ServiceGallery from "./ServiceGallery";
 import ServiceVideo from "./ServiceVideo";
 import ServiceRelated from "./ServiceRelated";
@@ -125,6 +124,12 @@ export default function ServicePageTemplate({
         videoUrl={service.heroVideo || service.videoUrl}
         fallbackImage={service.heroFallbackImage || service.aboutImage}
         imageAlt={service.imageAlt || service.title}
+        serviceSlug={service.slug}
+        parentSlug={
+          isSubService
+            ? subServiceData?.parentSlug || parentService?.slug
+            : undefined
+        }
         onOpenQuote={onOpenQuote}
       />
 
@@ -271,13 +276,7 @@ export default function ServicePageTemplate({
       {/* 6. WHAT OUR CLIENTS SAY — Testimonials */}
       <TestimonialsSection />
 
-      {/* 8. SERVICE-SPECIFIC FAQ */}
-      <ServiceFAQ
-        serviceName={service.title}
-        faqs={service.faqs || []}
-      />
-
-      {/* 9. RELATED SERVICES */}
+      {/* 8. RELATED SERVICES */}
       <ServiceRelated
         currentSlug={service.slug}
         isSubService={isSubService}

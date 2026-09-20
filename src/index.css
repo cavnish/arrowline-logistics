@@ -295,6 +295,32 @@ html.lenis, html.lenis body {
 }
 
 /* ----------------------------------------------------
+   SERVICE HERO SIZING
+   True full-screen hero shared by every service and
+   sub-service page. The fixed top announcement bar +
+   navbar overlay the section's top, so the hero spans the
+   entire first viewport and the content clears the header
+   via its own top padding. svh/dvh keep mobile browser
+   address bars from breaking the layout; min-height (not a
+   fixed height) lets the section grow if the copy ever
+   needs more room, so nothing gets cropped or pushes a
+   white gap between hero and the next section.
+   ---------------------------------------------------- */
+.service-hero-min {
+  min-height: 100vh; /* legacy fallback */
+}
+@supports (height: 100svh) {
+  .service-hero-min {
+    min-height: 100svh; /* stable smallest mobile viewport */
+  }
+}
+@supports (height: 100dvh) {
+  .service-hero-min {
+    min-height: 100dvh; /* dynamic — tracks the address bar */
+  }
+}
+
+/* ----------------------------------------------------
    SCROLL REVEAL SYSTEM
    Reveal.tsx toggles `.is-visible` on these elements
    via IntersectionObserver. GPU-friendly transform +
