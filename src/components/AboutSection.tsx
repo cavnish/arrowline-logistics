@@ -4,6 +4,7 @@ import { buildTel } from "../utils/contactLinks";
 import { useSiteContent } from "../hooks/useSiteContent";
 import SmartImage from "./ui/SmartImage";
 import Reveal from "./Reveal";
+import SectionBackground from "./SectionBackground";
 
 interface AboutSectionProps {
   onNavigateToAbout: () => void;
@@ -11,6 +12,7 @@ interface AboutSectionProps {
 
 export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
   const content = useSiteContent();
+  const aboutImage = content("about_image", "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg");
   const benefits = [
     "Multimodal Connectivity (Sea, Road, Rail & Air)",
     "Pan-India Reach across 500+ Cities & Industrial Zones",
@@ -21,8 +23,8 @@ export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
 
   return (
     <section className="py-16 lg:py-24 bg-white relative overflow-hidden">
-      {/* Background Subtle Route Lines */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none" />
+      {/* Premium logistics backdrop */}
+      <SectionBackground image={aboutImage} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
@@ -95,7 +97,7 @@ export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
               {/* Primary Large Image (Port & Container Crane) */}
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100 aspect-[4/3] sm:aspect-[16/11]">
                 <SmartImage
-                  src={content("about_image", "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg")}
+                  src={aboutImage}
                   alt="Mundra port container logistics crane and ship operations"
                   className="w-full h-full object-cover object-center"
                 />

@@ -30,12 +30,14 @@ export function getOptimizedImageUrl(url: string, options: ImageOptions = {}): s
 }
 
 /**
- * Builds a Cloudinary URL pre-processed for ghosted, low-key background
- * use (e.g. the deep logistics imagery behind the services grid): the
- * derivative is monochrome, navy-tinted, heavily blurred and served small
- * (~15-30KB) so decorative backgrounds add almost nothing to page weight.
+ * Builds a Cloudinary URL pre-processed for premium, full-bleed section
+ * backdrops (services grid, about, applications, related cards): served
+ * wide (~1920px), auto-format (WebP/AVIF via f_auto), auto-optimized,
+ * softly blurred and slightly desaturated so the image reads as a subtle,
+ * cinematic logistics environment once the 88–94% white wash is layered on
+ * top. Non-Cloudinary sources are returned untouched.
  */
-export function getGhostImageUrl(url: string, width = 700): string {
+export function getSectionBackgroundUrl(url: string, width = 1920): string {
   if (!url) return url;
   const match = url.match(CLOUDINARY_PATH_RE);
   if (!match) return url;
@@ -43,11 +45,10 @@ export function getGhostImageUrl(url: string, width = 700): string {
 
   const transforms = [
     "f_auto",
-    "q_auto:low",
+    "q_auto:good",
     `w_${width}`,
-    "e_grayscale",
-    "e_blur:600",
-    "e_colorize:50,co_rgb:062B3A",
+    "e_blur:350",
+    "e_saturation:-25",
   ];
   return `${match[1]}${transforms.join(",")}/${match[2]}`;
 }

@@ -1,6 +1,7 @@
 import { ChevronRight, Check } from "lucide-react";
 import Reveal from "../Reveal";
 import SmartImage from "../ui/SmartImage";
+import ServiceSectionBackground from "../SectionBackground";
 import { SubServiceData } from "../../data/servicesData";
 import { getOptimizedImageUrl, buildImageAlt } from "../../utils/imageUrl";
 
@@ -11,8 +12,12 @@ interface ServiceSubServicesProps {
   capabilities?: Array<{ title: string; desc: string }>;
   sectionTitle?: string;
   sectionSubtitle?: string;
+  backgroundImage?: string;
   onNavigateToSubService?: (subSlug: string) => void;
 }
+
+const FALLBACK_BACKGROUND =
+  "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg";
 
 export default function ServiceSubServices({
   isSubServicePage = false,
@@ -21,12 +26,15 @@ export default function ServiceSubServices({
   capabilities = [],
   sectionTitle,
   sectionSubtitle,
+  backgroundImage,
   onNavigateToSubService,
 }: ServiceSubServicesProps) {
   // ── For Sub-Service Page: Display Detailed Capabilities ──
   if (isSubServicePage && capabilities.length > 0) {
     return (
       <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
+        <ServiceSectionBackground image={backgroundImage || FALLBACK_BACKGROUND} />
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
             <Reveal>
@@ -51,7 +59,7 @@ export default function ServiceSubServices({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {capabilities.map((cap, index) => (
               <Reveal key={index} delay={index * 80}>
-                <div className="group h-full bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:border-[#FF6B1A]/40 transition-all duration-300 flex flex-col justify-between hover:-translate-y-1">
+                <div className="group h-full bg-white/90 backdrop-blur-xl border border-white/70 rounded-3xl p-6 shadow-lg shadow-[#062B3A]/5 hover:shadow-xl hover:shadow-[#062B3A]/10 hover:border-[#FF6B1A]/40 transition-all duration-300 flex flex-col justify-between hover:-translate-y-1">
                   <div>
                     <div className="w-12 h-12 rounded-2xl bg-[#EAF3F6] group-hover:bg-[#FF6B1A] text-[#062B3A] group-hover:text-white flex items-center justify-center mb-5 transition-colors shadow-xs">
                       <Check className="w-6 h-6" />
@@ -81,8 +89,7 @@ export default function ServiceSubServices({
 
   return (
     <section id="sub-services" className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
-      {/* Background Decorative Grid */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none" />
+      <ServiceSectionBackground image={backgroundImage || FALLBACK_BACKGROUND} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
@@ -120,7 +127,7 @@ export default function ServiceSubServices({
                       onNavigateToSubService(sub.slug);
                     }
                   }}
-                  className="group flex flex-col h-full bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#FF6B1A]/40 transition-all duration-300 hover:-translate-y-1.5 focus:outline-none focus:ring-2 focus:ring-[#FF6B1A]"
+                  className="group flex flex-col h-full bg-white/90 backdrop-blur-xl border border-white/70 rounded-3xl overflow-hidden shadow-lg shadow-[#062B3A]/5 hover:shadow-2xl hover:shadow-[#062B3A]/10 hover:border-[#FF6B1A]/40 transition-all duration-300 hover:-translate-y-1.5 focus:outline-none focus:ring-2 focus:ring-[#FF6B1A]"
                 >
                   {/* Image Frame */}
                   <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">

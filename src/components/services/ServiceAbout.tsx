@@ -1,6 +1,7 @@
 import { CheckCircle2, ArrowRight, Phone, ShieldCheck } from "lucide-react";
 import Reveal from "../Reveal";
 import SmartImage from "../ui/SmartImage";
+import ServiceSectionBackground from "../SectionBackground";
 import { COMPANY_DETAILS } from "../../data/logisticsData";
 import { buildTel } from "../../utils/contactLinks";
 
@@ -23,8 +24,8 @@ export default function ServiceAbout({
 }: ServiceAboutProps) {
   return (
     <section className="py-16 lg:py-24 bg-white relative overflow-hidden">
-      {/* Background Subtle Route Lines */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-50 pointer-events-none" />
+      {/* Premium logistics backdrop relevant to this service */}
+      <ServiceSectionBackground image={image} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">

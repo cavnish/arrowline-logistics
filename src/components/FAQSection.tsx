@@ -6,6 +6,11 @@ import { ChevronDown, HelpCircle, Phone } from "lucide-react";
 import { COMPANY_DETAILS } from "../data/logisticsData";
 import { buildTel } from "../utils/contactLinks";
 import Reveal from "./Reveal";
+import SectionBackground from "./SectionBackground";
+
+// Container terminal imagery — subtle backdrop relevant to freight/port FAQs.
+const FAQ_BACKGROUND =
+  "https://res.cloudinary.com/uorctww6/image/upload/v1789377042/arrowline/general/project-port.jpg";
 
 export default function FAQSection() {
   const [faqs, setFaqs] = useState<FAQItem[]>(FAQ_ITEMS);
@@ -43,8 +48,8 @@ export default function FAQSection() {
 
   return (
     <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden">
-      {/* Background Technical Grid */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none" />
+      {/* Premium logistics backdrop */}
+      <SectionBackground image={FAQ_BACKGROUND} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
@@ -95,9 +100,9 @@ export default function FAQSection() {
               return (
                 <Reveal key={item.id} delay={index * 50} duration={400}>
                 <div
-                  className={`border rounded-2xl transition-all duration-200 overflow-hidden ${isOpen
-                      ? "bg-white border-[#FF6B1A] shadow-md"
-                      : "bg-white border-slate-200 hover:border-slate-300"
+                  className={`border rounded-2xl transition-all duration-200 overflow-hidden bg-white/90 backdrop-blur-md ${isOpen
+                      ? "border-[#FF6B1A] shadow-md"
+                      : "border-white/70 shadow-sm shadow-[#062B3A]/5 hover:border-slate-300"
                     }`}
                 >
                   <button

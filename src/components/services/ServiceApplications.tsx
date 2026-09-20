@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ApplicationItem } from "../../data/servicesData";
 import Reveal from "../Reveal";
 import SmartImage from "../ui/SmartImage";
+import ServiceSectionBackground from "../SectionBackground";
 import { Package } from "lucide-react";
 import { getOptimizedImageUrl } from "../../utils/imageUrl";
 import { cn } from "../../utils/cn";
@@ -11,13 +12,14 @@ interface ServiceApplicationsProps {
   applications: ApplicationItem[];
   heading?: string;
   description?: string;
+  backgroundImage?: string;
 }
 
 const DURATION_SECONDS = 45;
 
 function CargoCard({ app }: { app: ApplicationItem }) {
   return (
-    <article className="group relative w-[290px] sm:w-[330px] lg:w-[360px] shrink-0 h-full rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl border border-slate-200 bg-white transition-[box-shadow,transform] duration-300 hover:-translate-y-1 flex flex-col">
+    <article className="group relative w-[290px] sm:w-[330px] lg:w-[360px] shrink-0 h-full rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl border border-white/70 bg-white/90 backdrop-blur-xl transition-[box-shadow,transform] duration-300 hover:-translate-y-1 flex flex-col">
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
         <SmartImage
@@ -43,7 +45,7 @@ function CargoCard({ app }: { app: ApplicationItem }) {
   );
 }
 
-export default function ServiceApplications({ serviceName, applications, heading, description }: ServiceApplicationsProps) {
+export default function ServiceApplications({ serviceName, applications, heading, description, backgroundImage }: ServiceApplicationsProps) {
   const [paused, setPaused] = useState(false);
 
   if (!applications || applications.length === 0) return null;
@@ -53,6 +55,8 @@ export default function ServiceApplications({ serviceName, applications, heading
 
   return (
     <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
+      <ServiceSectionBackground image={backgroundImage || applications[0]?.image} />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Header */}

@@ -162,6 +162,7 @@ export default function ServicePageTemplate({
             capabilities={subServiceData?.capabilities || []}
             sectionTitle="Specialized Operational Scope"
             sectionSubtitle="Engineered operational parameters configured for route reliability, safety compliance, and maximum throughput."
+            backgroundImage={service.heroImage || service.aboutImage || FALLBACK_IMAGE}
           />
 
           {/* Related Images / Gallery */}
@@ -189,6 +190,7 @@ export default function ServicePageTemplate({
             applications={service.applications || []}
             heading={(service as SubServiceData).cargoHeading}
             description={(service as SubServiceData).cargoDescription}
+            backgroundImage={service.heroImage || service.aboutImage || FALLBACK_IMAGE}
           />
         </>
       ) : (
@@ -214,6 +216,7 @@ export default function ServicePageTemplate({
             subServices={mainServiceData?.subServices || []}
             sectionTitle={`Specialized ${service.title} Solutions`}
             sectionSubtitle={`Explore dedicated ${service.title.toLowerCase()} configurations tailored to specific industrial freight profiles.`}
+            backgroundImage={service.heroImage || service.aboutImage || FALLBACK_IMAGE}
             onNavigateToSubService={(subSlug) => {
               if (onNavigateToService) {
                 onNavigateToService(mainServiceData?.slug || service.slug, subSlug);
@@ -229,6 +232,7 @@ export default function ServicePageTemplate({
             applications={service.applications || []}
             heading={(service as MainServiceData).cargoHeading}
             description={(service as MainServiceData).cargoDescription}
+            backgroundImage={service.heroImage || service.aboutImage || FALLBACK_IMAGE}
           />
 
           {/* Image Gallery (if present) */}
@@ -283,6 +287,7 @@ export default function ServicePageTemplate({
         parentService={parentService}
         siblingSubServices={siblingSubServices}
         otherMainServices={otherMainServices}
+        backgroundImage={service.heroImage || service.aboutImage || FALLBACK_IMAGE}
         onNavigateToService={onNavigateToService}
       />
 

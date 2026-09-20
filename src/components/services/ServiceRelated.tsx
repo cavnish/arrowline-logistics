@@ -2,6 +2,7 @@ import { ArrowRight, ChevronRight, Layers } from "lucide-react";
 import { MainServiceData, SubServiceData } from "../../data/servicesData";
 import Reveal from "../Reveal";
 import SmartImage from "../ui/SmartImage";
+import ServiceSectionBackground from "../SectionBackground";
 import { getOptimizedImageUrl, buildImageAlt } from "../../utils/imageUrl";
 
 interface ServiceRelatedProps {
@@ -10,6 +11,7 @@ interface ServiceRelatedProps {
   parentService?: MainServiceData;
   siblingSubServices?: SubServiceData[];
   otherMainServices?: MainServiceData[];
+  backgroundImage?: string;
   onNavigateToService?: (serviceSlug: string, subSlug?: string) => void;
 }
 
@@ -18,10 +20,13 @@ export default function ServiceRelated({
   parentService,
   siblingSubServices = [],
   otherMainServices = [],
+  backgroundImage,
   onNavigateToService,
 }: ServiceRelatedProps) {
   return (
     <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
+      <ServiceSectionBackground image={backgroundImage || otherMainServices[0]?.heroImage} />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Header */}
@@ -70,7 +75,7 @@ export default function ServiceRelated({
                               onNavigateToService(sub.parentSlug, sub.slug);
                             }
                           }}
-                          className="group bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:border-[#FF6B1A]/40 transition-all duration-300 flex flex-col justify-between h-full hover:-translate-y-1"
+                          className="group bg-white/90 backdrop-blur-xl border border-white/70 rounded-3xl p-6 shadow-lg shadow-[#062B3A]/5 hover:shadow-xl hover:shadow-[#062B3A]/10 hover:border-[#FF6B1A]/40 transition-all duration-300 flex flex-col justify-between h-full hover:-translate-y-1"
                         >
                           <div>
                             <span className="text-[10px] font-black uppercase tracking-wider text-[#FF6B1A] mb-1.5 block">
@@ -116,7 +121,7 @@ const targetUrl = `/services/${main.slug}`;
                             onNavigateToService(main.slug);
                           }
                         }}
-                        className="group relative rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
+                        className="group relative rounded-3xl overflow-hidden shadow-lg shadow-[#062B3A]/5 hover:shadow-2xl hover:shadow-[#062B3A]/10 border border-white/70 bg-white/90 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
                       >
                         <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                           <SmartImage
@@ -164,7 +169,7 @@ const targetUrl = `/services/${main.slug}`;
                         onNavigateToService(main.slug);
                       }
                     }}
-                    className="group flex flex-col h-full bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#FF6B1A]/40 transition-all duration-300 hover:-translate-y-1.5 focus:outline-none"
+                    className="group flex flex-col h-full bg-white/90 backdrop-blur-xl border border-white/70 rounded-3xl overflow-hidden shadow-lg shadow-[#062B3A]/5 hover:shadow-2xl hover:shadow-[#062B3A]/10 hover:border-[#FF6B1A]/40 transition-all duration-300 hover:-translate-y-1.5 focus:outline-none"
                   >
                     <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                       <SmartImage

@@ -202,45 +202,39 @@ html.lenis, html.lenis body {
 }
 
 /* ----------------------------------------------------
-   GHOSTED LOGISTICS IMAGERY (Services section backdrop)
-   Deep, monochrome logistics photographs sit *behind*
-   the square grid. Assets are pre-processed on Cloudinary
-   (grayscale + navy tint + heavy blur + small size) and
-   further softened with a multiply blend and edge masks.
-   The layer is desktop-only — hidden below `md` so the
-   section stays light and readable on small screens.
+   SECTION BACKGROUND (shared premium Arrowline system)
+   One reusable backdrop across the Home page and every
+   Service page section (about, services grid, FAQ,
+   applications, related…). The image URL is injected via
+   `--section-bg` by the <SectionBackground/> component; the
+   asset is served from Cloudinary in a modern auto format
+   (WebP/AVIF via f_auto), softened with a deep blur and a
+   light desaturation, and the section layers an 88–94%
+   ~#F5F8FA white wash on top so cards stay the clear focal
+   point. `background-attachment: fixed` (parallax) is
+   enabled only on fine-pointer desktop viewports where it
+   stays buttery — never on touch devices where it hurts
+   performance. `background-color` is the accessible
+   fallback if the image fails to load.
    ---------------------------------------------------- */
-.ghost-logistics-layer {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  mix-blend-mode: multiply;
+.section-bg {
+  background-color: #F5F8FA;
+  background-image: var(--section-bg, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
 }
 
-.ghost-logistics-layer img {
-  position: absolute;
-  display: block;
-  max-width: none;
-  object-fit: cover;
-  filter: grayscale(1) blur(2px);
-  will-change: opacity;
-  -webkit-mask-image: var(--gm, none);
-  mask-image: var(--gm, none);
-  -webkit-user-select: none;
-  user-select: none;
+@media (hover: hover) and (pointer: fine) and (min-width: 1280px) {
+  .section-bg {
+    background-attachment: fixed;
+  }
 }
-
-.gm-tl { --gm: radial-gradient(115% 115% at 12% 15%, #000 25%, rgba(0,0,0,.5) 55%, transparent 80%); }
-.gm-tr { --gm: radial-gradient(115% 115% at 88% 15%, #000 25%, rgba(0,0,0,.5) 55%, transparent 80%); }
-.gm-l  { --gm: linear-gradient(to right, transparent 0%, #000 10%, #000 55%, transparent 88%); }
-.gm-r  { --gm: linear-gradient(to left, transparent 0%, #000 10%, #000 55%, transparent 88%); }
-.gm-bl { --gm: radial-gradient(115% 115% at 10% 88%, #000 25%, rgba(0,0,0,.5) 55%, transparent 80%); }
-.gm-br { --gm: radial-gradient(115% 115% at 90% 88%, #000 25%, rgba(0,0,0,.5) 55%, transparent 80%); }
 
 @media (prefers-reduced-motion: reduce) {
-  .ghost-logistics-layer img {
-    filter: grayscale(1);
+  .section-bg {
+    background-attachment: scroll;
   }
 }
 
