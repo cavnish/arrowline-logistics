@@ -1932,24 +1932,3 @@ export function getSubServiceBySlug(parentSlug: string, subSlug: string): SubSer
 export function getAllSubServices(): SubServiceData[] {
   return MAIN_SERVICES.flatMap(m => m.subServices);
 }
-
-export function getRelatedServices(currentServiceSlug: string, currentSubSlug?: string) {
-  if (currentSubSlug) {
-    const parent = getMainServiceBySlug(currentServiceSlug);
-    const siblings = parent ? parent.subServices.filter(s => s.slug !== currentSubSlug) : [];
-    const otherMain = MAIN_SERVICES.filter(m => m.slug !== currentServiceSlug);
-    return {
-      parent,
-      siblings,
-      otherMain,
-    };
-  } else {
-    const otherMain = MAIN_SERVICES.filter(m => m.slug !== currentServiceSlug);
-    const current = getMainServiceBySlug(currentServiceSlug);
-    return {
-      current,
-      otherMain,
-      subServices: current ? current.subServices : [],
-    };
-  }
-}

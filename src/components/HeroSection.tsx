@@ -117,7 +117,7 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
         <div className="max-w-[880px] space-y-3.5 md:space-y-5 lg:space-y-6" style={{ containerType: "inline-size" }}>
           {/* Badge */}
           <div style={anim(loaded, 40)}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-[#03212D]/40 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#FFB27D] backdrop-blur-sm sm:text-[11px]">
+            <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-white/15 bg-[#03212D]/40 px-3 py-1.5 text-[9.5px] font-bold uppercase tracking-[0.12em] text-[#FFB27D] backdrop-blur-sm sm:text-[11px] sm:tracking-[0.18em] sm:px-3.5">
               <span className="h-1.5 w-1.5 rounded-full bg-[#FF6B1A] shadow-[0_0_8px_rgba(255,107,26,0.9)]" aria-hidden="true" />
               Pan-India Logistics &amp; Transportation
             </span>

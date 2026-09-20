@@ -136,7 +136,7 @@ export default function ProcessSection() {
                   <div className="absolute -left-[27px] top-0 w-8 h-8 bg-white border border-slate-200 rounded-full flex items-center justify-center z-10 shadow-sm">
                     <Icon className="w-3.5 h-3.5 text-[#062B3A]" strokeWidth={2.5} />
                   </div>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1 pl-3 sm:pl-3">
                     <div className="text-[9px] font-black text-[#FF6B1A] tracking-widest uppercase mb-0.5">
                       STAGE {s.n}
                     </div>

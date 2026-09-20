@@ -62,15 +62,6 @@ export interface StatItem {
   iconName: string;
 }
 
-export interface ProcessStep {
-  step: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  icon: string;
-  image: string;
-}
-
 export interface IndustryItem {
   id: string;
   title: string;
@@ -85,18 +76,6 @@ export interface FAQItem {
   question: string;
   answer: string;
   category: string;
-}
-
-export interface BlogPost {
-  id: string;
-  title: string;
-  slug: string;
-  readTime: string;
-  date: string;
-  author: string;
-  category: string;
-  summary: string;
-  image: string;
 }
 
 export interface Testimonial {
@@ -133,20 +112,6 @@ export const COMPANY_DETAILS = {
   aboutShort: "ARROWLINE LOGISTICS is a premier multimodal logistics and transportation company operating across India. Centered at Mundra Port, Gujarat—the gateway of India's maritime trade—we integrate road transportation (FTL/PTL), rail freight, coastal shipping, and customs clearance to deliver reliable, optimized, and secure door-to-door supply chain solutions.",
   aboutDetailed: "Arrowline Logistics provides end-to-end logistics, material transport, and supply chain solutions designed to move industrial goods, containers, and oversized cargo efficiently across India. Grounded at Mundra Port, Gujarat, we coordinate highway transport, CONCOR rail links, coastal shipping routes, and global freight forwarding to deliver seamless pan-India connectivity for major industries."
 };
-
-// Client / Partner logos shown in the marquee strip
-export const CLIENT_LOGOS = [
-  { logoType: "ADANI", name: "Mundra Port Alliance" },
-  { logoType: "CONCOR", name: "Rail Freight Partner" },
-  { logoType: "IATA", name: "Air Cargo Licensed" },
-  { logoType: "DP WORLD", name: "Terminal Operator" },
-  { logoType: "MAERSK", name: "Ocean Carrier" },
-  { logoType: "MSC", name: "Global Shipping" },
-  { logoType: "KRIBHCO", name: "Bulk Fertilizer" },
-  { logoType: "TATA STEEL", name: "Industrial Metals" },
-  { logoType: "RELIANCE", name: "Petrochemicals" },
-  { logoType: "ADITYA BIRLA", name: "Manufacturing Group" },
-];
 
 // Section 13: Verified Company Statistics
 export const LOGISTICS_STATS: StatItem[] = [
@@ -619,58 +584,6 @@ export const CORE_SERVICES: ServiceDetail[] = [
   }
 ];
 
-// Logistics Process Steps
-export const PROCESS_STEPS: ProcessStep[] = [
-  {
-    step: "01",
-    title: "Requirement",
-    subtitle: "Cargo Analysis & Consultation",
-    description: "We analyze your material dimensions, weight, origin, destination, timeline requirements, and commercial considerations.",
-    icon: "FileSearch",
-    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377036/arrowline/general/business-handshake.jpg"
-  },
-  {
-    step: "02",
-    title: "Planning",
-    subtitle: "Multimodal Route Optimization",
-    description: "Our logistics planners design the optimal multimodal route combining road, rail, or coastal shipping for best cost & speed.",
-    icon: "Route",
-    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg"
-  },
-  {
-    step: "03",
-    title: "Pickup",
-    subtitle: "Safe Loading & Inspection",
-    description: "GPS-enabled fleet arrives for on-schedule cargo pickup with certified heavy lashing, seal verification, and digital manifest.",
-    icon: "PackageCheck",
-    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377072/arrowline/general/truck-fleet-yard.jpg"
-  },
-  {
-    step: "04",
-    title: "Transportation",
-    subtitle: "Dedicated Transit Execution",
-    description: "Your consignment moves smoothly across national expressways, freight rail corridors, or coastal shipping lines.",
-    icon: "Truck",
-    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg"
-  },
-  {
-    step: "05",
-    title: "Tracking",
-    subtitle: "Real-Time 24/7 Visibility",
-    description: "Live GPS tracking and milestone updates keep your supply chain team informed of location, ETA, and progress.",
-    icon: "Activity",
-    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377045/arrowline/general/rail-multimodal.jpg"
-  },
-  {
-    step: "06",
-    title: "Delivery",
-    subtitle: "On-Time Doorstep Handover",
-    description: "Safe final-mile unloading, electronic Proof of Delivery (e-POD) sign-off, and seamless consignment closure.",
-    icon: "CheckCircle",
-    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377039/arrowline/general/hero-trucks-city.jpg"
-  }
-];
-
 // Industries We Serve (8 Core Categories)
 export const INDUSTRIES_SERVED: IndustryItem[] = [
   {
@@ -938,43 +851,6 @@ export const FAQ_ITEMS: FAQItem[] = [
     category: "Coverage",
     question: "Does Arrowline provide transportation across all major cities and states in India?",
     answer: "Yes. Arrowline operates a pan-India logistics network serving over 500 cities and industrial hubs across Gujarat, Maharashtra, Rajasthan, Delhi NCR, Haryana, Punjab, Madhya Pradesh, Karnataka, Tamil Nadu, Telangana, Andhra Pradesh, West Bengal, and beyond."
-  }
-];
-
-// Logistics Insights / Blog Articles
-export const BLOG_POSTS: BlogPost[] = [
-  {
-    id: "blog-1",
-    title: "How FTL Transportation Works in India: Efficiency & Route Guide",
-    slug: "how-ftl-transportation-works-india",
-    readTime: "5 min read",
-    date: "Aug 2026",
-    author: "Operations Desk",
-    category: "Road Transport",
-    summary: "Discover how Full Truck Load (FTL) logistics provides dedicated vehicle space, reduces transit delays, and optimizes supply chains from Mundra Port to industrial centers.",
-    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg"
-  },
-  {
-    id: "blog-2",
-    title: "Mundra Port Logistics Guide: Gateway to Pan-India Commercial Trade",
-    slug: "mundra-port-logistics-guide",
-    readTime: "7 min read",
-    date: "Aug 2026",
-    author: "Maritime Team",
-    category: "Port Logistics",
-    summary: "An in-depth analysis of Mundra Port’s maritime infrastructure, customs clearance workflows, and how multimodal connectivity links western maritime trade with northern inland depots.",
-    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg"
-  },
-  {
-    id: "blog-3",
-    title: "Rail vs Road Transportation: Optimizing Freight Costs for Long Hauls",
-    slug: "rail-vs-road-transportation-costs",
-    readTime: "6 min read",
-    date: "Jul 2026",
-    author: "Supply Chain Team",
-    category: "Multimodal Strategy",
-    summary: "Comparing the economics of dedicated freight rail corridors versus express highway trucking for bulk, containerized, and industrial cargo across India.",
-    image: "https://res.cloudinary.com/uorctww6/image/upload/v1789377045/arrowline/general/rail-multimodal.jpg"
   }
 ];
 

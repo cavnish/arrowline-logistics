@@ -124,12 +124,6 @@ export default function ServicePageTemplate({
         videoUrl={service.heroVideo || service.videoUrl}
         fallbackImage={service.heroFallbackImage || service.aboutImage}
         imageAlt={service.imageAlt || service.title}
-        serviceSlug={service.slug}
-        parentSlug={
-          isSubService
-            ? subServiceData?.parentSlug || parentService?.slug
-            : undefined
-        }
         onOpenQuote={onOpenQuote}
       />
 

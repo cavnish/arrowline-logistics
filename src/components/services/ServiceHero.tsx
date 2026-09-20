@@ -19,56 +19,6 @@ interface ServiceHeroProps {
   fallbackImage?: string;
   imageAlt?: string;
   onOpenQuote: () => void;
-  serviceSlug?: string;
-  parentSlug?: string;
-}
-
-/* ── Scene configuration ──
-   Every service hero is a full-bleed photographic campaign shot with a dark
-   navy cinematic overlay. Dedicated photographs live in public/images/services
-   (hero-*-bg.jpg). Sub-services inherit their parent's scene. When a dedicated
-   photo has not been dropped in yet, the backdrop falls back to the service's
-   configured heroImage (Cloudinary) so the hero always shows a real
-   photograph, never a missing image. */
-interface HeroBackground {
-  bg?: string;
-  position?: string;
-}
-
-const HERO_BACKGROUNDS: Record<string, HeroBackground> = {
-  "road-transportation": {
-    bg: "/images/services/hero-road-bg.jpg",
-    position: "center",
-  },
-  "rail-transportation": {
-    bg: "/images/services/hero-rail-bg.jpg",
-    position: "center",
-  },
-  "project-cargo-transportation": {
-    bg: "/images/services/hero-project-cargo-bg.jpg",
-    position: "center",
-  },
-  "warehousing-storage": {
-    bg: "/images/services/hero-warehouse-bg.jpg",
-    position: "center",
-  },
-  "container-transportation": {
-    bg: "/images/services/hero-container-bg.jpg",
-    position: "center",
-  },
-};
-
-function getHeroBackground(
-  serviceSlug?: string,
-  parentSlug?: string
-): HeroBackground | undefined {
-  if (serviceSlug && HERO_BACKGROUNDS[serviceSlug]) {
-    return HERO_BACKGROUNDS[serviceSlug];
-  }
-  if (parentSlug && HERO_BACKGROUNDS[parentSlug]) {
-    return HERO_BACKGROUNDS[parentSlug];
-  }
-  return undefined;
 }
 
 /* Balanced split into exactly two headline rows (never more than two),
@@ -92,10 +42,9 @@ function splitHeadline(text: string): [string, string] {
   return [words.slice(0, best).join(" "), words.slice(best).join(" ")];
 }
 
-/* Full-bleed background: walks the candidate list (dedicated photograph →
-   service heroImage → branded fallback) and advances on load error so the
-   hero never shows a broken image. Fills the whole hero with
-   background-size: cover behaviour. */
+/* Full-bleed background: walks the candidate list (service heroImage →
+   branded fallback) and advances on load error so the hero never shows a
+   broken image. Fills the whole hero with background-size: cover behaviour. */
 function HeroBackdrop({
   srcs,
   position,
@@ -137,14 +86,11 @@ export default function ServiceHero({
   image,
   fallbackImage,
   onOpenQuote,
-  serviceSlug,
-  parentSlug,
 }: ServiceHeroProps) {
   const [headlineA, headlineB] = splitHeadline(headline);
   const reduceMotion = useReducedMotion();
-  const background = getHeroBackground(serviceSlug, parentSlug);
   const heroMedia = fallbackImage || image || FALLBACK_IMAGE;
-  const backdropSrcs = [background?.bg, heroMedia, FALLBACK_IMAGE]
+  const backdropSrcs = [heroMedia, FALLBACK_IMAGE]
     .filter((s): s is string => Boolean(s))
     .filter((s, i, arr) => arr.indexOf(s) === i);
 
@@ -154,7 +100,7 @@ export default function ServiceHero({
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <HeroBackdrop
           srcs={backdropSrcs}
-          position={background?.position ?? "center"}
+          position="center"
         />
 
         {/* Navy scrim → transparent. Dark enough only behind the copy on the

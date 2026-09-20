@@ -79,37 +79,3 @@ export async function submitLead(payload: LeadPayload): Promise<LeadResponse> {
     clearTimeout(timeout);
   }
 }
-
-/**
- * Optional health-check for the admin/status badge.
- */
-export async function checkBackendHealth(): Promise<{
-  ok: boolean;
-  supabase: string;
-  resend: string;
-  cloudinary: string;
-  admin: string;
-} | null> {
-  if (!shouldAttemptBackend()) return null;
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
-
-  try {
-    const response = await fetch(apiUrl("/api/health"), { signal: controller.signal });
-    if (!response.ok) return null;
-    const data = await response.json();
-    const checks = data.checks || {};
-    return {
-      ok: data.ok === true,
-      supabase: checks.supabase || "unknown",
-      resend: checks.resend || "unknown",
-      cloudinary: checks.cloudinary || "unknown",
-      admin: checks.admin || "unknown",
-    };
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(timeout);
-  }
-}
