@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, Phone, Mail, ChevronDown, Globe, Anchor, ChevronRight } from "lucide-react";
+import { Menu, X, Phone, Mail, ChevronDown, Globe, Anchor, ChevronRight, ArrowRight } from "lucide-react";
 import { COMPANY_DETAILS } from "../data/logisticsData";
 import { getAllMainServices } from "../data/servicesData";
 import ArrowlineLogo from "./ArrowlineLogo";
@@ -20,6 +20,7 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [hoveredService, setHoveredService] = useState<string | null>(null);
+  const [megaOffset, setMegaOffset] = useState(0);
   const megaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,6 +55,37 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
     }
   }, [isServicesOpen]);
 
+  useEffect(() => {
+    const computeOffset = () => {
+      if (!megaRef.current) return;
+      const rect = megaRef.current.getBoundingClientRect();
+      const panelWidth = Math.min(880, window.innerWidth - 48);
+      const center = rect.left + rect.width / 2;
+      const clamped = Math.min(
+        Math.max(center - panelWidth / 2, 12),
+        window.innerWidth - panelWidth - 12
+      );
+      setMegaOffset(clamped - rect.left);
+    };
+    if (isServicesOpen) {
+      computeOffset();
+      window.addEventListener("resize", computeOffset);
+      return () => window.removeEventListener("resize", computeOffset);
+    }
+  }, [isServicesOpen]);
+
+  const positionMega = () => {
+    if (!megaRef.current) return;
+    const rect = megaRef.current.getBoundingClientRect();
+    const panelWidth = Math.min(880, window.innerWidth - 48);
+    const center = rect.left + rect.width / 2;
+    const clamped = Math.min(
+      Math.max(center - panelWidth / 2, 12),
+      window.innerWidth - panelWidth - 12
+    );
+    setMegaOffset(clamped - rect.left);
+  };
+
   const navItems = [
     { id: "home", label: "Home" },
     { id: "about", label: "About Us" },
@@ -77,7 +109,8 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const hoveredServiceData = mainServices.find((s) => s.slug === hoveredService) || null;
+  const activeCategorySlug = hoveredService ?? mainServices[0]?.slug ?? "";
+  const hoveredServiceData = mainServices.find((s) => s.slug === activeCategorySlug) || null;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
@@ -165,13 +198,21 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                     key={item.id}
                     ref={megaRef}
                     className="relative"
-                    onMouseEnter={() => setIsServicesOpen(true)}
+                    onMouseEnter={() => {
+                      positionMega();
+                      setIsServicesOpen(true);
+                    }}
                     onMouseLeave={() => {
                       setIsServicesOpen(false);
                       setHoveredService(null);
                     }}
                   >
                     <button
+                      onClick={() => {
+                        if (!isServicesOpen) positionMega();
+                        setIsServicesOpen((open) => !open);
+                        if (!isServicesOpen) setHoveredService(null);
+                      }}
                       className={cn(
                         "flex items-center space-x-1 text-sm font-bold tracking-wide transition-all duration-200 hover:text-[#FF6B1A] py-2 cursor-pointer",
                         activePage.startsWith("services") ? "text-[#FF6B1A]" : "text-[#062B3A]"
@@ -186,79 +227,158 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                       />
                     </button>
 
-                    {/* Services Dropdown */}
+                    {/* Services Dropdown — Mega Menu */}
                     <div
+                      aria-hidden={!isServicesOpen}
+                      style={{ left: megaOffset }}
                       className={cn(
-                        "absolute top-full left-0 pt-1 z-50 transition-all duration-200 origin-top",
+                        "absolute top-full origin-top z-50 transition-all duration-200 pt-3",
                         isServicesOpen
                           ? "opacity-100 scale-100 pointer-events-auto visible"
-                          : "opacity-0 scale-95 pointer-events-none invisible"
+                          : "opacity-0 scale-[0.97] translate-y-2 pointer-events-none invisible"
                       )}
                     >
-                      <div className="bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden">
-                        <div className="flex items-stretch">
-                          {/* First Column: Main Services */}
-                          <div className="py-2 px-1.5 space-y-0.5 w-56">
+                      <style>{`
+                        @keyframes megaFade {
+                          from { opacity: 0; transform: translateY(6px); }
+                          to { opacity: 1; transform: translateY(0); }
+                        }
+                        .mega-fade { animation: megaFade 0.22s ease-out; }
+                      `}</style>
+                      <div className="w-[min(880px,calc(100vw-3rem))] bg-white rounded-2xl border border-slate-200/80 shadow-[0_25px_70px_-15px_rgba(6,43,58,0.28)] overflow-hidden">
+                        <div className="flex">
+                          {/* Left Column: Service Categories */}
+                          <div className="w-64 sm:w-72 shrink-0 border-r border-slate-100 bg-[#FAFCFD] p-4 space-y-1">
+                            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 px-2 mb-3">
+                              Explore Services
+                            </p>
                             {mainServices.map((srv) => {
-                              const hasSubs = srv.subServices && srv.subServices.length > 0;
+                              const isActiveCat = srv.slug === activeCategorySlug;
+                              const isCurrent = activePage === `services/${srv.slug}`;
                               return (
-                                <div key={srv.id} className="relative">
-                                  <button
-                                    onMouseEnter={() => setHoveredService(srv.slug)}
-                                    onClick={() => handleServiceClick(srv.slug)}
+                                <button
+                                  key={srv.id}
+                                  onMouseEnter={() => setHoveredService(srv.slug)}
+                                  onClick={() => handleServiceClick(srv.slug)}
+                                  className={cn(
+                                    "relative w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200 group cursor-pointer",
+                                    isActiveCat ? "bg-[#EDF4F8]" : "hover:bg-[#F1F6F9]"
+                                  )}
+                                >
+                                  {isActiveCat && (
+                                    <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-[#FF6B1A]" />
+                                  )}
+                                  <span
                                     className={cn(
-                                      "text-left w-full px-3 py-2 rounded text-sm transition-all duration-150 flex items-center justify-between cursor-pointer",
-                                      activePage === `services/${srv.slug}`
-                                        ? "bg-[#EAF3F6] font-bold"
-                                        : "",
-                                      hoveredService === srv.slug
-                                        ? "bg-[#F5F8FA]"
-                                        : "hover:bg-[#F5F8FA]"
+                                      "text-[13px] transition-colors duration-200",
+                                      isActiveCat
+                                        ? "font-black text-[#062B3A]"
+                                        : isCurrent
+                                        ? "font-bold text-[#FF6B1A]"
+                                        : "font-semibold text-[#2C4A5A] group-hover:text-[#062B3A]"
                                     )}
                                   >
-                                    <span
-                                      className={cn(
-                                        "font-bold text-xs transition-colors pr-2",
-                                        activePage === `services/${srv.slug}`
-                                          ? "text-[#FF6B1A]"
-                                          : hoveredService === srv.slug
-                                          ? "text-[#FF6B1A]"
-                                          : "text-[#062B3A]"
-                                      )}
-                                    >
-                                      {srv.title}
-                                    </span>
-                                    {hasSubs && (
-                                      <ChevronRight
-                                        className={cn(
-                                          "w-3.5 h-3.5 shrink-0 transition-colors",
-                                          hoveredService === srv.slug || activePage === `services/${srv.slug}`
-                                            ? "text-[#FF6B1A]"
-                                            : "text-slate-300"
-                                        )}
-                                      />
+                                    {srv.title}
+                                  </span>
+                                  <ChevronRight
+                                    className={cn(
+                                      "w-4 h-4 shrink-0 transition-all duration-200 group-hover:translate-x-0.5",
+                                      isActiveCat
+                                        ? "text-[#FF6B1A]"
+                                        : "text-slate-300 group-hover:text-[#FF6B1A]"
                                     )}
-                                  </button>
-                                  {hoveredService === srv.slug && (
-                                    <div className="absolute left-0 top-0 h-full w-0.5 bg-[#FF6B1A]" />
-                                  )}
-                                </div>
+                                  />
+                                </button>
                               );
                             })}
                           </div>
 
-                          {/* Second Column: Sub-Services (hovered main service only) */}
+                          {/* Right Column: Services of the Selected Category */}
                           {hoveredServiceData && (
-                            <div className="py-2 px-1.5 space-y-0.5 w-72 border-l border-slate-100">
-                              {(hoveredServiceData.subServices || []).map((sub) => (
+                            <div
+                              key={activeCategorySlug}
+                              className="mega-fade flex-1 min-w-0 p-5 sm:p-6 flex flex-col"
+                            >
+                              {/* Panel Header */}
+                              <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  <h3 className="text-base font-black text-[#062B3A] truncate">
+                                    {hoveredServiceData.title}
+                                  </h3>
+                                </div>
                                 <button
-                                  key={sub.id}
-                                  onClick={() => handleServiceClick(`${hoveredServiceData.slug}/${sub.slug}`)}
-                                  className="w-full text-left px-3 py-1.5 rounded text-xs text-slate-600 hover:text-[#FF6B1A] hover:bg-[#F5F8FA] transition-all duration-150 cursor-pointer whitespace-nowrap"
+                                  onClick={() => handleServiceClick(hoveredServiceData.slug)}
+                                  className="shrink-0 flex items-center gap-1 text-[11px] font-black uppercase tracking-wider text-[#FF6B1A] hover:text-[#E55A0D] transition-colors cursor-pointer"
                                 >
-                                  {sub.title}
+                                  View All
+                                  <ArrowRight className="w-3.5 h-3.5" />
                                 </button>
-                              ))}
+                              </div>
+
+                              {/* Sub-Services Grid */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                {(hoveredServiceData.subServices || []).map((sub) => {
+                                  const isSubActive =
+                                    activePage ===
+                                    `services/${hoveredServiceData.slug}/${sub.slug}`;
+                                  return (
+                                    <button
+                                      key={sub.id}
+                                      onClick={() =>
+                                        handleServiceClick(
+                                          `${hoveredServiceData.slug}/${sub.slug}`
+                                        )
+                                      }
+                                      className={cn(
+                                        "group/sub w-full text-left px-3 py-2.5 rounded-xl border border-transparent transition-all duration-200 cursor-pointer",
+                                        isSubActive
+                                          ? "bg-[#EAF3F6] border-[#D6E7EE]"
+                                          : "hover:bg-[#F6F9FB] hover:border-slate-100"
+                                      )}
+                                    >
+                                      <span className="flex items-start justify-between gap-2">
+                                        <span
+                                          className={cn(
+                                            "text-[13px] font-bold transition-colors duration-200",
+                                            isSubActive
+                                              ? "text-[#FF6B1A]"
+                                              : "text-[#243B48] group-hover/sub:text-[#FF6B1A]"
+                                          )}
+                                        >
+                                          {sub.title}
+                                        </span>
+                                        <ArrowRight
+                                          className={cn(
+                                            "w-3.5 h-3.5 shrink-0 mt-0.5 text-slate-300 opacity-0 -translate-x-1 group-hover/sub:opacity-100 group-hover/sub:translate-x-0 transition-all duration-200",
+                                            isSubActive
+                                              ? "text-[#FF6B1A] opacity-100 translate-x-0"
+                                              : "group-hover/sub:text-[#FF6B1A]"
+                                          )}
+                                        />
+                                      </span>
+                                      <span className="mt-1 block text-[11px] leading-snug text-slate-500 line-clamp-2">
+                                        {sub.shortDesc}
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {/* Panel Footer */}
+                              <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
+                                <p className="text-[11px] text-slate-500">
+                                  Planning a shipment?{" "}
+                                  <span className="font-bold text-[#062B3A]">
+                                    Our logistics experts are on call 24/7.
+                                  </span>
+                                </p>
+                                <button
+                                  onClick={openQuoteForm}
+                                  className="shrink-0 px-4 py-2 bg-[#062B3A] text-white text-[10px] font-black uppercase tracking-wider rounded-lg hover:bg-[#0B3D50] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+                                >
+                                  Get a Quote
+                                </button>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -348,62 +468,98 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
               About Arrowline
             </button>
 
-            <div className="space-y-2 pt-2">
+            <div className="space-y-2 pt-2 pb-3">
               <div className="text-xs font-bold text-[#FF6B1A] flex items-center space-x-1.5">
                 <Globe className="w-3.5 h-3.5" />
-                <span>Multimodal Services:</span>
+                <span>Multimodal Services</span>
               </div>
-              <div className="pl-4 grid grid-cols-1 gap-2.5 border-l border-slate-200">
+              <div className="pl-2 space-y-1.5">
                 {mainServices.map((srv) => {
                   const hasSubs = srv.subServices && srv.subServices.length > 0;
                   const isExpanded = expandedService === srv.slug;
+                  const isActiveCat =
+                    activePage === `services/${srv.slug}` ||
+                    srv.subServices.some(
+                      (sub) => activePage === `services/${srv.slug}/${sub.slug}`
+                    );
                   return (
-                    <div key={srv.id}>
+                    <div
+                      key={srv.id}
+                      className={cn(
+                        "overflow-hidden rounded-xl border transition-all duration-200",
+                        isExpanded ? "border-[#D6E7EE] bg-[#FAFCFD]" : "border-slate-100 bg-white"
+                      )}
+                    >
                       <button
                         onClick={() => {
                           if (hasSubs) {
                             setExpandedService(isExpanded ? null : srv.slug);
                           } else {
                             handleServiceClick(srv.slug);
-                            setIsMobileMenuOpen(false);
                           }
                         }}
+                        aria-expanded={isExpanded}
                         className={cn(
-                          "block w-full text-left text-sm transition-all duration-150 flex items-center justify-between cursor-pointer",
-                          activePage === `services/${srv.slug}` ? "text-[#FF6B1A] font-bold" : "text-slate-600 hover:text-[#062B3A]"
+                          "w-full flex items-center justify-between gap-3 px-3.5 py-3 text-left transition-colors cursor-pointer",
+                          isActiveCat ? "bg-[#EDF4F8]" : ""
                         )}
                       >
-                        <span>• {srv.title}</span>
+                        <span
+                          className={cn(
+                            "text-sm transition-colors",
+                            isActiveCat
+                              ? "font-black text-[#062B3A]"
+                              : "font-bold text-slate-600 hover:text-[#062B3A]"
+                          )}
+                        >
+                          {srv.title}
+                        </span>
                         {hasSubs && (
-                          <ChevronRight
-                            className={cn("w-4 h-4 transition-transform duration-200", isExpanded && "rotate-90")}
-                          />
+                          <span
+                            className={cn(
+                              "w-6 h-6 shrink-0 rounded-full flex items-center justify-center transition-all duration-300",
+                              isExpanded
+                                ? "bg-[#FF6B1A] text-white rotate-90"
+                                : "bg-[#F0F5FA] text-[#062B3A]"
+                            )}
+                          >
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </span>
                         )}
                       </button>
+
                       {hasSubs && (
                         <div
                           className={cn(
-                            "overflow-hidden transition-all duration-200 mt-1 mb-1",
-                            isExpanded ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+                            "overflow-hidden transition-all duration-300 ease-in-out",
+                            isExpanded ? "max-h-[520px] opacity-100" : "max-h-0 opacity-0"
                           )}
                         >
-                          <div className="pl-4 space-y-1 border-l border-slate-200">
-                            {(srv.subServices || []).map((sub) => (
-                              <button
-                                key={sub.id}
-                                onClick={() => {
-                                  handleServiceClick(`${srv.slug}/${sub.slug}`);
-                                  setIsMobileMenuOpen(false);
-                                  setExpandedService(null);
-                                }}
-                                className={cn(
-                                  "block w-full text-left text-sm py-1 px-2 transition-colors cursor-pointer",
-                                  activePage === `services/${srv.slug}/${sub.slug}` ? "text-[#FF6B1A] font-bold" : "text-slate-500 hover:text-[#062B3A]"
-                                )}
-                              >
-                                – {sub.title}
-                              </button>
-                            ))}
+                          <div className="px-3.5 pb-3 pt-1 space-y-0.5">
+                            {(srv.subServices || []).map((sub) => {
+                              const isSubActive = activePage === `services/${srv.slug}/${sub.slug}`;
+                              return (
+                                <div key={sub.id} className="relative">
+                                  {isSubActive && (
+                                    <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-full bg-[#FF6B1A]" />
+                                  )}
+                                  <button
+                                    onClick={() => {
+                                      handleServiceClick(`${srv.slug}/${sub.slug}`);
+                                      setExpandedService(null);
+                                    }}
+                                    className={cn(
+                                      "w-full text-left text-[13px] py-2 px-2.5 rounded-lg transition-colors cursor-pointer",
+                                      isSubActive
+                                        ? "bg-[#EAF3F6] text-[#FF6B1A] font-bold"
+                                        : "text-slate-500 hover:text-[#062B3A] hover:bg-[#F6F9FB]"
+                                    )}
+                                  >
+                                    {sub.title}
+                                  </button>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       )}

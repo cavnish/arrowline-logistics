@@ -21,13 +21,11 @@ import Contact from "./pages/Contact";
 import ServiceRouteView from "./components/services/ServiceRouteView";
 
 import {
-  Phone,
   X,
   ShieldCheck,
 } from "lucide-react";
 
 import {
-  buildTel,
   buildWhatsApp,
 } from "./utils/contactLinks";
 
@@ -540,19 +538,6 @@ export default function App() {
       {/* FLOATING BUTTONS */}
 
       <div className="fixed bottom-4 right-4 z-40 flex flex-col space-y-2.5 items-end sm:bottom-6 sm:right-6 sm:space-y-3">
-
-        {/* CALL */}
-
-        <a
-          href={buildTel(
-            COMPANY_DETAILS.phone
-          )}
-          className="w-11 h-11 sm:w-14 sm:h-14 bg-white hover:bg-[#F5F8FA] text-[#062B3A] rounded-full flex items-center justify-center shadow-[0_6px_20px_rgba(6,43,58,0.2)] hover:-translate-y-0.5 active:scale-95 transition-all group relative border border-slate-200"
-          aria-label={`Call ${COMPANY_DETAILS.phone}`}
-          title="Direct Dial Dispatch Desk"
-        >
-          <Phone className="w-[18px] h-[18px] sm:w-6 sm:h-6 text-[#FF6B1A]" />
-        </a>
 
         {/* WHATSAPP */}
 

@@ -4,7 +4,7 @@ import SEOMeta from "../components/SEOMeta";
 import Reveal from "../components/Reveal";
 import { ContactChoiceMenu } from "../components/ContactLink";
 import { buildMailto, buildTel } from "../utils/contactLinks";
-import { Mail, Phone, MapPin, Anchor, Clock, ExternalLink, HelpCircle, AlertCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Anchor, Clock, ExternalLink } from "lucide-react";
 
 interface ContactProps {
   onFormSuccess: (data: any) => void;
@@ -144,71 +144,6 @@ export default function Contact({ onFormSuccess }: ContactProps) {
           </div>
         </Reveal>
       </div>
-
-      <Reveal className="bg-gradient-to-br from-[#FEF9F0] via-white to-[#FFF4DC] border-2 border-[#FF7A00]/20 rounded-2xl p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 relative overflow-hidden shadow-sm">
-        <div className="space-y-4">
-          <h3 className="text-sm font-bold text-[#1E3A8A] uppercase tracking-wider flex items-center space-x-2">
-            <HelpCircle className="w-5 h-5 text-[#FF7A00]" />
-            <span>Indian Shipping & Customs FAQs</span>
-          </h3>
-          <div className="space-y-4 text-xs">
-            <div className="space-y-1">
-              <span className="block font-bold text-[#1E3A8A] leading-snug">What documents are needed to file a Bill of Entry at Mundra?</span>
-              <p className="text-slate-600 leading-relaxed">
-                Standard documents: Bill of Lading, Commercial Invoice, Packing List, Certificate of Origin, and specialized test reports if applicable.
-              </p>
-            </div>
-            <div className="space-y-1">
-              <span className="block font-bold text-[#1E3A8A] leading-snug">Do you handle port-to-port coastal loops for bulk commodities?</span>
-              <p className="text-slate-600 leading-relaxed">
-                Yes, our maritime division manages routine bulk shipments of steel, clay, gypsum connecting Gujarat, Maharashtra, Goa, and Tamil Nadu ports.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white border border-slate-200 p-5 rounded-xl space-y-3 flex flex-col justify-between shadow-sm">
-          <div className="space-y-2">
-            <span className="text-[10px] font-black uppercase text-[#FF7A00] tracking-widest flex items-center space-x-1.5">
-              <AlertCircle className="w-3.5 h-3.5 text-[#1E3A8A]" />
-              <span>Escalations & Special Moves</span>
-            </span>
-            <p className="text-[11px] text-slate-600 leading-relaxed">
-              For high-volume portfolios or over-dimensional hydraulic trailers (ODC moves), connect directly with director operations:
-            </p>
-          </div>
-          <div className="space-y-2 pt-2 border-t border-slate-200 text-xs">
-            <div className="flex justify-between items-center">
-              <span className="text-slate-500">Phone:</span>
-              <a
-                href={buildTel(COMPANY_DETAILS.phone)}
-                className="text-[#1E3A8A] font-bold hover:text-[#FF7A00] transition-colors"
-                aria-label={`Call ${COMPANY_DETAILS.phone}`}
-              >
-                {COMPANY_DETAILS.phone}
-              </a>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-500">Director Email:</span>
-              <a
-                href={buildMailto({ to: COMPANY_DETAILS.secondaryEmail, context: "project" })}
-                className="text-[#1E3A8A] text-[11px] font-bold hover:text-[#FF7A00] transition-colors"
-                aria-label={`Send email to ${COMPANY_DETAILS.secondaryEmail}`}
-              >
-                {COMPANY_DETAILS.secondaryEmail}
-              </a>
-            </div>
-          </div>
-          {/* Bottom quick-action menu: Email · Call · WhatsApp */}
-          <div className="pt-3 border-t border-slate-200">
-            <ContactChoiceMenu
-              email={COMPANY_DETAILS.secondaryEmail}
-              context="project"
-              size="sm"
-            />
-          </div>
-        </div>
-      </Reveal>
     </div>
   );
 }

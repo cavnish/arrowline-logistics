@@ -21,9 +21,6 @@ export default function TrackTraceBar(_props: TrackTraceBarProps) {
         <Reveal className="bg-[#F0F5FA] border border-slate-200/90 rounded-3xl p-6 sm:p-8 lg:p-10 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-6">
 
           <div className="space-y-1.5 text-center lg:text-left">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#FF6B1A] block">
-              REAL-TIME CONSIGNMENT TELEMETRY
-            </span>
             <h2 className="text-2xl sm:text-3xl font-black text-[#062B3A]">
               Track Your Cargo / Consignment
             </h2>

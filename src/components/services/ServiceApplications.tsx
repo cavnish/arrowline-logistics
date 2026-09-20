@@ -3,7 +3,6 @@ import { ApplicationItem } from "../../data/servicesData";
 import Reveal from "../Reveal";
 import SmartImage from "../ui/SmartImage";
 import ServiceSectionBackground from "../SectionBackground";
-import { Package } from "lucide-react";
 import { getOptimizedImageUrl } from "../../utils/imageUrl";
 import { cn } from "../../utils/cn";
 
@@ -61,13 +60,6 @@ export default function ServiceApplications({ serviceName, applications, heading
 
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-10 sm:mb-12">
-          <Reveal>
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1 bg-white border border-[#062B3A]/15 rounded-full text-xs font-bold text-[#FF6B1A] tracking-widest uppercase shadow-sm">
-              <Package className="w-3.5 h-3.5" />
-              <span>CARGO &amp; APPLICATIONS</span>
-            </div>
-          </Reveal>
-
           <Reveal delay={80}>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight">
               {heading || "What We Transport & Handle"}

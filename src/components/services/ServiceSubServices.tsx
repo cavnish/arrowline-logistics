@@ -37,12 +37,6 @@ export default function ServiceSubServices({
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
-            <Reveal>
-              <div className="inline-flex items-center space-x-2 px-3.5 py-1 bg-white border border-[#062B3A]/15 rounded-full text-xs font-bold text-[#FF6B1A] tracking-widest uppercase shadow-sm">
-                <span>KEY CAPABILITIES</span>
-              </div>
-            </Reveal>
-
             <Reveal delay={80}>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight">
                 {sectionTitle || "Specialized Service Capabilities"}
