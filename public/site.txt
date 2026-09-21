@@ -1,7 +1,7 @@
 ================================================================
 ARROWLINE LOGISTICS
 ================================================================
-Website: https://www.arrowlinelogistics.in/
+Website: https://arrowlinelogistics.in/
 Company: Arrowline Logistics (Arrowline Logistics India Pvt Ltd)
 Tagline: Moving Cargo. Connecting India.
 Founded: 2014
@@ -92,16 +92,16 @@ Instagram - https://www.instagram.com/arrowline_logistics
 ----------------------------------------------------------------
 IMPORTANT PUBLIC URLS
 ----------------------------------------------------------------
-Homepage:        https://www.arrowlinelogistics.in/
-About Us:        https://www.arrowlinelogistics.in/about
-Industries:      https://www.arrowlinelogistics.in/industries
-Case Studies:    https://www.arrowlinelogistics.in/gallery
-Contact:         https://www.arrowlinelogistics.in/contact
+Homepage:        https://arrowlinelogistics.in/
+About Us:        https://arrowlinelogistics.in/about
+Industries:      https://arrowlinelogistics.in/industries
+Case Studies:    https://arrowlinelogistics.in/gallery
+Contact:         https://arrowlinelogistics.in/contact
 
 Services:
-Road Transportation:     https://www.arrowlinelogistics.in/services/road-transportation
-Rail Transportation:    https://www.arrowlinelogistics.in/services/rail-transportation
-Project Cargo:          https://www.arrowlinelogistics.in/services/project-cargo-transportation
-Warehousing & Storage:  https://www.arrowlinelogistics.in/services/warehousing-storage
+Road Transportation:     https://arrowlinelogistics.in/services/road-transportation
+Rail Transportation:    https://arrowlinelogistics.in/services/rail-transportation
+Project Cargo:          https://arrowlinelogistics.in/services/project-cargo-transportation
+Warehousing & Storage:  https://arrowlinelogistics.in/services/warehousing-storage
 
-Sitemap:         https://www.arrowlinelogistics.in/sitemap.xml
+Sitemap:         https://arrowlinelogistics.in/sitemap.xml

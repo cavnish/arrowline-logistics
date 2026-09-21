@@ -327,7 +327,7 @@ export default function About() {
       <SEOMeta
         title="About Us | Arrowline Logistics India Story & Hubs"
         description="Learn about Arrowline Logistics, India's trusted multimodal carrier. From Adani Mundra Port to national highway FTL, rail freight, and custom clearance."
-        canonicalUrl="https://www.arrowlinelogistics.in/about"
+        canonicalUrl="https://arrowlinelogistics.in/about"
       />
 
       {/* ============================================================

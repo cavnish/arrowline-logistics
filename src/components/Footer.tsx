@@ -1,9 +1,11 @@
+import type { MouseEvent } from "react";
 import { Phone, MapPin, Mail, ShieldCheck } from "lucide-react";
 import { COMPANY_DETAILS, REGIONAL_HUBS } from "../data/logisticsData";
 import { getAllMainServices, getAllSubServices } from "../data/servicesData";
 import ArrowlineLogo from "./ArrowlineLogo";
 import Reveal from "./Reveal";
 import { buildMailto, buildTel } from "../utils/contactLinks";
+import { pageIdToPath } from "../utils/navigation";
 
 export default function Footer({ setActivePage }: { setActivePage: (page: string) => void }) {
   const currentYear = new Date().getFullYear();
@@ -15,9 +17,14 @@ export default function Footer({ setActivePage }: { setActivePage: (page: string
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleServiceClick = (slug: string) => {
-    setActivePage(`services/${slug}`);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  /* SPA-safe anchor navigation: keeps pushState routing but gives crawlers a
+     real href, the SPA fallback serves index.html for direct hits, and
+     modifier/right-clicks still open default browser behaviour. */
+  const handleSPANav = (e: MouseEvent<HTMLAnchorElement>, pageId: string) => {
+    if (e.defaultPrevented) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    handleNavClick(pageId);
   };
 
   const col1 = mainServices.slice(0, 2);
@@ -52,22 +59,24 @@ export default function Footer({ setActivePage }: { setActivePage: (page: string
                 <ul key={ci} className="space-y-1.5">
                   {col.map((srv) => (
                     <li key={srv.id}>
-                      <button
-                        onClick={() => handleServiceClick(srv.slug)}
+                      <a
+                        href={pageIdToPath(`services/${srv.slug}`)}
+                        onClick={(e) => handleSPANav(e, `services/${srv.slug}`)}
                         className="text-slate-100 hover:text-[#FF7A00] transition-colors flex items-center space-x-1 cursor-pointer font-bold text-xs"
                       >
                         <span className="text-[#FF7A00] font-bold">›</span>
                         <span>{srv.title}</span>
-                      </button>
+                      </a>
                       <ul className="ml-4 mt-1 space-y-0.5">
                         {(srv.subServices || []).map((sub) => (
                           <li key={sub.id}>
-                            <button
-                              onClick={() => handleServiceClick(`${srv.slug}/${sub.slug}`)}
+                            <a
+                              href={pageIdToPath(`services/${srv.slug}/${sub.slug}`)}
+                              onClick={(e) => handleSPANav(e, `services/${srv.slug}/${sub.slug}`)}
                               className="block w-full text-left text-[11px] text-slate-400 hover:text-[#FF7A00] transition-colors cursor-pointer"
                             >
                               {sub.title}
-                            </button>
+                            </a>
                           </li>
                         ))}
                       </ul>
@@ -87,13 +96,14 @@ export default function Footer({ setActivePage }: { setActivePage: (page: string
               <ul className="space-y-1.5">
                 {REGIONAL_HUBS.slice(0, 6).map((hub) => (
                   <li key={hub.id}>
-                    <button
-                      onClick={() => handleNavClick("home")}
+                    <a
+                      href={pageIdToPath("home")}
+                      onClick={(e) => handleSPANav(e, "home")}
                       className="text-[11px] text-slate-400 hover:text-[#00C2CB] transition-colors flex items-center space-x-1.5 cursor-pointer"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-[#FF7A00] flex-shrink-0" />
                       <span>{hub.name.split(" (")[0]}</span>
-                    </button>
+                    </a>
                   </li>
                 ))}
               </ul>

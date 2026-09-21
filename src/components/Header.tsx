@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type MouseEvent as ReactMouseEvent } from "react";
 import { Menu, X, Phone, Mail, ChevronDown, Globe, Anchor, ChevronRight, ArrowRight } from "lucide-react";
 import { COMPANY_DETAILS } from "../data/logisticsData";
 import { getAllMainServices } from "../data/servicesData";
 import ArrowlineLogo from "./ArrowlineLogo";
 import { buildMailto, buildTel } from "../utils/contactLinks";
+import { pageIdToPath } from "../utils/navigation";
 import { cn } from "../utils/cn";
 
 interface HeaderProps {
@@ -109,6 +110,16 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  /* SPA-safe anchor navigation: keeps pushState routing but gives crawlers a
+     real href; modifier/right-clicks keep default browser behaviour so the
+     SPA fallback (index.html) handles any direct, full-page navigation. */
+  const handleSPANav = (e: ReactMouseEvent<HTMLAnchorElement>, pageId: string) => {
+    if (e.defaultPrevented) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    handleNavClick(pageId);
+  };
+
   const activeCategorySlug = hoveredService ?? mainServices[0]?.slug ?? "";
   const hoveredServiceData = mainServices.find((s) => s.slug === activeCategorySlug) || null;
 
@@ -181,13 +192,14 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
         )}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <button
-            onClick={() => handleNavClick("home")}
+          <a
+            href={pageIdToPath("home")}
+            onClick={(e) => handleSPANav(e, "home")}
             className="flex items-center focus:outline-none group transition-transform hover:scale-[1.02] cursor-pointer"
             aria-label="Arrowline Logistics Home"
           >
             <ArrowlineLogo size="md" />
-          </button>
+          </a>
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center space-x-8">
@@ -256,10 +268,11 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                               const isActiveCat = srv.slug === activeCategorySlug;
                               const isCurrent = activePage === `services/${srv.slug}`;
                               return (
-                                <button
+                                <a
                                   key={srv.id}
+                                  href={pageIdToPath(`services/${srv.slug}`)}
                                   onMouseEnter={() => setHoveredService(srv.slug)}
-                                  onClick={() => handleServiceClick(srv.slug)}
+                                  onClick={(e) => handleSPANav(e, `services/${srv.slug}`)}
                                   className={cn(
                                     "relative w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200 group cursor-pointer",
                                     isActiveCat ? "bg-[#EDF4F8]" : "hover:bg-[#F1F6F9]"
@@ -288,7 +301,7 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                                         : "text-slate-300 group-hover:text-[#FF6B1A]"
                                     )}
                                   />
-                                </button>
+                                </a>
                               );
                             })}
                           </div>
@@ -306,13 +319,14 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                                     {hoveredServiceData.title}
                                   </h3>
                                 </div>
-                                <button
-                                  onClick={() => handleServiceClick(hoveredServiceData.slug)}
+                                <a
+                                  href={pageIdToPath(`services/${hoveredServiceData.slug}`)}
+                                  onClick={(e) => handleSPANav(e, `services/${hoveredServiceData.slug}`)}
                                   className="shrink-0 flex items-center gap-1 text-[11px] font-black uppercase tracking-wider text-[#FF6B1A] hover:text-[#E55A0D] transition-colors cursor-pointer"
                                 >
                                   View All
                                   <ArrowRight className="w-3.5 h-3.5" />
-                                </button>
+                                </a>
                               </div>
 
                               {/* Sub-Services Grid */}
@@ -322,11 +336,15 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                                     activePage ===
                                     `services/${hoveredServiceData.slug}/${sub.slug}`;
                                   return (
-                                    <button
+                                    <a
                                       key={sub.id}
-                                      onClick={() =>
-                                        handleServiceClick(
-                                          `${hoveredServiceData.slug}/${sub.slug}`
+                                      href={pageIdToPath(
+                                        `services/${hoveredServiceData.slug}/${sub.slug}`
+                                      )}
+                                      onClick={(e) =>
+                                        handleSPANav(
+                                          e,
+                                          `services/${hoveredServiceData.slug}/${sub.slug}`
                                         )
                                       }
                                       className={cn(
@@ -359,7 +377,7 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                                       <span className="mt-1 block text-[11px] leading-snug text-slate-500 line-clamp-2">
                                         {sub.shortDesc}
                                       </span>
-                                    </button>
+                                    </a>
                                   );
                                 })}
                               </div>
@@ -389,9 +407,10 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
               }
 
               return (
-                <button
+                <a
                   key={item.id}
-                  onClick={() => handleNavClick(item.id)}
+                  href={pageIdToPath(item.id)}
+                  onClick={(e) => handleSPANav(e, item.id)}
                   className={cn(
                     "text-sm font-bold tracking-wide transition-all duration-200 hover:text-[#FF6B1A] relative py-2 cursor-pointer",
                     activePage === item.id ? "text-[#FF6B1A]" : "text-[#062B3A]"
@@ -401,7 +420,7 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                   {activePage === item.id && (
                     <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF6B1A] rounded-full" />
                   )}
-                </button>
+                </a>
               );
             })}
           </div>
@@ -449,24 +468,26 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
               Arrowline Navigation
             </div>
 
-            <button
-              onClick={() => handleNavClick("home")}
+            <a
+              href={pageIdToPath("home")}
+              onClick={(e) => handleSPANav(e, "home")}
               className={cn(
                 "block w-full text-left text-lg font-bold transition-colors",
                 activePage === "home" ? "text-[#FF6B1A]" : "text-[#062B3A] hover:text-[#FF6B1A]"
               )}
             >
               Home
-            </button>
-            <button
-              onClick={() => handleNavClick("about")}
+            </a>
+            <a
+              href={pageIdToPath("about")}
+              onClick={(e) => handleSPANav(e, "about")}
               className={cn(
                 "block w-full text-left text-lg font-bold transition-colors",
                 activePage === "about" ? "text-[#FF6B1A]" : "text-[#062B3A] hover:text-[#FF6B1A]"
               )}
             >
               About Arrowline
-            </button>
+            </a>
 
             <div className="space-y-2 pt-2 pb-3">
               <div className="text-xs font-bold text-[#FF6B1A] flex items-center space-x-1.5">
@@ -543,20 +564,21 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                                   {isSubActive && (
                                     <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-full bg-[#FF6B1A]" />
                                   )}
-                                  <button
-                                    onClick={() => {
-                                      handleServiceClick(`${srv.slug}/${sub.slug}`);
-                                      setExpandedService(null);
-                                    }}
-                                    className={cn(
-                                      "w-full text-left text-[13px] py-2 px-2.5 rounded-lg transition-colors cursor-pointer",
-                                      isSubActive
-                                        ? "bg-[#EAF3F6] text-[#FF6B1A] font-bold"
-                                        : "text-slate-500 hover:text-[#062B3A] hover:bg-[#F6F9FB]"
-                                    )}
-                                  >
-                                    {sub.title}
-                                  </button>
+                                  <a
+                                      href={pageIdToPath(`services/${srv.slug}/${sub.slug}`)}
+                                      onClick={(e) => {
+                                        handleSPANav(e, `services/${srv.slug}/${sub.slug}`);
+                                        setExpandedService(null);
+                                      }}
+                                      className={cn(
+                                        "block w-full text-left text-[13px] py-2 px-2.5 rounded-lg transition-colors cursor-pointer",
+                                        isSubActive
+                                          ? "bg-[#EAF3F6] text-[#FF6B1A] font-bold"
+                                          : "text-slate-500 hover:text-[#062B3A] hover:bg-[#F6F9FB]"
+                                      )}
+                                    >
+                                      {sub.title}
+                                    </a>
                                 </div>
                               );
                             })}
@@ -569,33 +591,36 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
               </div>
             </div>
 
-            <button
-              onClick={() => handleNavClick("industries")}
+            <a
+              href={pageIdToPath("industries")}
+              onClick={(e) => handleSPANav(e, "industries")}
               className={cn(
                 "block w-full text-left text-lg font-bold transition-colors pt-2",
                 activePage === "industries" ? "text-[#FF6B1A]" : "text-[#062B3A] hover:text-[#FF6B1A]"
               )}
             >
               Industries We Serve
-            </button>
-            <button
-              onClick={() => handleNavClick("gallery")}
+            </a>
+            <a
+              href={pageIdToPath("gallery")}
+              onClick={(e) => handleSPANav(e, "gallery")}
               className={cn(
                 "block w-full text-left text-lg font-bold transition-colors",
                 activePage === "gallery" ? "text-[#FF6B1A]" : "text-[#062B3A] hover:text-[#FF6B1A]"
               )}
             >
               Case Studies & Gallery
-            </button>
-            <button
-              onClick={() => handleNavClick("contact")}
+            </a>
+            <a
+              href={pageIdToPath("contact")}
+              onClick={(e) => handleSPANav(e, "contact")}
               className={cn(
                 "block w-full text-left text-lg font-bold transition-colors",
                 activePage === "contact" ? "text-[#FF6B1A]" : "text-[#062B3A] hover:text-[#FF6B1A]"
               )}
             >
               Contact Operations Desk
-            </button>
+            </a>
           </div>
         </div>
 

@@ -15,7 +15,7 @@ export default function SEOMeta({
   title,
   description,
   keywords = "multimodal logistics India, road transport FTL, coastal shipping India, Mundra Port logistics, ODC transport Gujarat, rail freight CONCOR, project cargo India, customs brokerage Mundra, shipping cargo India",
-  canonicalUrl = "https://www.arrowlinelogistics.in",
+  canonicalUrl = "https://arrowlinelogistics.in",
   ogImage = DEFAULT_OG_IMAGE
 }: SEOMetaProps) {
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function SEOMeta({
     const cleanCanonical = canonicalUrl.split("#")[0];
     const prefixes = ["https://", "http://"];
     const isAbsolute = prefixes.some((p) => cleanCanonical.startsWith(p));
-    const finalCanonical = isAbsolute ? cleanCanonical : `https://www.arrowlinelogistics.in${cleanCanonical.startsWith("/") ? cleanCanonical : `/${cleanCanonical}`}`;
+    const finalCanonical = isAbsolute ? cleanCanonical : `https://arrowlinelogistics.in${cleanCanonical.startsWith("/") ? cleanCanonical : `/${cleanCanonical}`}`;
 
     // 2. Set Meta Description & Keywords
     setMetaTag("name", "description", description);
@@ -90,9 +90,17 @@ export default function SEOMeta({
     }
     canonicalLink.setAttribute("href", finalCanonical);
 
-    // 6. Inject JSON-LD Structured Data for SEO (Organization and LocalBusiness)
+    // 6. Inject JSON-LD Structured Data for SEO (Organization, LocalBusiness, WebSite)
     const orgSchema = getOrganizationSchema();
     const localSchema = getLocalBusinessSchema();
+    const websiteSchema = {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Arrowline Logistics",
+      "alternateName": "Arrowline Logistics India Pvt Ltd",
+      "url": finalCanonical,
+      "inLanguage": "en-IN"
+    };
 
     let scriptTag = document.getElementById("seo-structured-data") as HTMLScriptElement;
     if (!scriptTag) {
@@ -101,7 +109,7 @@ export default function SEOMeta({
       scriptTag.type = "application/ld+json";
       document.head.appendChild(scriptTag);
     }
-    scriptTag.text = JSON.stringify([orgSchema, localSchema], null, 2);
+    scriptTag.text = JSON.stringify([websiteSchema, orgSchema, localSchema], null, 2);
   }, [title, description, keywords, canonicalUrl, ogImage]);
 
   return null; // This component doesn't render any visible DOM nodes

@@ -36,13 +36,17 @@ export default function IndustriesPreviewBar({ onNavigateToIndustries }: Industr
             </p>
           </div>
 
-          <button
-            onClick={onNavigateToIndustries}
+          <a
+            href="/industries"
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigateToIndustries();
+            }}
             className="px-6 py-3.5 bg-[#062B3A] hover:bg-[#03212D] text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center space-x-2 cursor-pointer self-start md:self-auto shadow-md hover:shadow-lg hover:-translate-y-0.5"
           >
             <span>VIEW ALL INDUSTRIES & SPECIFICATIONS</span>
             <ArrowRight className="w-4 h-4 text-[#FF6B1A]" />
-          </button>
+          </a>
         </Reveal>
 
         {/* Quick Industry Grid (Preview) */}

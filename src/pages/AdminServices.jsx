@@ -2306,7 +2306,7 @@ export default function AdminServices() {
                       Google Search Live Preview
                     </span>
                     <p className="text-xs text-emerald-700 font-mono">
-                      https://www.arrowlinelogistics.in › services › {formData.slug || "service"}
+                      https://arrowlinelogistics.in › services › {formData.slug || "service"}
                     </p>
                     <h4 className="text-sm font-medium text-[#1a0dab] hover:underline cursor-pointer">
                       {formData.seoTitle || `${formData.title} | Arrowline Logistics`}

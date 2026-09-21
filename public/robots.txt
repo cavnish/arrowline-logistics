@@ -1,6 +1,6 @@
 # ============================================================
 # Arrowline Logistics — robots.txt
-# Production domain: https://www.arrowlinelogistics.in/
+# Production domain: https://arrowlinelogistics.in/
 # ============================================================
 # Public pages, services, images, CSS and JavaScript are fully
 # crawlable. Only the internal API and admin/CMS areas are
@@ -15,8 +15,8 @@ Disallow: /api
 
 # --- Admin / CMS / session areas (never indexed) -------------
 # The admin panel is a login-gated client-side route at
-# #/arrowline-admin and its API is under /api/admin (blocked
-# above). These extra rules are defensive only.
+# /arrowline-admin (hash router) and its API is under /api/admin
+# (blocked above). These extra rules are defensive only.
 Disallow: /arrowline-admin/
 Disallow: /arrowline-admin
 Disallow: /admin
@@ -25,4 +25,4 @@ Disallow: /login
 Disallow: /dashboard
 
 # Public XML sitemap
-Sitemap: https://www.arrowlinelogistics.in/sitemap.xml
+Sitemap: https://arrowlinelogistics.in/sitemap.xml

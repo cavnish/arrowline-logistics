@@ -1,4 +1,4 @@
-export const SITE_URL = "https://www.arrowlinelogistics.in";
+export const SITE_URL = "https://arrowlinelogistics.in";
 
 export function pageIdToPath(pageId: string): string {
   if (!pageId || pageId === "home" || pageId === "/") return "/";

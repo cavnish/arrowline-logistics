@@ -10,7 +10,7 @@ export default function Gallery() {
       <SEOMeta
         title="Case Studies & Operational Photo Gallery"
         description="Review successful logistics case studies from Arrowline Logistics. Highlights include heavy-lift ODC cargo moves, coastal transport loops, and customs brokerage approvals."
-        canonicalUrl="https://www.arrowlinelogistics.in/gallery"
+        canonicalUrl="https://arrowlinelogistics.in/gallery"
       />
 
       <section className="space-y-4">
