@@ -840,19 +840,23 @@ app.use(
 // START
 // =====================================================
 
+// Binds 0.0.0.0 explicitly so Render (and any container/VPS host) can route
+// traffic to the app. Node defaults to all interfaces, but being explicit
+// makes the Render binding contract reliable.
 app.listen(
   PORT,
+  "0.0.0.0",
   () => {
     console.log(
-      `🚛 Arrowline API running on http://localhost:${PORT}`
+      `🚛 Arrowline API running on http://0.0.0.0:${PORT}`
     );
 
     console.log(
-      `   Health check: http://localhost:${PORT}/health`
+      `   Health check: http://0.0.0.0:${PORT}/health`
     );
 
     console.log(
-      `   Admin API: http://localhost:${PORT}/api/admin`
+      `   Admin API: http://0.0.0.0:${PORT}/api/admin`
     );
   }
 );

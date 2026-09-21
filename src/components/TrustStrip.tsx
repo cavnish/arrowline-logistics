@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { getOptimizedImageUrl } from "../utils/imageUrl";
+import { apiUrl } from "../lib/api";
 import Reveal from "./Reveal";
 
 interface TrustedPartner {
@@ -10,13 +11,11 @@ interface TrustedPartner {
   logo_alt: string | null;
 }
 
-const API_URL = String((import.meta as any).env?.VITE_API_URL || "").trim().replace(/\/$/, "");
-
 async function fetchTrustedNetwork(): Promise<TrustedPartner[]> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
   try {
-    const response = await fetch(`${API_URL}/api/trusted-network`, {
+    const response = await fetch(apiUrl("/api/trusted-network"), {
       method: "GET",
       headers: { Accept: "application/json" },
       signal: controller.signal,

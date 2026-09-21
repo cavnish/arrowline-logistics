@@ -9,6 +9,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { getOptimizedImageUrl } from "../utils/imageUrl";
+import { apiUrl } from "../lib/api";
 import Reveal from "./Reveal";
 
 interface Testimonial {
@@ -186,10 +187,9 @@ export default function TestimonialsSection() {
    */
   useEffect(() => {
     let mounted = true;
-    const apiUrl = String((import.meta as any).env?.VITE_API_URL || "").trim().replace(/\/$/, "");
     const load = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/api/testimonials`);
+        const response = await axios.get(apiUrl("/api/testimonials"));
         if (!mounted) return;
         if (response.data?.success && Array.isArray(response.data.data) && response.data.data.length > 0) {
           setTestimonials(response.data.data.map(mapRecord));

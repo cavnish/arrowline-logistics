@@ -5,6 +5,7 @@ import type { FAQItem } from "../data/logisticsData";
 import { ChevronDown, HelpCircle, Phone } from "lucide-react";
 import { COMPANY_DETAILS } from "../data/logisticsData";
 import { buildTel } from "../utils/contactLinks";
+import { apiUrl } from "../lib/api";
 import Reveal from "./Reveal";
 import SectionBackground from "./SectionBackground";
 
@@ -18,9 +19,8 @@ export default function FAQSection() {
 
   useEffect(() => {
     let mounted = true;
-    const apiUrl = ((import.meta as any).env?.VITE_API_URL || "").trim().replace(/\/$/, "");
     axios
-      .get(`${apiUrl}/api/faqs`)
+      .get(apiUrl("/api/faqs"))
       .then((response) => {
         const fetched: FAQItem[] = (response.data?.data || [])
           .filter((item: any) => item.question && item.answer)

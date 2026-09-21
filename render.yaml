@@ -1,0 +1,53 @@
+# Render blueprint for the Arrowline Logistics Express backend.
+#
+# The frontend (Vite/React) deploys separately on Vercel and talks to this
+# service through VITE_API_URL. The backend does NOT depend on Vite.
+#
+# Root directory is `server` (its own npm package with package.json,
+# index.js, routes/, services/, middleware/). Render runs `npm install`
+# then `npm start` (= node index.js) inside server/ and injects PORT.
+#
+# Set every `sync: false` variable in the Render dashboard (never in Git):
+#   - CORS_ORIGIN          -> https://YOUR-VERCEL-DOMAIN.vercel.app
+#                             (comma-separate multiple origins if needed)
+#   - SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY
+#   - RESEND_API_KEY / FROM_EMAIL / NOTIFY_EMAILS
+#   - ADMIN_API_KEY / ADMIN_EMAIL / ADMIN_EMAILS
+#   - CLOUDINARY_CLOUD_NAME / CLOUDINARY_API_KEY / CLOUDINARY_API_SECRET
+
+services:
+  - type: web
+    name: arrowline-logistics-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CORS_ORIGIN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: FROM_EMAIL
+        sync: false
+      - key: NOTIFY_EMAILS
+        sync: false
+      - key: ADMIN_API_KEY
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false

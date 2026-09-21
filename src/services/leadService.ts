@@ -6,6 +6,8 @@
  * are returned to the caller; inquiries are never reported as stored locally.
  */
 
+import { apiUrl, API_URL } from "../lib/api";
+
 export interface LeadPayload {
   name: string;
   company: string;
@@ -23,15 +25,8 @@ export interface LeadResponse {
   message?: string;
 }
 
-function apiUrl(path: string): string {
-  const base = ((import.meta as any).env?.VITE_API_URL || "").trim();
-  if (base) return `${base.replace(/\/$/, "")}${path}`;
-  return path;
-}
-
 function shouldAttemptBackend(): boolean {
-  return Boolean(((import.meta as any).env?.VITE_API_URL || "").trim()) ||
-    (import.meta as any).env?.PROD === true;
+  return Boolean(API_URL) || import.meta.env.PROD === true;
 }
 
 function generateReferenceNumber(): string {

@@ -4,6 +4,7 @@ import {
   MainServiceData,
   SubServiceData,
 } from '../data/servicesData';
+import { apiUrl } from '../lib/api';
 
 // Types for our service data (mirrors the Express public API, which is the
 // single source of truth for the browser — no direct Supabase reads).
@@ -156,8 +157,6 @@ export interface Industry {
   updated_at: string;
 }
 
-const API_URL = String((import.meta as any).env?.VITE_API_URL || "").trim().replace(/\/$/, "");
-
 // Single API helper for all public reads. Same-origin in production when
 // VITE_API_URL is unset (frontend is served by the same Express process).
 // Static fallbacks kick in on any API failure, so this helper is tuned to
@@ -168,7 +167,7 @@ async function apiGet(path: string): Promise<any> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 4000);
   try {
-    const response = await fetch(`${API_URL}${path}`, {
+    const response = await fetch(apiUrl(path), {
       method: "GET",
       headers: { Accept: "application/json" },
       signal: controller.signal,
