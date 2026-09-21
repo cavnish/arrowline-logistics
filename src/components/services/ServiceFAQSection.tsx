@@ -98,11 +98,19 @@ export default function ServiceFAQSection({
                       </div>
                     </button>
 
-                    {isOpen && (
-                      <div className="px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3 animate-in fade-in duration-200">
-                        {faq.a}
+                    <div
+                      className={`grid transition-all duration-200 ease-in-out ${
+                        isOpen
+                          ? "grid-rows-[1fr] opacity-100"
+                          : "grid-rows-[0fr] opacity-80"
+                      }`}
+                    >
+                      <div className="overflow-hidden min-h-0">
+                        <div className="px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+                          {faq.a}
+                        </div>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </Reveal>
               );

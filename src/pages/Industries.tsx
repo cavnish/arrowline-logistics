@@ -94,7 +94,7 @@ export default function Industries({ onOpenQuote, onFormSuccess }: IndustriesPro
     <div className="w-full bg-[#F5F8FA] min-h-screen">
       <SEOMeta
         title="Industries We Serve | Specialized Cargo Logistics from Mundra Port & Pan-India | Arrowline"
-        description="Tailored multimodal logistics, container haulage, and specialized road transport from Mundra Port for Automotive, Solar & Clean Energy, Steel, Chemicals, and Manufacturing across India."
+        description="Tailored multimodal logistics and industrial material transportation from Mundra Port for Automotive, Solar & Clean Energy, Steel, Chemicals, and Manufacturing across India."
         keywords="FMCG logistics India, Automotive logistics India, Manufacturing logistics India, Solar equipment logistics Mundra, Steel transport India, Material transportation India, Pan-India industrial transport"
         canonicalUrl="https://arrowlinelogistics.in/industries"
       />
@@ -112,11 +112,11 @@ export default function Industries({ onOpenQuote, onFormSuccess }: IndustriesPro
 
           <h1 className="text-3xl sm:text-4xl lg:text-6xl font-black text-[#062B3A] tracking-tight leading-[1.1]">
             Specialized Supply Chain & <br />
-            <span className="text-[#FF6B1A]">Material Transportation Across India</span>
+            <span className="text-[#FF6B1A]">Industrial Material Transportation Across India</span>
           </h1>
 
           <p className="text-sm sm:text-base text-slate-600 max-w-3xl leading-relaxed">
-            Every industry has distinct regulatory requirements, handling protocols, and transit timelines. Arrowline Logistics configures dedicated road fleets, coastal shipping loops, CONCOR rail rakes, and port-gate customs clearance tailored to your sector's demands.
+            Every industry has distinct regulatory requirements, handling protocols, and transit timelines. Arrowline Logistics configures dedicated road fleets, coastal shipping loops, CONCOR rail rakes, and port-gate customs clearance tailored to your sector's demands. From heavy steel coils and industrial machinery to solar modules and chemical consignments, we move industrial materials safely across India.
           </p>
 
           <div className="flex flex-wrap gap-4 pt-2">

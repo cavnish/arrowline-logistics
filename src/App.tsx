@@ -23,7 +23,11 @@ import ServiceRouteView from "./components/services/ServiceRouteView";
 import {
   X,
   ShieldCheck,
+  AlertCircle,
+  ArrowRight,
 } from "lucide-react";
+
+import { NotFoundMeta } from "./components/SEOMeta";
 
 import {
   buildWhatsApp,
@@ -74,6 +78,39 @@ const routeFromUrl = (): string => {
   }
   return pathToPageId(path);
 };
+
+// Soft-404 view for unknown top-level routes. Rendered instead of the home
+// page so unknown URLs (e.g. /privacy, /foo) are not indexed as duplicates
+// of the homepage. NotFoundMeta applies a noindex, follow + self canonical.
+function NotFoundView({
+  onNavigateTo,
+}: {
+  onNavigateTo: (pageId: string) => void;
+}) {
+  return (
+    <div className="min-h-[70vh] flex flex-col items-center justify-center bg-[#F5F8FA] px-4 py-20 text-center">
+      <NotFoundMeta />
+      <div className="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-200 flex items-center justify-center text-[#FF6B1A] mb-5 shadow-sm">
+        <AlertCircle className="w-8 h-8" />
+      </div>
+      <h1 className="text-2xl sm:text-3xl font-black text-[#062B3A] tracking-tight mb-2">
+        Page Not Found
+      </h1>
+      <p className="text-sm text-slate-600 max-w-md mx-auto mb-6">
+        The page you requested does not exist or has been moved.
+      </p>
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <button
+          onClick={() => onNavigateTo("home")}
+          className="px-6 py-3 bg-[#062B3A] hover:bg-[#03212D] text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-md"
+        >
+          <span>Return to Home</span>
+          <ArrowRight className="w-4 h-4 text-[#FF6B1A]" />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const [activePage, setActivePage] =
@@ -371,7 +408,6 @@ export default function App() {
           );
 
         case "home":
-        default:
           return (
             <Home
               onOpenQuote={() =>
@@ -391,6 +427,15 @@ export default function App() {
               }
               onFormSuccess={
                 handleFormSuccess
+              }
+            />
+          );
+
+        default:
+          return (
+            <NotFoundView
+              onNavigateTo={
+                handlePageChange
               }
             />
           );

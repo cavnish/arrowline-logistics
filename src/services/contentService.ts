@@ -160,9 +160,13 @@ const API_URL = String((import.meta as any).env?.VITE_API_URL || "").trim().repl
 
 // Single API helper for all public reads. Same-origin in production when
 // VITE_API_URL is unset (frontend is served by the same Express process).
+// Static fallbacks kick in on any API failure, so this helper is tuned to
+// fail fast: a short timeout plus an immediate content-type check avoids
+// wasting time parsing an SPA-fallback HTML document as JSON when the API
+// (or a VITE_API_URL) is not actually serving this route.
 async function apiGet(path: string): Promise<any> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
+  const timeout = setTimeout(() => controller.abort(), 4000);
   try {
     const response = await fetch(`${API_URL}${path}`, {
       method: "GET",
@@ -171,6 +175,10 @@ async function apiGet(path: string): Promise<any> {
     });
     if (!response.ok) {
       throw new Error(`API request failed (${response.status})`);
+    }
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.toLowerCase().includes("application/json")) {
+      throw new Error(`API returned non-JSON content (${contentType || "unknown"})`);
     }
     const body = await response.json();
     return body?.data ?? null;

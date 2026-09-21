@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { getOrganizationSchema, getLocalBusinessSchema } from "../data/logisticsData";
+import { SITE_URL } from "../utils/navigation";
 
 interface SEOMetaProps {
   title: string;
@@ -11,6 +12,17 @@ interface SEOMetaProps {
 
 const DEFAULT_OG_IMAGE = "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg";
 
+// Shared helper to set or create a meta tag.
+export function setMetaTag(attribute: "name" | "property", value: string, content: string) {
+  let element = document.querySelector(`meta[${attribute}="${value}"]`) as HTMLMetaElement | null;
+  if (!element) {
+    element = document.createElement("meta");
+    element.setAttribute(attribute, value);
+    document.head.appendChild(element);
+  }
+  element.setAttribute("content", content);
+}
+
 export default function SEOMeta({
   title,
   description,
@@ -21,17 +33,6 @@ export default function SEOMeta({
   useEffect(() => {
     // 1. Update Title
     document.title = `${title} | ARROWLINE LOGISTICS`;
-
-    // Helper function to set or create meta tag
-    const setMetaTag = (attribute: "name" | "property", value: string, content: string) => {
-      let element = document.querySelector(`meta[${attribute}="${value}"]`);
-      if (!element) {
-        element = document.createElement("meta");
-        element.setAttribute(attribute, value);
-        document.head.appendChild(element);
-      }
-      element.setAttribute("content", content);
-    };
 
     // Remove potentially duplicate meta tags while keeping the first of each.
     const dedupeMetaTags = () => {
@@ -113,4 +114,38 @@ export default function SEOMeta({
   }, [title, description, keywords, canonicalUrl, ogImage]);
 
   return null; // This component doesn't render any visible DOM nodes
+}
+
+// Renders no visible DOM; applies soft-404 metadata (unique "Page Not Found"
+// title, noindex + follow, self-canonical) and restores prior head state on
+// unmount so subsequent valid pages are not left with leftover noindex tags.
+export function NotFoundMeta({ path }: { path?: string }) {
+  useEffect(() => {
+    const robotsTag = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+    const canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    const originalTitle = document.title;
+    const originalRobots = robotsTag?.getAttribute("content") || "";
+    const originalCanonical = canonicalLink?.getAttribute("href") || "";
+
+    document.title = "Page Not Found | Arrowline Logistics";
+    setMetaTag("name", "robots", "noindex, follow");
+
+    const cleanPath = (path || window.location.pathname).split("#")[0];
+    const canonicalHref = cleanPath.startsWith("http")
+      ? cleanPath
+      : `${SITE_URL}${cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`}`;
+
+    const canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (canonical) canonical.setAttribute("href", canonicalHref);
+
+    return () => {
+      document.title = originalTitle;
+      const robots = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+      if (robots) robots.setAttribute("content", originalRobots || "index, follow");
+      const canonicalAgain = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+      if (canonicalAgain) canonicalAgain.setAttribute("href", originalCanonical);
+    };
+  }, [path]);
+
+  return null;
 }

@@ -8,6 +8,7 @@ import {
 import { contentService } from "../../services/contentService";
 import ServicePageTemplate from "./ServicePageTemplate";
 import { ArrowRight, AlertCircle } from "lucide-react";
+import { NotFoundMeta } from "../SEOMeta";
 
 interface ServiceRouteViewProps {
   slug: string;
@@ -111,7 +112,9 @@ export default function ServiceRouteView({
   // Not Found State
   if (notFound || !serviceData) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center bg-[#F5F8FA] px-4 py-20 text-center">
+      <>
+        <NotFoundMeta path={`/services/${slug}`} />
+        <div className="min-h-[70vh] flex flex-col items-center justify-center bg-[#F5F8FA] px-4 py-20 text-center">
         <div className="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-200 flex items-center justify-center text-[#FF6B1A] mb-5 shadow-sm">
           <AlertCircle className="w-8 h-8" />
         </div>
@@ -136,7 +139,8 @@ export default function ServiceRouteView({
             Return to Home
           </button>
         </div>
-      </div>
+        </div>
+      </>
     );
   }
 

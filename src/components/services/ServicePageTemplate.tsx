@@ -86,6 +86,16 @@ export default function ServicePageTemplate({
     if (twitterDescTag) {
       twitterDescTag.setAttribute("content", service.seoDesc || service.shortDesc || "");
     }
+
+    const socialImage = service.heroImage || service.aboutImage || FALLBACK_IMAGE;
+    const ogImageTag = document.querySelector('meta[property="og:image"]');
+    if (ogImageTag) {
+      ogImageTag.setAttribute("content", socialImage);
+    }
+    const twitterImageTag = document.querySelector('meta[name="twitter:image"]');
+    if (twitterImageTag) {
+      twitterImageTag.setAttribute("content", socialImage);
+    }
   }, [service, isSubService, parentService]);
 
   const subServiceData = isSubService ? (service as SubServiceData) : null;
