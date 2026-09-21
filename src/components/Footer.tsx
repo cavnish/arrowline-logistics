@@ -93,16 +93,16 @@ export default function Footer({ setActivePage }: { setActivePage: (page: string
               <h3 className="text-xs font-black text-white uppercase tracking-wider border-b border-white/15 pb-2 mb-3">
                 Pan-India Hubs
               </h3>
-              <ul className="space-y-1.5">
-                {REGIONAL_HUBS.slice(0, 6).map((hub) => (
+              <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                {REGIONAL_HUBS.map((hub) => (
                   <li key={hub.id}>
                     <a
                       href={pageIdToPath("home")}
                       onClick={(e) => handleSPANav(e, "home")}
-                      className="text-[11px] text-slate-400 hover:text-[#00C2CB] transition-colors flex items-center space-x-1.5 cursor-pointer"
+                      className="text-[11px] text-slate-400 hover:text-[#00C2CB] transition-colors flex items-center space-x-1 cursor-pointer"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-[#FF7A00] flex-shrink-0" />
-                      <span>{hub.name.split(" (")[0]}</span>
+                      <span className="truncate">{hub.name.split(" (")[0]}</span>
                     </a>
                   </li>
                 ))}

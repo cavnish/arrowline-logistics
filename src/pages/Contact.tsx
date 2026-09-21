@@ -14,8 +14,9 @@ export default function Contact({ onFormSuccess }: ContactProps) {
   return (
     <div className="space-y-16">
       <SEOMeta
-        title="Contact Us | Operations Desk Mundra Port Gujarat"
-        description="Connect with Arrowline Logistics in Mundra, Kutch, Gujarat. Live logistics support, customs clearance agent (CHA), and direct FTL cargo dispatch hotlines."
+        title="Contact Us | Mundra Port Logistics Desk & Pan-India Offices | Arrowline"
+        description="Contact Arrowline Logistics headquarters at Mundra Port, Kutch, Gujarat. 24/7 dispatch desk for container transport, FTL freight quotes, and pan-India route coordination."
+        keywords="Contact Arrowline Logistics, Logistics Office Mundra, Mundra Port Transport Contact, Logistics Quote India, Freight Forwarder Mundra Kutch"
         canonicalUrl="https://arrowlinelogistics.in/contact"
       />
 

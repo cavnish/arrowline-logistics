@@ -93,9 +93,9 @@ export default function Industries({ onOpenQuote, onFormSuccess }: IndustriesPro
   return (
     <div className="w-full bg-[#F5F8FA] min-h-screen">
       <SEOMeta
-        title="Industries We Serve | Specialized Logistics & Transportation Solutions India"
-        description="Tailored multimodal logistics, dedicated FTL fleets, material transport, and custom clearance for Automotive, FMCG, Manufacturing, Solar, Pharma, and Steel across India from Arrowline Logistics."
-        keywords="FMCG logistics India, Automotive logistics India, Manufacturing logistics India, Solar equipment logistics, Steel transport India, Material transportation India, Pan-India industrial transport"
+        title="Industries We Serve | Specialized Cargo Logistics from Mundra Port & Pan-India | Arrowline"
+        description="Tailored multimodal logistics, container haulage, and specialized road transport from Mundra Port for Automotive, Solar & Clean Energy, Steel, Chemicals, and Manufacturing across India."
+        keywords="FMCG logistics India, Automotive logistics India, Manufacturing logistics India, Solar equipment logistics Mundra, Steel transport India, Material transportation India, Pan-India industrial transport"
         canonicalUrl="https://arrowlinelogistics.in/industries"
       />
 

@@ -28,9 +28,9 @@ export default function Home({
   return (
     <div className="w-full overflow-hidden bg-[#F5F8FA]">
       <SEOMeta
-        title="Arrowline Logistics | Logistics Company in India | Transportation Services"
-        description="Arrowline Logistics is a premier logistics and transportation company in India providing road transportation (FTL/PTL), multimodal logistics, container transport, rail freight and custom clearance centered at Mundra Port, Gujarat."
-        keywords="Logistics Company in India, Logistics Services in India, Transportation Services in India, Freight Transportation Services, Road Transportation Services India, FTL Transportation, PTL Transportation, Multimodal Logistics India, Container Transportation India, Project Cargo India, Supply Chain Logistics India"
+        title="Mundra Port Logistics & Pan-India Transportation Services | Arrowline"
+        description="Arrowline Logistics is an authorized logistics company headquartered at Mundra Port, Gujarat. Premier container haulage, FTL road freight, rail rakes, and warehousing across India."
+        keywords="Logistics Company in Mundra, Mundra Port Logistics, Logistics Services in India, Transportation Services in India, Road Transport Mundra Port, Container Transportation Mundra, Mundra to Delhi Logistics, Mundra to Mumbai Logistics, Mundra to Jaipur Transport, Rail Freight India, Project Cargo Mundra, Warehousing near Mundra Port"
         canonicalUrl="https://arrowlinelogistics.in/"
       />
 

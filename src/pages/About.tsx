@@ -325,8 +325,9 @@ export default function About() {
   return (
     <div className="space-y-20">
       <SEOMeta
-        title="About Us | Arrowline Logistics India Story & Hubs"
-        description="Learn about Arrowline Logistics, India's trusted multimodal carrier. From Adani Mundra Port to national highway FTL, rail freight, and custom clearance."
+        title="About Us | Logistics Company in Mundra & Pan-India Network | Arrowline"
+        description="Learn about Arrowline Logistics, an authorized logistics company headquartered at Mundra Port, Gujarat. Connecting Mundra Port to Delhi-NCR, Mumbai, Jaipur, and nationwide manufacturing hubs with dedicated container haulage, FTL road freight, and rail rakes."
+        keywords="About Arrowline Logistics, Logistics Company in Mundra, Mundra Port Logistics Company, Pan-India Transportation Company, Multimodal Logistics India, Mundra Logistics Network"
         canonicalUrl="https://arrowlinelogistics.in/about"
       />
 

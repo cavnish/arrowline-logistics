@@ -11,6 +11,8 @@ import ServiceRelated from "./ServiceRelated";
 import TrackTraceBar from "../TrackTraceBar";
 import ServiceCTA from "./ServiceCTA";
 import ServiceSchema from "./ServiceSchema";
+import ServiceCorridors from "./ServiceCorridors";
+import ServiceFAQSection from "./ServiceFAQSection";
 import { SITE_URL } from "../../utils/navigation";
 
 // ── Common Home-Page Sections (shared across ALL service pages) ──
@@ -257,6 +259,12 @@ export default function ServicePageTemplate({
       {/* 3. OUR CORE ADVANTAGES — Why Corporate India Chooses Arrowline */}
       <WhyChooseUsSection />
 
+      {/* 3B. PRIMARY PORT-TO-DESTINATION & PAN-INDIA CORRIDORS */}
+      <ServiceCorridors
+        currentServiceSlug={service.slug}
+        onNavigateToService={onNavigateToService}
+      />
+
       {/* 4. WORKFLOW SYNERGY — 6-Stage Process */}
       <ProcessSection />
 
@@ -273,6 +281,14 @@ export default function ServicePageTemplate({
 
       {/* 6. WHAT OUR CLIENTS SAY — Testimonials */}
       <TestimonialsSection />
+
+      {/* 7. SERVICE FAQS — Detailed Authoritative Answers */}
+      {service.faqs && service.faqs.length > 0 && (
+        <ServiceFAQSection
+          serviceTitle={service.title}
+          faqs={service.faqs}
+        />
+      )}
 
       {/* 8. RELATED SERVICES */}
       <ServiceRelated

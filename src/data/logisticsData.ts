@@ -851,6 +851,18 @@ export const FAQ_ITEMS: FAQItem[] = [
     category: "Coverage",
     question: "Does Arrowline provide transportation across all major cities and states in India?",
     answer: "Yes. Arrowline operates a pan-India logistics network serving over 500 cities and industrial hubs across Gujarat, Maharashtra, Rajasthan, Delhi NCR, Haryana, Punjab, Madhya Pradesh, Karnataka, Tamil Nadu, Telangana, Andhra Pradesh, West Bengal, and beyond."
+  },
+  {
+    id: "faq-9",
+    category: "Routes & Port Coverage",
+    question: "What are the primary container and road transportation routes from Mundra Port?",
+    answer: "Arrowline operates daily high-frequency routes from Mundra Port to Delhi / Delhi-NCR, Jaipur, Ahmedabad, Mumbai, Pune, Indore, Bhopal, Bengaluru, Hyderabad, Chennai, and Kolkata. We connect Mundra directly to manufacturing belts across Gujarat, Rajasthan, Maharashtra, Madhya Pradesh, Karnataka, Telangana, and Tamil Nadu via dedicated highway corridors and WDFC rail links."
+  },
+  {
+    id: "faq-10",
+    category: "Heavy Haulage & ODC",
+    question: "Does Arrowline handle project cargo, heavy haulage, and ODC transportation from Mundra Port?",
+    answer: "Yes. Operating from Mundra Port, our specialized heavy engineering division deploys hydraulic modular multi-axle trailers, low-beds, and heavy pullers for over-dimensional cargo (ODC), industrial machinery, power transformers, and solar EPC project equipment across India, backed by route feasibility surveys and statutory NHAI clearances."
   }
 ];
 
@@ -996,8 +1008,23 @@ export const getOrganizationSchema = () => {
     "@type": "Organization",
     "name": COMPANY_DETAILS.name,
     "alternateName": "Arrowline Multimodal Logistics",
+    "description": "Arrowline Logistics is an authorized multimodal logistics and transportation company headquartered at Mundra Port, Gujarat, operating pan-India container haulage, FTL road freight, rail corridors, ODC heavy haulage, and warehousing.",
     "url": "https://arrowlinelogistics.in",
     "logo": "https://res.cloudinary.com/uorctww6/image/upload/v1789377037/arrowline/general/favicon.png",
+    "knowsAbout": [
+      "Mundra Port logistics",
+      "Mundra Port container transportation",
+      "Container transport from Mundra",
+      "Freight transportation from Mundra",
+      "Road transport from Mundra",
+      "Project cargo from Mundra",
+      "ODC transportation from Mundra",
+      "Heavy haulage from Mundra",
+      "Warehousing near Mundra Port",
+      "Logistics company in Mundra",
+      "Pan-India logistics company",
+      "Pan-India transportation services"
+    ],
     "contactPoint": {
       "@type": "ContactPoint",
       "telephone": COMPANY_DETAILS.phone,
@@ -1018,6 +1045,7 @@ export const getLocalBusinessSchema = () => {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": COMPANY_DETAILS.name,
+    "description": "Headquartered at Mundra Port, Gujarat, Arrowline Logistics provides dedicated 20ft/40ft container transportation, FTL road freight, rail corridors, ODC heavy haulage, and warehousing across India.",
     "image": "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg",
     "@id": "https://arrowlinelogistics.in/#localbusiness",
     "url": "https://arrowlinelogistics.in",
@@ -1037,6 +1065,19 @@ export const getLocalBusinessSchema = () => {
       "latitude": 22.8429,
       "longitude": 69.7214
     },
+    "areaServed": [
+      { "@type": "City", "name": "Mundra" },
+      { "@type": "AdministrativeArea", "name": "Gujarat" },
+      { "@type": "AdministrativeArea", "name": "Delhi NCR" },
+      { "@type": "AdministrativeArea", "name": "Rajasthan" },
+      { "@type": "AdministrativeArea", "name": "Maharashtra" },
+      { "@type": "AdministrativeArea", "name": "Madhya Pradesh" },
+      { "@type": "AdministrativeArea", "name": "Karnataka" },
+      { "@type": "AdministrativeArea", "name": "Telangana" },
+      { "@type": "AdministrativeArea", "name": "Tamil Nadu" },
+      { "@type": "AdministrativeArea", "name": "West Bengal" },
+      { "@type": "Country", "name": "India" }
+    ],
     "openingHoursSpecification": {
       "@type": "OpeningHoursSpecification",
       "dayOfWeek": [
