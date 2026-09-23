@@ -4,13 +4,21 @@ import SEOMeta from "../components/SEOMeta";
 import Reveal from "../components/Reveal";
 import { ContactChoiceMenu } from "../components/ContactLink";
 import { buildMailto, buildTel } from "../utils/contactLinks";
-import { Mail, Phone, MapPin, Anchor, Clock, ExternalLink } from "lucide-react";
+import { useSiteContent } from "../hooks/useSiteContent";
+import { Mail, Phone, MapPin, Clock, ExternalLink } from "lucide-react";
 
 interface ContactProps {
   onFormSuccess: (data: any) => void;
 }
 
 export default function Contact({ onFormSuccess }: ContactProps) {
+  const content = useSiteContent();
+  const headOffice = content("contact_address", COMPANY_DETAILS.headOffice);
+  const phone = content("contact_phone", COMPANY_DETAILS.phone);
+  const primaryEmail = content("contact_email", COMPANY_DETAILS.primaryEmail);
+  const secondaryEmail = content("contact_secondary_email", COMPANY_DETAILS.secondaryEmail);
+  const whatsapp = content("contact_whatsapp", COMPANY_DETAILS.whatsapp);
+
   return (
     <div className="space-y-16">
       <SEOMeta
@@ -50,15 +58,15 @@ export default function Contact({ onFormSuccess }: ContactProps) {
               <div>
                 <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Operations hotline</span>
                 <a
-                  href={buildTel(COMPANY_DETAILS.phone)}
+                  href={buildTel(phone)}
                   className="block text-sm font-black text-[#1E3A8A] hover:text-[#FF7A00] transition-colors mt-0.5"
-                  aria-label={`Call ${COMPANY_DETAILS.phone}`}
+                  aria-label={`Call ${phone}`}
                 >
-                  {COMPANY_DETAILS.phone}
+                  {phone}
                 </a>
                 <span className="block text-[10px] text-emerald-600 mt-0.5">● Active 24/7</span>
                 {/* Quick action pills — one-tap Email / Call / WhatsApp */}
-                <ContactChoiceMenu context="quote" size="sm" className="mt-2" />
+                <ContactChoiceMenu context="quote" size="sm" className="mt-2" email={primaryEmail} phone={phone} whatsapp={whatsapp} />
               </div>
             </div>
 
@@ -70,18 +78,18 @@ export default function Contact({ onFormSuccess }: ContactProps) {
               <div>
                 <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Mundra Headquarters</span>
                 <a
-                  href={buildMailto({ to: COMPANY_DETAILS.primaryEmail, context: "quote" })}
+                  href={buildMailto({ to: primaryEmail, context: "quote" })}
                   className="block text-xs font-black text-[#1E3A8A] hover:text-[#FF7A00] transition-colors mt-0.5 truncate"
-                  aria-label={`Send email to ${COMPANY_DETAILS.primaryEmail}`}
+                  aria-label={`Send email to ${primaryEmail}`}
                 >
-                  {COMPANY_DETAILS.primaryEmail}
+                  {primaryEmail}
                 </a>
                 <a
-                  href={buildMailto({ to: COMPANY_DETAILS.secondaryEmail, context: "general" })}
+                  href={buildMailto({ to: secondaryEmail, context: "general" })}
                   className="block text-[9.5px] text-slate-500 hover:text-[#FF7A00] transition-colors truncate mt-0.5"
-                  aria-label={`Send email to ${COMPANY_DETAILS.secondaryEmail}`}
+                  aria-label={`Send email to ${secondaryEmail}`}
                 >
-                  Director: {COMPANY_DETAILS.secondaryEmail}
+                  Director: {secondaryEmail}
                 </a>
               </div>
             </div>
@@ -103,16 +111,12 @@ export default function Contact({ onFormSuccess }: ContactProps) {
               <div className="space-y-1">
                 <span className="block text-xs font-bold text-[#1E3A8A] uppercase tracking-wide">Mundra Headquarters:</span>
                 <p className="text-[11px] text-slate-700 leading-relaxed">
-                  {COMPANY_DETAILS.headOffice}
+                  {headOffice}
                 </p>
               </div>
             </div>
-            <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-500">
-              <span className="flex items-center space-x-1">
-                <Anchor className="w-3.5 h-3.5 text-[#1E3A8A]" />
-                <span>Next to Adani House Terminal</span>
-              </span>
-              <a href="https://maps.google.com/?q=Mundra+Port+Adani+House+Gujarat" target="_blank" rel="noopener noreferrer"
+            <div className="pt-2 border-t border-slate-200 flex items-center justify-end text-[10px] text-slate-500">
+              <a href={`https://maps.google.com/?q=${encodeURIComponent(headOffice)}`} target="_blank" rel="noopener noreferrer"
                  className="text-[#FF7A00] font-bold flex items-center space-x-0.5 hover:underline">
                 <span>Directions</span>
                 <ExternalLink className="w-3 h-3" />

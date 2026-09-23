@@ -11,7 +11,7 @@
 #   - CORS_ORIGIN          -> https://YOUR-VERCEL-DOMAIN.vercel.app
 #                             (comma-separate multiple origins if needed)
 #   - SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY
-#   - RESEND_API_KEY / FROM_EMAIL / NOTIFY_EMAILS
+#   - RESEND_API_KEY / RESEND_FROM_EMAIL / LEAD_NOTIFICATION_EMAIL
 #   - ADMIN_API_KEY / ADMIN_EMAIL / ADMIN_EMAILS
 #   - CLOUDINARY_CLOUD_NAME / CLOUDINARY_API_KEY / CLOUDINARY_API_SECRET
 
@@ -35,9 +35,9 @@ services:
         sync: false
       - key: RESEND_API_KEY
         sync: false
-      - key: FROM_EMAIL
+      - key: RESEND_FROM_EMAIL
         sync: false
-      - key: NOTIFY_EMAILS
+      - key: LEAD_NOTIFICATION_EMAIL
         sync: false
       - key: ADMIN_API_KEY
         sync: false

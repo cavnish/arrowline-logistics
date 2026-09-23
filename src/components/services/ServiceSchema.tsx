@@ -35,7 +35,7 @@ export default function ServiceSchema({
         "telephone": COMPANY_DETAILS.phone,
         "address": {
           "@type": "PostalAddress",
-          "streetAddress": "Office 204, Portview Commercial Complex, Near Adani House, Mundra Port Road",
+          "streetAddress": "Office No. 124, 1st Floor, Bhinde Business Hub, Survey No. 76, Plot No. 1, Pragpar, Mundra Port Highway, Near Mahadev Mandir",
           "addressLocality": "Mundra",
           "addressRegion": "Gujarat",
           "postalCode": "370421",

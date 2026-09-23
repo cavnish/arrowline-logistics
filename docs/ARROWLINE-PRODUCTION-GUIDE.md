@@ -250,8 +250,8 @@ Express validates fields (name, company, email, phone, service, message)
 Supabase: insert into `leads`  (reference_number e.g. ALQ-123456, status "new")
     v
 Resend: 2 emails
-    |-- Team notification -> NOTIFY_EMAILS (reply-to = customer)
-    |-- Customer confirmation -> customer email (Ref + next steps)
+    |-- Team notification -> LEAD_NOTIFICATION_EMAIL (sender RESEND_FROM_EMAIL, reply-to = customer)
+    |-- Customer confirmation -> customer email (sender RESEND_FROM_EMAIL, reply-to = RESEND_FROM email address)
 ```
 
 - **Downtime fallback:** if the DB insert fails the request returns 4xx/5xx
@@ -348,8 +348,9 @@ Local `vite dev` still reads `.env` and hits the localhost API.
 - `SUPABASE_URL` - Supabase project URL.
 - `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (server only).
 - `RESEND_API_KEY` - Resend API key.
-- `FROM_EMAIL` - sender address for outgoing email.
-- `NOTIFY_EMAILS` - comma-separated team notification recipients.
+- `RESEND_FROM_EMAIL` - business sender for ALL outgoing enquiry emails (e.g. `Arrowline Logistics <mundra@arrowlinelogistics.in>`; domain must be verified in Resend).
+- `LEAD_NOTIFICATION_EMAIL` - business inbox that receives every new-enquiry alert (e.g. `mundra@arrowlinelogistics.in`).
+- `FROM_EMAIL` / `NOTIFY_EMAILS` - legacy fallbacks for older deploys; the two vars above take precedence when set.
 - `ADMIN_API_KEY` - JWT signing secret (>= 32 chars) for the admin cookie.
 - `ADMIN_EMAIL` - primary admin email (Supabase Auth user).
 - `ADMIN_EMAILS` - comma-separated secondary admin emails.

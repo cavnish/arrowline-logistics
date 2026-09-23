@@ -134,6 +134,7 @@ export function WhatsAppLink({
 interface ContactChoiceMenuProps {
   email?: string;
   phone?: string;
+  whatsapp?: string;
   context?: EmailContext;
   className?: string;
   size?: "sm" | "md";
@@ -146,6 +147,7 @@ interface ContactChoiceMenuProps {
 export function ContactChoiceMenu({
   email,
   phone,
+  whatsapp,
   context = "general",
   className,
   size = "md",
@@ -181,7 +183,7 @@ export function ContactChoiceMenu({
         <span>Call</span>
       </a>
       <a
-        href={buildWhatsApp({ phone, context })}
+        href={buildWhatsApp({ phone: whatsapp ?? phone, context })}
         target="_blank"
         rel="noopener noreferrer"
         className={cn(

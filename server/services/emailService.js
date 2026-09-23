@@ -25,7 +25,10 @@ const LOGO_URL =
   "https://res.cloudinary.com/uorctww6/image/upload/v1789377037/arrowline/general/favicon.png";
 
 const OFFICE_ADDRESS =
-  "Office 204, Portview Commercial Complex, Near Adani House, Mundra Port Road, Mundra, Kutch, Gujarat - 370421, India";
+  "Office No. 124, 1st Floor, Bhinde Business Hub, Survey No. 76, Plot No. 1, Pragpar, Mundra Port Highway, Near Mahadev Mandir, Mundra, Gujarat - 370421, India";
+
+const OFFICE_PHONE = "+91 99222 04446";
+const OFFICE_EMAIL = "mundra@arrowlinelogistics.in";
 
 let resendClient = null;
 
@@ -35,6 +38,55 @@ function getResend() {
   if (!apiKey) throw new Error("RESEND_API_KEY is not set in .env");
   resendClient = new Resend(apiKey);
   return resendClient;
+}
+
+// Business sender. RESEND_FROM_EMAIL is the recommended variable; FROM_EMAIL is
+// kept as a legacy fallback so existing deploys keep working.
+export function resolveFromEmail() {
+  const from = process.env.RESEND_FROM_EMAIL || process.env.FROM_EMAIL || "";
+  return from.trim();
+}
+
+// Business notification recipient(s). LEAD_NOTIFICATION_EMAIL is the recommended
+// variable (single business inbox); NOTIFY_EMAILS is the legacy comma-separated
+// fallback. No personal/ad-hoc addresses are ever hardcoded here.
+export function resolveNotificationRecipients() {
+  const primary = (process.env.LEAD_NOTIFICATION_EMAIL || "").trim();
+  const list = primary
+    ? [primary]
+    : (process.env.NOTIFY_EMAILS || "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+  return Array.from(new Set(list));
+}
+
+// Extract the bare email address from either "Name <email>" or a plain email.
+function emailAddressOf(sender) {
+  const match = String(sender).match(/<([^>]+)>/);
+  return match ? match[1].trim() : String(sender).trim();
+}
+
+// Query Resend to confirm the configured sender domain is verified. Never throws.
+export async function getSenderDomainStatus() {
+  try {
+    const from = resolveFromEmail();
+    if (!from || !process.env.RESEND_API_KEY) {
+      return { from: from || null, domain: null, status: "not_configured" };
+    }
+    const domain = emailAddressOf(from).split("@")[1] || null;
+    if (!domain) return { from, domain: null, status: "unknown" };
+    const { data, error } = await getResend().domains.list();
+    if (error) return { from, domain, status: "unknown", detail: error.message };
+    const match = (data?.data || []).find((d) => d?.name === domain);
+    return {
+      from,
+      domain,
+      status: match ? match.status : "not_found_in_resend",
+    };
+  } catch (err) {
+    return { from: resolveFromEmail() || null, domain: null, status: "unknown", detail: err.message };
+  }
 }
 
 async function sendEmail(message) {
@@ -100,6 +152,10 @@ function brandHeaderHtml(title) {
 }
 
 function brandFooterHtml() {
+  const officeAddressHtml = escape(OFFICE_ADDRESS)
+    .replace("Bhinde Business Hub,", "Bhinde Business Hub,<br/>")
+    .replace("Plot No. 1,", "Plot No. 1,<br/>")
+    .replace("Near Mahadev Mandir,", "Near Mahadev Mandir,<br/>");
   return `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.deepNavy}; border-radius:0 0 16px 16px;">
       <tr>
@@ -113,20 +169,20 @@ function brandFooterHtml() {
             <tr>
               <td>
                 <span style="font-family:Arial, Helvetica, sans-serif; font-size:13px; color:#DCE6EC;">
-                  <a href="tel:+919922204446" style="color:${BRAND.lightOrange}; text-decoration:none;">+91 99222 04446</a>&nbsp;&nbsp;&nbsp;&middot;&nbsp;&nbsp;&nbsp;<a href="tel:+919766262612" style="color:${BRAND.lightOrange}; text-decoration:none;">+91 97662 62612</a>
+                  <a href="tel:${OFFICE_PHONE.replace(/[^0-9+]/g, "")}" style="color:${BRAND.lightOrange}; text-decoration:none;">${OFFICE_PHONE}</a>&nbsp;&nbsp;&nbsp;&middot;&nbsp;&nbsp;&nbsp;<a href="tel:+919766262612" style="color:${BRAND.lightOrange}; text-decoration:none;">+91 97662 62612</a>
                 </span>
               </td>
             </tr>
             <tr>
               <td style="padding-top:6px;">
                 <span style="font-family:Arial, Helvetica, sans-serif; font-size:13px; color:#DCE6EC;">
-                  <a href="mailto:mundra@arrowlinelogistics.in" style="color:${BRAND.lightOrange}; text-decoration:none;">mundra@arrowlinelogistics.in</a>
+                  <a href="mailto:${OFFICE_EMAIL}" style="color:${BRAND.lightOrange}; text-decoration:none;">${OFFICE_EMAIL}</a>
                 </span>
               </td>
             </tr>
             <tr>
               <td style="padding-top:12px;">
-                <span style="font-family:Arial, Helvetica, sans-serif; font-size:11px; color:#8FB0C0; line-height:1.6;">${escape(OFFICE_ADDRESS)}</span>
+                <span style="font-family:Arial, Helvetica, sans-serif; font-size:11px; color:#8FB0C0; line-height:1.6;">${officeAddressHtml}</span>
               </td>
             </tr>
           </table>
@@ -193,6 +249,7 @@ function buildInternalHtml(lead) {
   const detailsRows = [
     ["Contact Name", escape(lead.name)],
     ["Company", escape(lead.company)],
+    ["Customer Email", `<a href="mailto:${escape(lead.email)}" style="color:${BRAND.navy}; font-weight:600; text-decoration:none;">${escape(lead.email)}</a>`],
     ["Phone", `<a href="tel:${escape(lead.phone)}" style="color:${BRAND.navy}; font-weight:600; text-decoration:none;">${escape(lead.phone)}</a>`],
     ["Service of Interest", escape(lead.service)],
     ["Submitted", escape(submittedAt)],
@@ -291,6 +348,27 @@ function buildClientHtml(lead) {
     )
     .join("");
 
+  const officeContactBlock = `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.cream}; border-radius:12px; border:1px solid ${BRAND.border}; margin-top:22px;">
+      <tr>
+        <td style="padding:16px 18px 12px; font-family:Arial, Helvetica, sans-serif; font-size:11px; font-weight:700; color:${BRAND.orange}; letter-spacing:2px; text-transform:uppercase;">Mundra Headquarters</td>
+      </tr>
+      <tr>
+        <td style="padding:0 18px 12px; font-family:Arial, Helvetica, sans-serif; font-size:13px; color:${BRAND.slate}; line-height:1.6;">
+          Office No. 124, 1st Floor, Bhinde Business Hub,<br/>
+          Survey No. 76, Plot No. 1,<br/>
+          Pragpar, Mundra Port Highway, Near Mahadev Mandir,<br/>
+          Mundra, Gujarat \u002d 370421, India
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:0 18px 16px; font-family:Arial, Helvetica, sans-serif; font-size:13px; color:${BRAND.slate}; line-height:1.7;">
+          Phone: <a href="tel:${OFFICE_PHONE.replace(/[^0-9+]/g, "")}" style="color:${BRAND.brightOrange}; font-weight:700; text-decoration:none;">${OFFICE_PHONE}</a><br/>
+          Email: <a href="mailto:${OFFICE_EMAIL}" style="color:${BRAND.brightOrange}; font-weight:700; text-decoration:none;">${OFFICE_EMAIL}</a>
+        </td>
+      </tr>
+    </table>`;
+
   const body = `
     ${brandHeaderHtml("We received your inquiry")}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="content-pad" style="padding:26px 28px;">
@@ -298,16 +376,8 @@ function buildClientHtml(lead) {
         <td>
           <h1 style="margin:0 0 8px; font-family:Arial, Helvetica, sans-serif; font-size:22px; font-weight:800; color:${BRAND.deepNavy};">Thank you, ${escape(lead.name)}!</h1>
           <p style="margin:0 0 18px; font-family:Arial, Helvetica, sans-serif; font-size:14px; color:${BRAND.slate}; line-height:1.6;">
-            We have received your ${escape(lead.service || "shipping")} inquiry at our Mundra Port desk. Our routing team is analyzing your requirements. Keep the reference number below for all future correspondence:
+            Thank you for contacting Arrowline Logistics. We have received your enquiry and our team will review your requirements and get back to you shortly.
           </p>
-
-          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 22px;">
-            <tr>
-              <td style="background:${BRAND.cream}; border:2px solid ${BRAND.brightOrange}; border-radius:999px; padding:10px 20px; font-family:Arial, Helvetica, sans-serif; font-size:14px; font-weight:800; color:${BRAND.brightOrange}; letter-spacing:2px; text-align:center;">
-                REF: ${escape(lead.reference_number)}
-              </td>
-            </tr>
-          </table>
 
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.cream}; border-radius:12px; border:1px solid ${BRAND.border};">
             <tr>
@@ -316,9 +386,11 @@ function buildClientHtml(lead) {
             ${steps}
           </table>
 
+          ${officeContactBlock}
+
           <p style="margin:22px 0 0; font-family:Arial, Helvetica, sans-serif; font-size:13px; color:${BRAND.slate}; line-height:1.6;">
             Urgent question? Our operations desk is available 24/7 for active transits:
-            <a href="tel:+919922204446" style="color:${BRAND.brightOrange}; font-weight:700; text-decoration:none;">+91 99222 04446</a>.
+            <a href="tel:${OFFICE_PHONE.replace(/[^0-9+]/g, "")}" style="color:${BRAND.brightOrange}; font-weight:700; text-decoration:none;">${OFFICE_PHONE}</a>.
           </p>
         </td>
       </tr>
@@ -355,32 +427,36 @@ function buildClientText(lead) {
   return [
     `Thank you, ${lead.name}!`,
     "",
-    `We have received your ${lead.service || "shipping"} inquiry at our Mundra Port desk.`,
-    `Reference Number: ${lead.reference_number}`,
+    "Thank you for contacting Arrowline Logistics. We have received your enquiry and our team will review your requirements and get back to you shortly.",
     "",
     "What happens next:",
     "1. Analysis (0-1 hour) — our planners review your requirements.",
     "2. Quotation (within 2 hours) — customized tariffs by email.",
     "3. Dispatch — fleet assigned and timeline confirmed after approval.",
     "",
+    "Mundra Headquarters:",
+    OFFICE_ADDRESS,
+    `Phone: ${OFFICE_PHONE}`,
+    `Email: ${OFFICE_EMAIL}`,
+    "",
     "Urgent? Call +91 99222 04446 (24/7).",
   ].join("\n");
 }
 
 export async function sendLeadNotifications(lead) {
-  const notifyList = (process.env.NOTIFY_EMAILS || "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-
-  if (notifyList.length === 0) {
-    throw new Error("NOTIFY_EMAILS env var is empty — no team recipients configured.");
-  }
-
-  const from = process.env.FROM_EMAIL;
+  const from = resolveFromEmail();
   if (!from) {
-    throw new Error("FROM_EMAIL is not set in .env");
+    throw new Error("RESEND_FROM_EMAIL (or legacy FROM_EMAIL) is not set in .env");
   }
+
+  const notifyList = resolveNotificationRecipients();
+  if (notifyList.length === 0) {
+    throw new Error("LEAD_NOTIFICATION_EMAIL (or legacy NOTIFY_EMAILS) is empty — no business recipient configured.");
+  }
+
+  const businessReplyTo = emailAddressOf(from);
+
+  const displayName = [lead.name, lead.company].filter(Boolean).join(" — ");
 
   const failures = [];
   let ownerEmail;
@@ -391,11 +467,12 @@ export async function sendLeadNotifications(lead) {
       from,
       to: notifyList,
       replyTo: lead.email,
-      subject: `New Inquiry ${lead.reference_number} — ${lead.company}`,
+      subject: `New Shipping Enquiry — ${displayName}`,
       html: buildInternalHtml(lead),
       text: buildInternalText(lead),
     });
   } catch (error) {
+    console.error(`Email send failed (business notification to ${notifyList.join(", ")}):`, error.message);
     failures.push(`owner notification: ${error.message}`);
   }
 
@@ -403,11 +480,13 @@ export async function sendLeadNotifications(lead) {
     customerEmail = await sendEmail({
       from,
       to: lead.email,
-      subject: `We received your inquiry — Ref ${lead.reference_number}`,
+      replyTo: businessReplyTo,
+      subject: "We Received Your Shipping Enquiry — Arrowline Logistics",
       html: buildClientHtml(lead),
       text: buildClientText(lead),
     });
   } catch (error) {
+    console.error(`Email send failed (customer confirmation to ${lead.email}):`, error.message);
     failures.push(`customer confirmation: ${error.message}`);
   }
 

@@ -5,6 +5,7 @@ import { getAllMainServices } from "../data/servicesData";
 import ArrowlineLogo from "./ArrowlineLogo";
 import { buildMailto, buildTel } from "../utils/contactLinks";
 import { pageIdToPath } from "../utils/navigation";
+import { useSiteContent } from "../hooks/useSiteContent";
 import { cn } from "../utils/cn";
 
 interface HeaderProps {
@@ -15,6 +16,10 @@ interface HeaderProps {
 
 export default function Header({ activePage, setActivePage, openQuoteForm }: HeaderProps) {
   const mainServices = getAllMainServices();
+  const content = useSiteContent();
+  const headOffice = content("contact_address", COMPANY_DETAILS.headOffice);
+  const phone = content("contact_phone", COMPANY_DETAILS.phone);
+  const primaryEmail = content("contact_email", COMPANY_DETAILS.primaryEmail);
 
   const [expandedService, setExpandedService] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -144,26 +149,26 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
           </div>
           <div className="flex items-center min-w-0">
             <a
-              href={buildMailto({ to: COMPANY_DETAILS.primaryEmail, context: "general" })}
+              href={buildMailto({ to: primaryEmail, context: "general" })}
               className="flex items-center gap-1 text-[8px] sm:text-[9px] md:text-[10px] font-medium text-[#062B3A] hover:text-[#FF6B1A] transition-colors max-w-[125px] sm:max-w-none truncate"
-              aria-label={`Send email to ${COMPANY_DETAILS.primaryEmail}`}
+              aria-label={`Send email to ${primaryEmail}`}
             >
               <Mail className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#FF6B1A] shrink-0" />
-              <span className="sm:hidden truncate">{COMPANY_DETAILS.primaryEmail}</span>
+              <span className="sm:hidden truncate">{primaryEmail}</span>
               <span className="hidden sm:inline">
                 <span className="font-semibold">Mundra Headquarters:</span>{" "}
-                {COMPANY_DETAILS.primaryEmail}
+                {primaryEmail}
               </span>
             </a>
             <div className="hidden sm:flex items-center">
               <span className="mx-2 md:mx-3 h-3 w-px bg-slate-300" />
               <a
-                href={buildTel(COMPANY_DETAILS.phone)}
+                href={buildTel(phone)}
                 className="flex items-center gap-1 text-[9px] md:text-[10px] font-bold text-[#062B3A] hover:text-[#FF6B1A] transition-colors whitespace-nowrap"
-                aria-label={`Call ${COMPANY_DETAILS.phone}`}
+                aria-label={`Call ${phone}`}
               >
                 <Phone className="w-3 h-3 text-[#FF6B1A]" />
-                <span>{COMPANY_DETAILS.phone}</span>
+                <span>{phone}</span>
               </a>
             </div>
           </div>
@@ -628,17 +633,17 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
           <div className="text-xs text-slate-600">
             <span className="block font-bold text-[#062B3A] mb-1">Mundra Headquarters:</span>
             <span className="block text-[11px] leading-relaxed">
-              Office 204, Portview Commercial Complex, Near Adani House, Mundra, Kutch, Gujarat
+              {headOffice}
             </span>
           </div>
           <div className="flex items-center justify-between text-xs text-slate-600 border-t border-slate-200 pt-3">
             <a
-              href={buildTel(COMPANY_DETAILS.phone)}
+              href={buildTel(phone)}
               className="flex items-center space-x-1.5 text-[#FF6B1A] font-bold"
-              aria-label={`Call ${COMPANY_DETAILS.phone}`}
+              aria-label={`Call ${phone}`}
             >
               <Phone className="w-3.5 h-3.5" />
-              <span>{COMPANY_DETAILS.phone}</span>
+              <span>{phone}</span>
             </a>
             <button
               onClick={() => {

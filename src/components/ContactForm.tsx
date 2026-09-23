@@ -3,6 +3,7 @@ import { Mail, Phone, Building2, User, ChevronDown, MessageSquare, AlertCircle, 
 import { CORE_SERVICES, COMPANY_DETAILS } from "../data/logisticsData";
 import { submitLead } from "../services/leadService";
 import { cn } from "../utils/cn";
+import { useSiteContent } from "../hooks/useSiteContent";
 
 export interface LeadFormData {
   name: string;
@@ -23,6 +24,8 @@ interface ContactFormProps {
 }
 
 export default function ContactForm({ onSuccess, defaultService = "", isCompact = false }: ContactFormProps) {
+  const content = useSiteContent();
+  const phone = content("contact_phone", COMPANY_DETAILS.phone);
   const [formData, setFormData] = useState({
     name: "",
     company: "",
@@ -386,7 +389,7 @@ export default function ContactForm({ onSuccess, defaultService = "", isCompact 
       <p className="text-[10px] text-center text-slate-500 leading-normal flex items-center justify-center space-x-1">
         <ShieldCheck className="w-3 h-3 text-slate-400" />
         <span>
-          Secured with anti-spam honeypot. Priority dispatch: <strong className="text-[#1E3A8A]">{COMPANY_DETAILS.phone}</strong>
+          Secured with anti-spam honeypot. Priority dispatch: <strong className="text-[#1E3A8A]">{phone}</strong>
         </span>
       </p>
     </form>

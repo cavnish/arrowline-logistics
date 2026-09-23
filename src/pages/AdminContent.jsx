@@ -25,7 +25,7 @@ const DEFAULT_FIELDS = [
   ["contact_email", "Contact", "mundra@arrowlinelogistics.in", "text"],
   ["contact_secondary_email", "Contact", "info@arrowlinelogistics.in", "text"],
   ["contact_secondary_phone", "Contact", "+91 9766262612", "text"],
-  ["contact_address", "Contact", "Office 204, Portview Commercial Complex, Near Adani House, Mundra Port Road, Mundra, Kutch, Gujarat - 370421, India", "text"],
+  ["contact_address", "Contact", "Office No. 124, 1st Floor, Bhinde Business Hub, Survey No. 76, Plot No. 1, Pragpar, Mundra Port Highway, Near Mahadev Mandir, Mundra, Gujarat - 370421, India", "text"],
   ["social_facebook", "Social Links", "", "text"],
   ["social_instagram", "Social Links", "", "text"],
   ["social_linkedin", "Social Links", "", "text"],

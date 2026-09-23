@@ -6,11 +6,16 @@ import ArrowlineLogo from "./ArrowlineLogo";
 import Reveal from "./Reveal";
 import { buildMailto, buildTel } from "../utils/contactLinks";
 import { pageIdToPath } from "../utils/navigation";
+import { useSiteContent } from "../hooks/useSiteContent";
 
 export default function Footer({ setActivePage }: { setActivePage: (page: string) => void }) {
   const currentYear = new Date().getFullYear();
   const mainServices = getAllMainServices();
   const allSubs = getAllSubServices();
+  const content = useSiteContent();
+  const headOffice = content("contact_address", COMPANY_DETAILS.headOffice);
+  const phone = content("contact_phone", COMPANY_DETAILS.phone);
+  const primaryEmail = content("contact_email", COMPANY_DETAILS.primaryEmail);
 
   const handleNavClick = (pageId: string) => {
     setActivePage(pageId);
@@ -112,18 +117,18 @@ export default function Footer({ setActivePage }: { setActivePage: (page: string
             <div className="space-y-2 text-[11px]">
               <div className="flex items-start space-x-2">
                 <MapPin className="w-3.5 h-3.5 text-[#FF7A00] flex-shrink-0 mt-0.5" />
-                <span className="text-slate-400 leading-relaxed">{COMPANY_DETAILS.headOffice}</span>
+                <span className="text-slate-400 leading-relaxed">{headOffice}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="w-3.5 h-3.5 text-[#FF7A00] flex-shrink-0" />
-                <a href={buildTel(COMPANY_DETAILS.phone)} className="text-white hover:text-[#FF7A00] font-semibold">
-                  {COMPANY_DETAILS.phone}
+                <a href={buildTel(phone)} className="text-white hover:text-[#FF7A00] font-semibold">
+                  {phone}
                 </a>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="w-3.5 h-3.5 text-[#FF7A00] flex-shrink-0" />
-                <a href={buildMailto({ to: COMPANY_DETAILS.primaryEmail })} className="text-slate-400 hover:text-[#FF7A00]">
-                  {COMPANY_DETAILS.primaryEmail}
+                <a href={buildMailto({ to: primaryEmail })} className="text-slate-400 hover:text-[#FF7A00]">
+                  {primaryEmail}
                 </a>
               </div>
             </div>

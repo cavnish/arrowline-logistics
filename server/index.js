@@ -11,7 +11,7 @@ import rateLimit from "express-rate-limit";
 import { createClient } from "@supabase/supabase-js";
 
 import adminRouter from "./routes/admin.js";
-import { sendLeadNotifications } from "./services/emailService.js";
+import { sendLeadNotifications, getSenderDomainStatus } from "./services/emailService.js";
 
 const app = express();
 
@@ -176,7 +176,7 @@ app.get("/", (_req, res) => {
   });
 });
 
-app.get("/health", (_req, res) => {
+app.get("/health", async (_req, res) => {
   const status = {
     service:
       "Arrowline Logistics API",
@@ -194,11 +194,25 @@ app.get("/health", (_req, res) => {
           ? "configured"
           : "missing",
 
+      emailFrom:
+        process.env.RESEND_FROM_EMAIL ||
+        process.env.FROM_EMAIL
+          ? "configured"
+          : "missing",
+
+      emailRecipient:
+        process.env.LEAD_NOTIFICATION_EMAIL ||
+        process.env.NOTIFY_EMAILS
+          ? "configured"
+          : "missing",
+
       admin:
         process.env.ADMIN_API_KEY
           ? "configured"
           : "missing",
     },
+    senderDomain:
+      await getSenderDomainStatus(),
     uptime: process.uptime(),
     timestamp:
       new Date().toISOString(),
@@ -208,6 +222,10 @@ app.get("/health", (_req, res) => {
     status.checks.supabase !==
       "configured" ||
     status.checks.resend !==
+      "configured" ||
+    status.checks.emailFrom !==
+      "configured" ||
+    status.checks.emailRecipient !==
       "configured" ||
     status.checks.admin !==
       "configured"
