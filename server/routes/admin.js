@@ -26,6 +26,16 @@ const ALLOWED_IMAGE_TYPES = [
   "image/avif",
 ];
 
+// Media uploads additionally accept video so hero backgrounds (and any
+// Admin media) can be full-screen autoplay video clips.
+const ALLOWED_MEDIA_TYPES = [
+  ...ALLOWED_IMAGE_TYPES,
+  "video/mp4",
+  "video/webm",
+  "video/ogg",
+  "video/quicktime",
+];
+
 // Trusted-network logos additionally accept SVG so vector brand marks keep
 // crisp on every screen; Cloudinary is told resource_type "image" explicitly
 // because it cannot auto-detect SVG.
@@ -55,13 +65,26 @@ const upload = multer({
   },
 });
 
+// Media library uploads (used by POST /media and /media/:publicId/replace)
+// accept images AND video with a larger size budget for hero clips.
+const mediaUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 110 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!ALLOWED_MEDIA_TYPES.includes(file.mimetype)) {
+      return cb(new Error("Only images (JPEG, PNG, WEBP, GIF, AVIF) or videos (MP4, WEBM, OGG, QuickTime) are allowed"));
+    }
+    cb(null, true);
+  },
+});
+
 // Normalizes multer rejection into a clean 400 response instead of a 500.
 function handleUploadError(err, _req, res, next) {
   if (!err) return next();
   const message =
     err instanceof multer.MulterError
       ? err.code === "LIMIT_FILE_SIZE"
-        ? "File is too large (max 10 MB)"
+        ? "File is too large (max 10 MB for images, 100 MB for videos)"
         : err.message
       : err.message || "Upload failed";
   return res.status(400).json({ success: false, message });
@@ -1240,7 +1263,7 @@ router.delete("/service-items/:id", requireAdmin, async (req, res) => {
 // =====================================================
 
 // POST /api/admin/media
-router.post("/media", requireAdmin, upload.single("file"), handleUploadError, async (req, res) => {
+router.post("/media", requireAdmin, mediaUpload.single("file"), handleUploadError, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: "No file provided" });
@@ -1265,6 +1288,7 @@ router.post("/media", requireAdmin, upload.single("file"), handleUploadError, as
 
     try {
       const result = await cloudinaryService.upload(req.file.buffer, { folder });
+      const isVideo = req.file.mimetype.startsWith("video/");
       return res.status(201).json({
         success: true,
         data: {
@@ -1273,7 +1297,7 @@ router.post("/media", requireAdmin, upload.single("file"), handleUploadError, as
           url: result.secure_url || result.url,
           name: req.file.originalname,
           size: result.bytes || req.file.size,
-          type: "image",
+          type: isVideo ? req.file.mimetype : "image",
           width: result.width,
           height: result.height,
           format: result.format,
@@ -1441,7 +1465,7 @@ router.delete("/media", requireAdmin, async (req, res) => {
 });
 
 // REPLACE /api/admin/media/:publicId/replace
-router.put("/media/:publicId/replace", requireAdmin, upload.single("file"), handleUploadError, async (req, res) => {
+router.put("/media/:publicId/replace", requireAdmin, mediaUpload.single("file"), handleUploadError, async (req, res) => {
   try {
     const publicId = String(req.params.publicId || "").trim();
     if (!publicId) {

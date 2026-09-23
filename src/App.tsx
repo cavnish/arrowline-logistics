@@ -4,6 +4,7 @@ import Lenis from "lenis";
 import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 
 import { COMPANY_DETAILS } from "./data/logisticsData";
+import { useSiteContent } from "./hooks/useSiteContent";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -147,6 +148,15 @@ export default function App() {
   ] = useState<boolean>(
     () => routeFromUrl() !== "admin"
   );
+
+  // Admin-editable site content. Overrides static defaults (e.g. the
+  // WhatsApp number on the floating button) when configured in Admin > Content.
+  const content = useSiteContent();
+  const whatsappPhone =
+    content(
+      "contact_whatsapp",
+      COMPANY_DETAILS.whatsapp
+    );
 
   // ===================================================
   // ROUTING (clean path URLs + legacy hash fallback)
@@ -590,7 +600,7 @@ export default function App() {
           href={buildWhatsApp(
             {
               phone:
-                COMPANY_DETAILS.whatsapp,
+                whatsappPhone,
               context:
                 "quote",
             }

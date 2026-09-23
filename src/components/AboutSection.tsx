@@ -13,6 +13,7 @@ interface AboutSectionProps {
 export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
   const content = useSiteContent();
   const aboutImage = content("about_image", "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg");
+  const aboutSecondaryImage = content("about_secondary_image", "https://res.cloudinary.com/uorctww6/image/upload/v1789377072/arrowline/general/truck-fleet-yard.jpg");
   const benefits = [
     "Multimodal Connectivity (Sea, Road, Rail & Air)",
     "Pan-India Reach across 500+ Cities & Industrial Zones",
@@ -112,7 +113,7 @@ export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
               {/* Overlapping Secondary Image (Fleet in Yard) */}
               <div className="absolute -bottom-8 -left-6 sm:-left-8 w-1/2 rounded-2xl overflow-hidden shadow-2xl border-4 border-white hidden sm:block aspect-[4/3]">
                 <SmartImage
-                  src="https://res.cloudinary.com/uorctww6/image/upload/v1789377072/arrowline/general/truck-fleet-yard.jpg"
+                  src={aboutSecondaryImage}
                   alt="Arrowline logistics fleet in transport yard"
                   className="w-full h-full object-cover"
                 />

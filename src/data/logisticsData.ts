@@ -107,7 +107,7 @@ export const COMPANY_DETAILS = {
   secondaryEmail: "info@arrowlinelogistics.in",
   phone: "+91 99222 04446",
   secondaryPhone: "+91 9766262612",
-  whatsapp: "+919922204446",
+  whatsapp: "+91 97662 62612",
   headOffice: "Office 204, Portview Commercial Complex, Near Adani House, Mundra Port Road, Mundra, Kutch, Gujarat - 370421, India",
   aboutShort: "ARROWLINE LOGISTICS is a premier multimodal logistics and transportation company operating across India. Centered at Mundra Port, Gujarat—the gateway of India's maritime trade—we integrate road transportation (FTL/PTL), rail freight, coastal shipping, and customs clearance to deliver reliable, optimized, and secure door-to-door supply chain solutions.",
   aboutDetailed: "Arrowline Logistics provides end-to-end logistics, material transport, and supply chain solutions designed to move industrial goods, containers, and oversized cargo efficiently across India. Grounded at Mundra Port, Gujarat, we coordinate highway transport, CONCOR rail links, coastal shipping routes, and global freight forwarding to deliver seamless pan-India connectivity for major industries."
@@ -1010,7 +1010,7 @@ export const getOrganizationSchema = () => {
     "alternateName": "Arrowline Multimodal Logistics",
     "description": "Arrowline Logistics is an authorized multimodal logistics and transportation company headquartered at Mundra Port, Gujarat, operating pan-India container haulage, FTL road freight, rail corridors, ODC heavy haulage, and warehousing.",
     "url": "https://arrowlinelogistics.in",
-    "logo": "https://res.cloudinary.com/uorctww6/image/upload/v1789377037/arrowline/general/favicon.png",
+    "logo": "https://arrowlinelogistics.in/images/arrowline-logo.png",
     "knowsAbout": [
       "Mundra Port logistics",
       "Mundra Port container transportation",

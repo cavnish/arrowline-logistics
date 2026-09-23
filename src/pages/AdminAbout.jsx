@@ -35,7 +35,7 @@ const CONTENT_KEYS = {
   Hero: [
     "about_hero_badge_label", "about_hero_badge_place", "about_hero_eyebrow",
     "about_hero_title", "about_hero_p1", "about_hero_p2_pre", "about_fleet_count",
-    "about_hero_p2_post", "about_hero_p3",
+    "about_hero_p2_post", "about_hero_p3", "about_hero_video",
   ],
   Philosophy: [
     "about_philosophy_heading", "about_philosophy_p1", "about_bhag_p2_pre",
@@ -50,7 +50,7 @@ const CONTENT_KEYS = {
     "about_differentiators_heading_2", "about_differentiators_subtext",
   ],
   "Core Values": ["about_corevalues_heading", "about_corevalues_subtext"],
-  Leadership: ["about_leaders_eyebrow", "about_leaders_heading", "about_leaders_subtext"],
+  Leadership: ["about_leaders_eyebrow", "about_leaders_heading"],
   CTA: ["about_cta_heading", "about_cta_body", "about_cta_btn1_label", "about_cta_btn2_label"],
 };
 

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowRight, Phone } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { FALLBACK_IMAGE } from "../ui/SmartImage";
+import HeroVideo from "../ui/HeroVideo";
 import { COMPANY_DETAILS } from "../../data/logisticsData";
 import { buildTel } from "../../utils/contactLinks";
 import { buildImageSrcSet, getOptimizedImageUrl } from "../../utils/imageUrl";
@@ -84,6 +85,7 @@ export default function ServiceHero({
   headline,
   description,
   image,
+  videoUrl,
   fallbackImage,
   onOpenQuote,
 }: ServiceHeroProps) {
@@ -102,6 +104,16 @@ export default function ServiceHero({
           srcs={backdropSrcs}
           position="center"
         />
+
+        {/* Admin-uploaded hero video (full-bleed, muted/looping) — the
+            backdrop image above doubles as the poster + fallback. */}
+        {videoUrl && (
+          <HeroVideo
+            src={videoUrl}
+            poster={heroMedia}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
 
         {/* Navy scrim → transparent. Dark enough only behind the copy on the
             left for white text readability, and near-clear on the right so the

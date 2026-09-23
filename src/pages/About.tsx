@@ -4,6 +4,7 @@ import { contentService } from "../services/contentService";
 import SEOMeta from "../components/SEOMeta";
 import Reveal from "../components/Reveal";
 import CountUp from "../components/CountUp";
+import HeroVideo from "../components/ui/HeroVideo";
 import { buildMailto } from "../utils/contactLinks";
 import {
   Eye, Target, Award, TrendingUp,
@@ -251,6 +252,7 @@ export default function About() {
       : STATIC_DIFFERENTIATORS;
 
   const heroImage = resolveImage(about, "hero");
+  const heroVideo = tileText(about, "about_hero_video", "");
   const milestonesImage = resolveImage(about, "milestones");
   const differentiatorsImage = resolveImage(about, "differentiators");
   const coreValuesImage = resolveImage(about, "core-values");
@@ -314,8 +316,7 @@ export default function About() {
   const coreValuesSubtext = tileText(about, "about_corevalues_subtext", "At Arrowline, values aren't just printed on paper — they're practiced every single day, across every kilometre of every corridor.");
 
   const leadersEyebrow = tileText(about, "about_leaders_eyebrow", "LEADERSHIP");
-  const leadersHeading = tileText(about, "about_leaders_heading", "The Architects of **our success**");
-  const leadersSubtext = tileText(about, "about_leaders_subtext", "Meet the crew coordinating multi-state route surveys, port clearance compliance, customs filings, and pan-India dispatch loops.");
+  const leadersHeading = tileText(about, "about_leaders_heading", "Meet our Leadership Team");
 
   const ctaHeading = tileText(about, "about_cta_heading", "Ready to partner with **Arrowline**?");
   const ctaBody = tileText(about, "about_cta_body", COMPANY_DETAILS.aboutShort);
@@ -342,6 +343,15 @@ export default function About() {
               alt={heroImage.alt}
               className="w-full h-72 sm:h-96 object-cover group-hover:scale-105 transition-transform duration-700"
             />
+            {/* Admin-uploaded hero video (full-bleed, muted/looping) — the image
+                above doubles as the poster + fallback until/unless it plays. */}
+            {heroVideo && (
+              <HeroVideo
+                src={heroVideo}
+                poster={heroImage.url}
+                className="absolute inset-0 w-full h-72 sm:h-96 object-cover"
+              />
+            )}
             {/* Floating badge */}
             <div className="absolute top-4 left-4 bg-white/95 backdrop-blur border border-slate-200 rounded-xl px-3 py-2 shadow-md">
               <div className="text-[9px] font-black uppercase tracking-widest text-[#FF7A00]">
@@ -581,9 +591,6 @@ export default function About() {
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#1E3A8A]">
             {renderBold(leadersHeading, "text-[#FF7A00]")}
           </h2>
-          <p className="text-sm text-slate-600 max-w-2xl">
-            {leadersSubtext}
-          </p>
         </Reveal>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

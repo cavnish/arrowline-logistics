@@ -2,6 +2,7 @@ import { useState, useEffect, type CSSProperties } from "react";
 import { ArrowRight, ChevronDown, Play } from "lucide-react";
 import { useSiteContent } from "../hooks/useSiteContent";
 import SmartImage from "./ui/SmartImage";
+import HeroVideo from "./ui/HeroVideo";
 import { buildImageSrcSet } from "../utils/imageUrl";
 import { cn } from "../utils/cn";
 
@@ -54,6 +55,7 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
   const row2Lead = hasAccent ? row2.slice(0, row2.length - ACCENT.length - 1).trim() : row2;
 
   const heroImg = content("hero_image", HERO_IMAGE_FALLBACK);
+  const heroVideo = content("hero_video", "");
 
   /* Preload the home LCP hero image (route-specific; the static index.html
      preload was removed so service pages don't waste bandwidth on it). */
@@ -95,6 +97,16 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
             transition: "transform 2.4s cubic-bezier(0.16,1,0.3,1)",
           }}
         />
+
+        {/* Admin-uploaded hero video (full-bleed, muted/looping) — the image
+            above doubles as the poster + fallback until/unless it plays. */}
+        {heroVideo && (
+          <HeroVideo
+            src={heroVideo}
+            poster={heroImg}
+            className="absolute inset-0 h-full w-full object-cover object-[50%_35%] sm:object-center"
+          />
+        )}
 
         {/* Navy → transparent sweep (mobile full-strength, tablet/desktop left-heavy) */}
         <div className="absolute inset-0 bg-[linear-gradient(168deg,rgba(4,26,36,0.6)_0%,rgba(4,26,36,0.8)_45%,rgba(4,26,36,0.93)_100%)] md:bg-[linear-gradient(105deg,rgba(5,31,42,0.92)_0%,rgba(5,31,42,0.8)_38%,rgba(5,31,42,0.42)_68%,rgba(5,31,42,0.15)_100%)] lg:hidden lg:bg-none" />
