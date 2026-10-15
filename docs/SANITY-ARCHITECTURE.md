@@ -184,6 +184,7 @@ Scripts live in `scripts/sanity-migrate/` (to be added) and are idempotent (use 
 | `SANITY_API_READ_TOKEN` | `apps/web` (draft preview only) | server-only |
 | `SANITY_REVALIDATE_SECRET` | `apps/web` `/api/revalidate` | server-only, matches the Sanity webhook secret |
 | `NEXT_PUBLIC_API_URL` | `apps/web` lead form | points at the Express API |
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | `apps/web` Transit Time Estimator | browser-safe; restrict to Maps JS/Places/Directions + referrer; omitting it degrades to the offline model |
 | `SANITY_MIGRATION_TOKEN` | `scripts/sanity-migrate` | server-only, Editor token |
 
 ---
@@ -194,9 +195,9 @@ Scripts live in `scripts/sanity-migrate/` (to be added) and are idempotent (use 
 |---|---|---|
 | 0 | Checkpoint branch + tag (done) | no |
 | 1 | Restore green build (done) | no |
-| 2 | Create Sanity project; add **`studio/`** with the content model (§4); host Studio | no (additive) |
-| 3 | Migration scripts + staging import; verify content migration | no |
-| 4 | Next.js public app: routes, SSG/ISR, `@sanity/client`, SEO parity, webhook `/api/revalidate` | new app alongside |
+| 2 | Create Sanity project; add **`studio/`** with the content model (§4); host Studio — *`studio/` authored and typechecks ✅, project + hosting pending* | no (additive) |
+| 3 | Migration scripts + staging import; verify content migration — *`scripts/sanity-migrate/` written ✅, run pending credentials* | no |
+| 4 | Next.js public app: routes, SSG/ISR, `@sanity/client`, SEO parity, webhook `/api/revalidate` — *built and green ✅* | new app alongside |
 | 5 | Point lead form + admin enquiries at existing Express API; env plumbing | config only |
 | 6 | Cutover: DNS, sitemap/robots from Sanity, preview/draft mode | switch |
 | 7 | Retire Supabase CMS tables + old content admin; update docs/tests | after bake-in |
@@ -210,7 +211,7 @@ Each phase is a separate branch/PR, verified with build + a smoke test before me
 ```
 /
 ├─ studio/                 # Sanity Studio (content model, config)  ← added now
-├─ apps/web/               # Next.js public site (phase 4)          ← added later
+├─ apps/web/               # Next.js public site (phase 4)          ✅ built (SSG/ISR)
 ├─ server/                 # Express private API + Supabase (retained)
 ├─ scripts/sanity-migrate/ # content migration (phase 3)
 ├─ supabase/migrations/    # frozen CMS tables + transactional schema

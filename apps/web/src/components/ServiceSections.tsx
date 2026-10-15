@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import SmartImage from "@/components/SmartImage";
 import type { ServiceDetail } from "@/lib/types";
 
@@ -112,6 +114,47 @@ export default function ServiceSections({ service }: { service: ServiceDetail })
           </div>
         </section>
       )}
+
+      {service.industries && service.industries.length > 0 && (
+        <section className="mt-12">
+          <h2 className="text-2xl font-black text-navy">Industries we serve</h2>
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {service.industries.map((industry) => (
+              <li
+                key={industry._id}
+                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-navy"
+              >
+                {industry.title}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section className="mt-14 rounded-2xl bg-navy-dark px-6 py-8 text-white sm:px-10">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-xl font-black">Need {service.title} on a fixed schedule?</h2>
+            <p className="mt-1 text-sm text-slate-300">
+              Share your route and cargo profile — our desk confirms the tariff and dispatch slot within 2 hours.
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-3">
+            <Link
+              href="/contact"
+              className="rounded-xl bg-orange px-5 py-3 text-xs font-black uppercase tracking-wider text-white hover:bg-orange-bright"
+            >
+              Talk to our desk
+            </Link>
+            <Link
+              href="/transit-time-estimator"
+              className="rounded-xl border border-white/30 px-5 py-3 text-xs font-black uppercase tracking-wider text-white hover:bg-white/10"
+            >
+              Estimate transit
+            </Link>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
