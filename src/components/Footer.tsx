@@ -141,6 +141,14 @@ export default function Footer({ setActivePage }: { setActivePage: (page: string
             © {currentYear} {COMPANY_DETAILS.name}. All Rights Reserved. Moving Cargo. Connecting India.
           </p>
           <div className="flex space-x-3 items-center">
+            <a
+              href={pageIdToPath("transit-time-estimator")}
+              onClick={(e) => handleSPANav(e, "transit-time-estimator")}
+              className="hover:text-[#FF7A00] transition-colors cursor-pointer text-[#FF7A00] font-black"
+            >
+              Transit Estimator
+            </a>
+            <span>·</span>
             <span className="hover:text-slate-300 cursor-pointer transition-colors">Sitemap</span>
             <span>·</span>
             <span className="hover:text-slate-300 cursor-pointer transition-colors">Privacy Policy</span>

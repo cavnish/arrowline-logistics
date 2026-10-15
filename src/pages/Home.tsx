@@ -7,6 +7,7 @@ import WhyChooseUsSection from "../components/WhyChooseUsSection";
 import ProcessSection from "../components/ProcessSection";
 import IndustriesPreviewBar from "../components/IndustriesPreviewBar";
 import TestimonialsSection from "../components/TestimonialsSection";
+import TransitTimeEstimator from "../components/estimator/TransitTimeEstimator";
 import FAQSection from "../components/FAQSection";
 import TrackTraceBar from "../components/TrackTraceBar";
 import ArrowlineLogo from "../components/ArrowlineLogo";
@@ -74,7 +75,10 @@ export default function Home({
         }
       />
 
-      {/* 8. Testimonials */}
+      {/* 8. Transit Time Estimator */}
+      <TransitTimeEstimator variant="section" />
+
+      {/* 9. Testimonials */}
       <TestimonialsSection />
 
       {/* 10. FAQ */}

@@ -18,6 +18,7 @@ import About from "./pages/About";
 import Industries from "./pages/Industries";
 import Gallery from "./pages/Gallery";
 import Contact from "./pages/Contact";
+import TransitEstimatorPage from "./pages/TransitEstimatorPage";
 
 import ServiceRouteView from "./components/services/ServiceRouteView";
 
@@ -36,6 +37,12 @@ import {
 
 import { pathToPageId, pageIdToPath } from "./utils/navigation";
 
+import {
+  subscribeQuoteForm,
+  clearQuotePrefill,
+  type QuotePrefill,
+} from "./utils/quoteBus";
+
 const AdminRouter = lazy(() => import("./admin/AdminRouter"));
 
 // Extract a pageId from a hash like "#/about" or "#/services/road-transportation"
@@ -52,6 +59,9 @@ const pageIdFromHash = (
   if (hash.startsWith("#/industries")) return "industries";
   if (hash.startsWith("#/gallery")) return "gallery";
   if (hash.startsWith("#/contact")) return "contact";
+  if (hash.startsWith("#/transit-time-estimator")) {
+    return "transit-time-estimator";
+  }
   if (hash.startsWith("#/services")) {
     const raw = hash.replace("#/services", "");
     const clean = raw.startsWith("/") ? raw.slice(1) : raw;
@@ -139,6 +149,13 @@ export default function App() {
     setIsAdminRoute,
   ] = useState(false);
 
+  const [
+    globalQuotePrefill,
+    setGlobalQuotePrefill,
+  ] = useState<QuotePrefill | null>(
+    null
+  );
+
   // Show the full-screen logo loader only once on the very first full page
   // load (App mounts once per hard refresh; internal navigation via
   // pushState/popstate never remounts it, so it won't reappear).
@@ -190,6 +207,17 @@ export default function App() {
   useEffect(() => {
     const splash = document.getElementById("boot-splash");
     if (splash) splash.remove();
+  }, []);
+
+  // ===================================================
+  // GLOBAL QUOTE PREFILL (Transit Time Estimator bus)
+  // ===================================================
+
+  useEffect(() => {
+    return subscribeQuoteForm((prefill) => {
+      setGlobalQuotePrefill(prefill);
+      setIsGlobalQuoteOpen(true);
+    });
   }, []);
 
   // ===================================================
@@ -408,6 +436,9 @@ export default function App() {
         case "gallery":
           return <Gallery />;
 
+        case "transit-time-estimator":
+          return <TransitEstimatorPage />;
+
         case "contact":
           return (
             <Contact
@@ -558,11 +589,11 @@ export default function App() {
 
             <button
               type="button"
-              onClick={() =>
-                setIsGlobalQuoteOpen(
-                  false
-                )
-              }
+              onClick={() => {
+                setIsGlobalQuoteOpen(false);
+                clearQuotePrefill();
+                setGlobalQuotePrefill(null);
+              }}
               className="absolute top-4 right-4 text-slate-500 hover:text-[#062B3A] bg-[#F5F8FA] p-2 rounded-xl hover:bg-white border border-slate-200 transition-all z-50 cursor-pointer"
               aria-label="Close quote form"
             >
@@ -571,11 +602,18 @@ export default function App() {
 
             <div className="max-h-[85vh] overflow-y-auto">
               <ContactForm
+                prefill={
+                  globalQuotePrefill
+                }
                 onSuccess={(
                   data
                 ) => {
                   setIsGlobalQuoteOpen(
                     false
+                  );
+                  clearQuotePrefill();
+                  setGlobalQuotePrefill(
+                    null
                   );
 
                   handleFormSuccess(

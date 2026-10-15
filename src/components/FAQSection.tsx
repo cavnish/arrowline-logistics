@@ -1,46 +1,11 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+v import { useState } from "react";
 import { FAQ_ITEMS } from "../data/logisticsData";
-import type { FAQItem } from "../data/logisticsData";
 import { ChevronDown, HelpCircle, Phone } from "lucide-react";
 import { COMPANY_DETAILS } from "../data/logisticsData";
 import { buildTel } from "../utils/contactLinks";
-import { apiUrl } from "../lib/api";
-import Reveal from "./Reveal";
-import SectionBackground from "./SectionBackground";
-
-// Container terminal imagery — subtle backdrop relevant to freight/port FAQs.
-const FAQ_BACKGROUND =
-  "https://res.cloudinary.com/uorctww6/image/upload/v1789377042/arrowline/general/project-port.jpg";
 
 export default function FAQSection() {
-  const [faqs, setFaqs] = useState<FAQItem[]>(FAQ_ITEMS);
-  const [openFaqId, setOpenFaqId] = useState<string>(FAQ_ITEMS[0]?.id || "");
-
-  useEffect(() => {
-    let mounted = true;
-    axios
-      .get(apiUrl("/api/faqs"))
-      .then((response) => {
-        const fetched: FAQItem[] = (response.data?.data || [])
-          .filter((item: any) => item.question && item.answer)
-          .map((item: any): FAQItem => ({
-            id: String(item.id),
-            question: item.question,
-            answer: item.answer,
-            category: item.category || "",
-          }));
-        if (!mounted || fetched.length === 0) return;
-        setFaqs(fetched);
-        setOpenFaqId((current) => (fetched.some((item) => item.id === current) ? current : fetched[0].id));
-      })
-      .catch((error) => {
-        console.error("Error fetching FAQs:", error);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const [openFaqId, setOpenFaqId] = useState<string>(FAQ_ITEMS[0].id);
 
   const toggleFaq = (id: string) => {
     setOpenFaqId((prev) => (prev === id ? "" : id));
@@ -48,14 +13,14 @@ export default function FAQSection() {
 
   return (
     <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden">
-      {/* Premium logistics backdrop */}
-      <SectionBackground image={FAQ_BACKGROUND} />
+      {/* Background Technical Grid */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
 
           {/* Left Column: Title & Contact Help (Matching Reference Image) */}
-          <Reveal direction="left" className="lg:col-span-5 space-y-6">
+          <div className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
               <div className="inline-flex items-center space-x-2 px-3 py-1 bg-white border border-[#062B3A]/15 rounded-full text-xs font-bold text-[#FF6B1A] tracking-widest uppercase shadow-sm">
                 <HelpCircle className="w-3.5 h-3.5" />
@@ -91,18 +56,18 @@ export default function FAQSection() {
                 <span>Call {COMPANY_DETAILS.phone}</span>
               </a>
             </div>
-          </Reveal>
+          </div>
 
           {/* Right Column: Accordion List (Matching Reference Image) */}
           <div className="lg:col-span-7 space-y-3.5">
-            {faqs.map((item, index) => {
+            {FAQ_ITEMS.map((item) => {
               const isOpen = openFaqId === item.id;
               return (
-                <Reveal key={item.id} delay={index * 50} duration={400}>
                 <div
-                  className={`border rounded-2xl transition-all duration-200 overflow-hidden bg-white/90 backdrop-blur-md ${isOpen
-                      ? "border-[#FF6B1A] shadow-md"
-                      : "border-white/70 shadow-sm shadow-[#062B3A]/5 hover:border-slate-300"
+                  key={item.id}
+                  className={`border rounded-2xl transition-all duration-200 overflow-hidden ${isOpen
+                      ? "bg-white border-[#FF6B1A] shadow-md"
+                      : "bg-white border-slate-200 hover:border-slate-300"
                     }`}
                 >
                   <button
@@ -127,7 +92,6 @@ export default function FAQSection() {
                     </div>
                   )}
                 </div>
-                </Reveal>
               );
             })}
           </div>

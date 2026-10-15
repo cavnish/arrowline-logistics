@@ -4,6 +4,8 @@ import { CORE_SERVICES, COMPANY_DETAILS } from "../data/logisticsData";
 import { submitLead } from "../services/leadService";
 import { cn } from "../utils/cn";
 import { useSiteContent } from "../hooks/useSiteContent";
+import type { QuotePrefill } from "../utils/quoteBus";
+import { Info, Route } from "lucide-react";
 
 export interface LeadFormData {
   name: string;
@@ -21,18 +23,21 @@ interface ContactFormProps {
   onSuccess: (data: LeadFormData) => void;
   defaultService?: string;
   isCompact?: boolean;
+  /** Route/service prefill from the Transit Time Estimator. */
+  prefill?: QuotePrefill | null;
 }
 
-export default function ContactForm({ onSuccess, defaultService = "", isCompact = false }: ContactFormProps) {
+export default function ContactForm({ onSuccess, defaultService = "", isCompact = false, prefill = null }: ContactFormProps) {
   const content = useSiteContent();
   const phone = content("contact_phone", COMPANY_DETAILS.phone);
+  const initialService = prefill?.service || defaultService;
   const [formData, setFormData] = useState({
     name: "",
     company: "",
     email: "",
     phone: "",
-    service: defaultService,
-    message: "",
+    service: initialService,
+    message: prefill?.message || "",
     consent: false,
     honeypot: "",
   });
@@ -121,7 +126,7 @@ export default function ContactForm({ onSuccess, defaultService = "", isCompact 
       });
       setFormData({
         name: "", company: "", email: "", phone: "",
-        service: defaultService, message: "", consent: false, honeypot: "",
+        service: initialService, message: "", consent: false, honeypot: "",
       });
     } catch (err) {
       console.error("Lead submission error: ", err);
@@ -187,6 +192,17 @@ export default function ContactForm({ onSuccess, defaultService = "", isCompact 
           <div className="rounded-lg border border-red-200 bg-red-50 p-2.5 text-xs text-red-700 flex items-start space-x-2" role="alert">
             <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
             <span>{submitError}</span>
+          </div>
+        )}
+        {prefill?.message && (
+          <div className="rounded-lg border border-[#FF7A00]/30 bg-[#FF7A00]/10 p-2.5 text-[11px] text-[#1E3A8A] flex items-start space-x-2">
+            <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-[#FF7A00]" />
+            <span>
+              <strong className="font-black inline-flex items-center gap-1">
+                <Route className="w-3 h-3" /> Transit Estimator route
+              </strong>{" "}
+              pre-filled below — confirm the cargo details and we'll return a binding tariff for this lane.
+            </span>
           </div>
         )}
       </div>

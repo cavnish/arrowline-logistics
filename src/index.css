@@ -82,30 +82,41 @@ html.lenis, html.lenis body {
 }
 
 /* ----------------------------------------------------
-   SIGNATURE ROUTE LINE ANIMATIONS
+   GOOGLE PLACES AUTOCOMPLETE THEMING
+   The `.pac-*` dropdown is appended to <body> by the Maps
+   library, so it is styled here (surface-ready CSS, z-index
+   sits below the global quote modal).
    ---------------------------------------------------- */
-@keyframes drawRouteX {
-  0%   { stroke-dashoffset: 600; opacity: 0.2; }
-  100% { stroke-dashoffset: 0;   opacity: 1; }
+.pac-container {
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 16px 40px -12px rgba(6, 43, 58, 0.28);
+  font-family: 'Inter', 'Manrope', system-ui, sans-serif;
+  margin-top: 6px;
+  padding: 4px 0;
 }
-
-@keyframes pulseLocation {
-  0%, 100% { transform: scale(1);   opacity: 1; }
-  50%      { transform: scale(1.4); opacity: 0.7; }
+.pac-container:after {
+  display: none;
 }
-
-@keyframes cargoMove {
-  0%   { offset-distance: 0%; }
-  100% { offset-distance: 100%; }
+.pac-item {
+  padding: 9px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #062B3A;
+  border-color: #f1f5f9;
+  line-height: 1.35;
 }
-
-.animate-route-draw {
-  stroke-dasharray: 600;
-  animation: drawRouteX 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.pac-item:hover,
+.pac-item-selected {
+  background: #EDF4F8;
 }
-
-.animate-location-dot {
-  animation: pulseLocation 2.4s ease-in-out infinite;
+.pac-icon {
+  display: none;
+}
+.pac-item-query {
+  font-size: 13px;
+  color: #062B3A;
+  font-weight: 600;
 }
 
 @keyframes map-sway {
@@ -142,9 +153,7 @@ html.lenis, html.lenis body {
   .service-card {
     animation: none;
   }
-  .map-sway,
-  .animate-route-draw,
-  .animate-location-dot {
+  .map-sway {
     animation: none;
   }
 }
