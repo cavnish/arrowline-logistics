@@ -37,6 +37,10 @@ export interface ServiceDetail extends ServiceSummary {
   aboutHeading?: string | null;
   aboutBody?: string | null;
   aboutImage?: SanityImageValue | null;
+  showcaseHeading?: string | null;
+  showcaseDescription?: string | null;
+  cargoHeading?: string | null;
+  cargoDescription?: string | null;
   processSteps?: Array<{ title?: string; subtitle?: string; description?: string; icon?: string; image?: SanityImageValue | null }> | null;
   showcase?: Array<{ title?: string; caption?: string; image?: SanityImageValue | null }> | null;
   cargoApplications?: Array<{ title?: string; description?: string; image?: SanityImageValue | null }> | null;

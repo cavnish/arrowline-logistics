@@ -5,6 +5,7 @@ import { ChevronRight } from "lucide-react";
 
 import SmartImage from "@/components/SmartImage";
 import FaqList from "@/components/FaqList";
+import ServiceSections from "@/components/ServiceSections";
 import { sanityFetch } from "@/lib/sanity/client";
 import { subServiceQuery, serviceSlugsByParentQuery } from "@/lib/sanity/queries";
 import { buildMetadata } from "@/lib/seo";
@@ -77,16 +78,7 @@ export default async function SubServicePage({
         )}
         {service.fullDescription && <p className="mt-6 leading-relaxed text-slate-700">{service.fullDescription}</p>}
 
-        {service.capabilities && service.capabilities.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-xl font-black text-navy">Capabilities</h2>
-            <ul className="mt-3 list-disc space-y-1 pl-6 text-slate-700">
-              {service.capabilities.map((capability) => (
-                <li key={capability}>{capability}</li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <ServiceSections service={service} />
 
         {faqs.length > 0 && (
           <div className="mt-10">
