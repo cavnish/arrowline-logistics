@@ -17,6 +17,14 @@ export const siteSettings = defineType({
     defineField({ name: "defaultSeo", title: "Default SEO", type: "seo" }),
     defineField({ name: "googleAnalyticsId", title: "Google Analytics ID", type: "string" }),
     defineField({
+      name: "siteContent",
+      title: "Legacy site content (key/value)",
+      type: "array",
+      description:
+        "Lossless migration of the old Supabase site_content / site_settings key-value rows. Promote values into the structured fields above as you review them.",
+      of: [defineArrayMember({ type: "siteContentItem" })],
+    }),
+    defineField({
       name: "announcementBanner",
       title: "Announcement banner",
       type: "reference",
@@ -123,4 +131,4 @@ export const contactPage = defineType({
 export const singletonTypes = [siteSettings, navigation, homePage, aboutPage, servicesPage, contactPage];
 
 /** Names used by the desk structure + config to lock singletons down. */
-export const SINGLETON_NAMES = singletonTypes.map((type) => type.name);
+export const SINGLETON_NAMES: string[] = singletonTypes.map((type) => type.name);

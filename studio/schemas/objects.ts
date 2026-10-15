@@ -203,6 +203,19 @@ export const portableText = defineType({
   ],
 });
 
+export const siteContentItem = defineType({
+  name: "siteContentItem",
+  title: "Legacy content item",
+  type: "object",
+  fields: [
+    defineField({ name: "key", title: "Key", type: "string" }),
+    defineField({ name: "value", title: "Value", type: "text", rows: 3 }),
+    defineField({ name: "section", title: "Section", type: "string" }),
+    defineField({ name: "type", title: "Type", type: "string" }),
+  ],
+  preview: { select: { title: "key", subtitle: "value" } },
+});
+
 export const objectTypes = [
   mediaImage,
   link,
@@ -219,4 +232,5 @@ export const objectTypes = [
   coreValue,
   statItem,
   portableText,
+  siteContentItem,
 ];

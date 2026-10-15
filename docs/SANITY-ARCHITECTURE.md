@@ -1,6 +1,6 @@
 # Arrowline Logistics — Sanity-First Architecture & Migration Plan
 
-**Status:** Proposed (pending approval of the frontend rendering decision in §9)
+**Status:** Approved — decisions in §9 resolved (2026-10-15): **Next.js App Router**, **Sanity image pipeline**, credentials to be supplied by owner.
 **Date:** 2026-10-15
 **Supersedes:** the "keep current CMS" assumptions in `docs/AUDIT-REPORT-2026-10-15.md` (that report remains valid for the audit findings).
 
@@ -167,15 +167,24 @@ Scripts live in `scripts/sanity-migrate/` (to be added) and are idempotent (use 
 
 ---
 
-## 9. Decisions Required From You
+## 9. Decisions (resolved 2026-10-15)
 
-1. **Frontend framework (gates everything):**
-   - **(A) Migrate public site to Next.js App Router** — true SSG + ISR + tag revalidation. *Recommended.*
-   - **(B) Keep Vite** + `vite-react-ssg` + webhook-triggered full rebuild. Less capable, less rewrite.
-2. **Media:** (A) migrate Cloudinary assets into Sanity assets *[recommended]*, or (B) keep Cloudinary and store URLs in Sanity.
-3. **Private API:** keep the existing Express service *[recommended]*, or fold it into Next route handlers.
-4. **Sanity credentials:** project ID, dataset name(s), and an Editor/Deploy token (staging vs production).
-5. **Admin panel:** retire the custom content CMS pages once Sanity Studio is live; keep only the enquiries dashboard.
+1. **Frontend framework:** ✅ **Next.js App Router** — public site migrates to `apps/web/` for true SSG + ISR.
+2. **Media:** ✅ **Sanity image pipeline** — migrate Cloudinary assets into Sanity assets.
+3. **Private API:** ✅ **Keep the existing Express service** (`server/`) for forms/leads/admin; it is not rewritten.
+4. **Sanity credentials:** ⏳ Owner will supply `projectId`, dataset name(s) and a token.
+5. **Admin panel:** content CMS pages are replaced by Sanity Studio; only the enquiries dashboard remains on the Express side.
+
+## 9a. Environments
+
+| Var | Consumer | Notes |
+|---|---|---|
+| `SANITY_STUDIO_PROJECT_ID`, `SANITY_STUDIO_DATASET` | Studio (`studio/`) | browser-safe |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`, `NEXT_PUBLIC_SANITY_API_VERSION` | `apps/web` content reads | browser-safe |
+| `SANITY_API_READ_TOKEN` | `apps/web` (draft preview only) | server-only |
+| `SANITY_REVALIDATE_SECRET` | `apps/web` `/api/revalidate` | server-only, matches the Sanity webhook secret |
+| `NEXT_PUBLIC_API_URL` | `apps/web` lead form | points at the Express API |
+| `SANITY_MIGRATION_TOKEN` | `scripts/sanity-migrate` | server-only, Editor token |
 
 ---
 

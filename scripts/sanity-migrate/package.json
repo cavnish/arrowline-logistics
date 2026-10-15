@@ -1,0 +1,16 @@
+{
+  "name": "arrowline-sanity-migrate",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Idempotent Supabase (CMS tables) → Sanity content migration for Arrowline Logistics.",
+  "type": "module",
+  "scripts": {
+    "export": "node migrate.mjs --export",
+    "dry-run": "node migrate.mjs",
+    "write": "node migrate.mjs --write"
+  },
+  "dependencies": {
+    "@sanity/client": "^6.22.0",
+    "@supabase/supabase-js": "^2.47.0"
+  }
+}

@@ -2,6 +2,13 @@
 node_modules/
 dist/
 
+# --- Next.js ---
+.next/
+next-env.d.ts
+
+# --- Migration dumps (may contain production content) ---
+scripts/sanity-migrate/dump/
+
 # --- Environment files (never commit real values) ---
 .env
 .env.*

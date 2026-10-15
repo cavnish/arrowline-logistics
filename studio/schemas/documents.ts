@@ -58,7 +58,11 @@ export const service = defineType({
     defineField({ name: "aboutBody", title: "About body", type: "text", rows: 4 }),
     defineField({ name: "aboutImage", title: "About image", type: "mediaImage" }),
     defineField({ name: "processSteps", title: "Process steps", type: "array", of: [defineArrayMember({ type: "processStep" })] }),
+    defineField({ name: "showcaseHeading", title: "Showcase heading", type: "string" }),
+    defineField({ name: "showcaseDescription", title: "Showcase description", type: "text", rows: 2 }),
     defineField({ name: "showcase", title: "Visual showcase", type: "array", of: [defineArrayMember({ type: "showcaseItem" })] }),
+    defineField({ name: "cargoHeading", title: "Cargo heading", type: "string" }),
+    defineField({ name: "cargoDescription", title: "Cargo description", type: "text", rows: 2 }),
     defineField({ name: "cargoApplications", title: "Cargo & applications", type: "array", of: [defineArrayMember({ type: "cargoApplication" })] }),
     defineField({ name: "faqs", title: "FAQs", type: "array", of: [defineArrayMember({ type: "faqItem" })] }),
     defineField({
