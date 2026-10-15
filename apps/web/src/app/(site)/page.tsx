@@ -4,6 +4,7 @@ import Hero from "@/components/Hero";
 import ServiceCard from "@/components/ServiceCard";
 import TestimonialCard from "@/components/TestimonialCard";
 import FaqList from "@/components/FaqList";
+import TransitTimeEstimator from "@/components/estimator/TransitTimeEstimator";
 import { sanityFetch } from "@/lib/sanity/client";
 import { faqsQuery, homePageQuery, servicesQuery, testimonialsQuery } from "@/lib/sanity/queries";
 import { buildMetadata } from "@/lib/seo";
@@ -81,6 +82,8 @@ export default async function HomePage() {
           </p>
         )}
       </section>
+
+      <TransitTimeEstimator variant="section" />
 
       {testimonials && testimonials.length > 0 && (
         <section className="bg-cream py-16">

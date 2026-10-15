@@ -12,6 +12,7 @@ const FALLBACK_NAV = [
   { label: "Industries", href: "/industries" },
   { label: "About", href: "/about" },
   { label: "Gallery", href: "/gallery" },
+  { label: "Transit Estimator", href: "/transit-time-estimator" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];

@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import QuoteModal from "@/components/QuoteModal";
 
 export const revalidate = 300;
 
@@ -21,6 +22,8 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
         {children}
       </main>
       <Footer navigation={navigation} settings={settings} />
+      {/* Global quote dialog opened by the estimator's "Get Exact Quote" CTA. */}
+      <QuoteModal />
     </div>
   );
 }

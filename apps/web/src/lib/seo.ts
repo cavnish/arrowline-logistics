@@ -16,11 +16,13 @@ export function buildMetadata({
   fallbackTitle,
   fallbackDescription,
   path,
+  keywords,
 }: {
   seo?: SeoFields | null;
   fallbackTitle?: string;
   fallbackDescription?: string;
   path?: string;
+  keywords?: string[];
 }): Metadata {
   const title = seo?.title || fallbackTitle || DEFAULT_TITLE;
   const description = seo?.description || fallbackDescription || DEFAULT_DESCRIPTION;
@@ -30,7 +32,7 @@ export function buildMetadata({
   return {
     title,
     description,
-    keywords: seo?.keywords || undefined,
+    keywords: seo?.keywords || (keywords && keywords.length ? keywords : undefined),
     alternates: { canonical },
     robots: seo?.noIndex ? { index: false, follow: true } : { index: true, follow: true },
     openGraph: {

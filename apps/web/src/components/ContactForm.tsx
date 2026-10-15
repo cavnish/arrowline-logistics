@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Loader2, ShieldCheck } from "lucide-react";
 
 import { apiUrl } from "@/lib/api";
+import type { QuotePrefill } from "@/lib/estimator/quoteBus";
 
 const SERVICES = [
   "Container Transportation",
@@ -37,11 +38,29 @@ const EMPTY: FormState = {
   honeypot: "",
 };
 
-export default function ContactForm({ formHeading }: { formHeading?: string | null }) {
+export default function ContactForm({
+  formHeading,
+  prefill,
+  onCancel,
+}: {
+  formHeading?: string | null;
+  prefill?: QuotePrefill | null;
+  onCancel?: () => void;
+}) {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [submitting, setSubmitting] = useState(false);
   const [reference, setReference] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Apply a pre-filled service/message (e.g. routed in by the Transit Time Estimator).
+  useEffect(() => {
+    if (!prefill) return;
+    setForm((prev) => ({
+      ...prev,
+      service: prefill.service || prev.service,
+      message: prefill.message || prev.message,
+    }));
+  }, [prefill]);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -93,12 +112,25 @@ export default function ContactForm({ formHeading }: { formHeading?: string | nu
         <p className="mt-1 text-sm text-slate-600">
           Your reference number is <strong>{reference}</strong>. Our routing team will respond within 2 hours.
         </p>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="mt-4 rounded-xl border border-emerald-300 px-4 py-2 text-xs font-black uppercase tracking-wide text-navy hover:bg-emerald-100"
+          >
+            Close
+          </button>
+        )}
       </div>
     );
   }
 
   const inputClass =
     "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-navy outline-none focus:border-orange focus:ring-2 focus:ring-orange/20";
+
+  // Keep a pre-filled service selectable even when it isn't in the base list.
+  const serviceOptions =
+    prefill?.service && !SERVICES.includes(prefill.service) ? [...SERVICES, prefill.service] : SERVICES;
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
@@ -127,7 +159,7 @@ export default function ContactForm({ formHeading }: { formHeading?: string | nu
         <span className="mb-1 block text-xs font-bold uppercase tracking-wide text-slate-500">Service *</span>
         <select className={inputClass} value={form.service} onChange={(e) => update("service", e.target.value)} required>
           <option value="">Select a service</option>
-          {SERVICES.map((service) => (
+          {serviceOptions.map((service) => (
             <option key={service} value={service}>
               {service}
             </option>
