@@ -6,10 +6,9 @@ import {
   Truck,
   Quote,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import { useRef, useState, useEffect } from "react";
 import { getOptimizedImageUrl } from "../utils/imageUrl";
-import { apiUrl } from "../lib/api";
+import { SNAPSHOT_TESTIMONIALS } from "../data/snapshot";
 import Reveal from "./Reveal";
 
 interface Testimonial {
@@ -124,86 +123,33 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-function formatRelativeTime(value: string | null | undefined): string {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months} month${months === 1 ? "" : "s"} ago`;
-  const years = Math.floor(months / 12);
-  return `${years} year${years === 1 ? "" : "s"} ago`;
-}
-
-interface ApiRecord {
-  id: string;
-  customer_name?: string;
-  company?: string;
-  position?: string;
-  testimonial?: string;
-  photo?: string | null;
-  rating?: number | null;
-  is_verified?: boolean;
-  created_at?: string;
-}
-
-function mapRecord(record: ApiRecord): Testimonial {
-  const name = record.customer_name || "Customer";
-  return {
-    id: String(record.id),
-    name,
-    role: record.position || "",
-    company: record.company || "",
-    message: record.testimonial || "",
-    time: formatRelativeTime(record.created_at) || "Verified review",
-    initial: getInitials(name),
-    avatarColor: getAvatarColor(name),
-    photo: record.photo || undefined,
-    rating: Math.max(1, Math.min(5, Number(record.rating) || 5)),
-    isVerified: record.is_verified !== false,
-  };
-}
-
 export default function TestimonialsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(fallbackTestimonials);
+  const [testimonials] = useState<Testimonial[]>(() =>
+    SNAPSHOT_TESTIMONIALS.length > 0
+      ? SNAPSHOT_TESTIMONIALS.map((item) => ({
+          id: item.id,
+          name: item.clientName,
+          role: item.role,
+          company: item.company,
+          message: item.comment,
+          time: "Verified client",
+          initial: getInitials(item.clientName),
+          avatarColor: getAvatarColor(item.clientName),
+          photo: item.avatar || undefined,
+          rating: item.rating || 5,
+          isVerified: true,
+        }))
+      : fallbackTestimonials
+  );
   const [visibleCards, setVisibleCards] = useState(3);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
 
-  /*
-   * FETCH CMS TESTIMONIALS
-   *
-   * API data wins. The hardcoded list above is only used when the
-   * backend is unreachable.
-   */
-  useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      try {
-        const response = await axios.get(apiUrl("/api/testimonials"));
-        if (!mounted) return;
-        if (response.data?.success && Array.isArray(response.data.data) && response.data.data.length > 0) {
-          setTestimonials(response.data.data.map(mapRecord));
-          setCurrentIndex(0);
-        }
-      } catch (error) {
-        console.error("Error fetching testimonials:", error);
-      }
-    };
-    load();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  /* Static-first: testimonials embedded at build time; no runtime API dependency. */
+  // The backend remains available for admin updates; published changes
+  // are reflected after the next build/deploy.
 
   /*
    * RESPONSIVE CARD COUNT

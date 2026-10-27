@@ -782,6 +782,11 @@ app.use("/api/admin", adminRouter);
 // FRONTEND (production build hosted alongside the API)
 // =====================================================
 
+// Canonical entry point for the services hub.
+app.get(["/services", "/services/"], (_req, res) => {
+  res.redirect(308, "/services/road-transportation");
+});
+
 if (hasDist) {
   app.use(
     express.static(distDir, {
@@ -794,10 +799,41 @@ if (hasDist) {
     })
   );
 
+  // Resolve a prerendered directory index without allowing path traversal.
+  const resolvePrerenderedFile = (requestPath) => {
+    let pathname;
+    try {
+      pathname = decodeURIComponent(requestPath);
+    } catch {
+      return null;
+    }
+    if (pathname.includes("\0")) return null;
+
+    const relative = pathname.replace(/^\/+/, "");
+    const candidates = relative
+      ? [
+          path.join(distDir, relative, "index.html"),
+          path.join(distDir, `${relative}.html`),
+        ]
+      : [path.join(distDir, "index.html")];
+
+    for (const candidate of candidates) {
+      const resolved = path.resolve(candidate);
+      if (resolved !== distDir && !resolved.startsWith(`${distDir}${path.sep}`)) continue;
+      try {
+        if (fs.statSync(resolved).isFile()) return resolved;
+      } catch {
+        // Try the next candidate.
+      }
+    }
+    return null;
+  };
+
   app.get("*", (req, res, next) => {
     if (req.path.startsWith("/api/")) return next();
     res.setHeader("Cache-Control", "no-cache");
-    res.sendFile(path.join(distDir, "index.html"));
+    const file = resolvePrerenderedFile(req.path);
+    return res.sendFile(file || path.join(distDir, "index.html"));
   });
 }
 

@@ -63,6 +63,7 @@ function toEndpoint(place: MapPlace): EstimateEndpoint {
 export default function TransitTimeEstimator({
   variant = "page",
 }: TransitTimeEstimatorProps) {
+  const hasGoogleMapsKey = Boolean(import.meta.env.VITE_GOOGLE_MAPS_API_KEY?.trim());
   const [from, setFrom] = useState<MapPlace | null>(defaultOrigin);
   const [to, setTo] = useState<MapPlace | null>(null);
   const [vehicle, setVehicle] = useState<VehicleKey>("ftl");
@@ -353,7 +354,7 @@ export default function TransitTimeEstimator({
             {busy ? (
               <>
                 <Loader2 className="animate-spin w-4 h-4" />
-                <span>Routing via Google Maps…</span>
+                <span>{hasGoogleMapsKey ? "Routing via Google Maps…" : "Calculating hub estimate…"}</span>
               </>
             ) : (
               <>
@@ -401,7 +402,7 @@ export default function TransitTimeEstimator({
                     {route?.distanceText || `${estimate.roadDistanceKm.toLocaleString("en-IN")} km`}
                   </span>
                   <span className="block text-[9.5px] text-slate-500 mt-0.5">
-                    Google route · straight line ≈ {estimate.straightLineKm.toLocaleString("en-IN")} km
+                    {route ? "Google route" : "Offline network estimate"} · straight line ≈ {estimate.straightLineKm.toLocaleString("en-IN")} km
                   </span>
                 </div>
 
@@ -445,7 +446,15 @@ export default function TransitTimeEstimator({
             )}
 
             {/* Real Google Map */}
-            <RouteMap origin={from} destination={to} route={route} busy={busy} />
+            {phase !== "idle" && (
+              <RouteMap
+                origin={from}
+                destination={to}
+                route={route}
+                busy={busy}
+                showOfflineFallback={fallbackActive}
+              />
+            )}
 
             {/* Route summary + CTA — below the map */}
             {phase === "result" && estimate && (
@@ -501,23 +510,24 @@ export default function TransitTimeEstimator({
       <section className="py-12 sm:py-14 lg:py-16 bg-[#F5F8FA]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-4 lg:pt-6 space-y-4">
+            <div className="lg:col-span-4 space-y-4">
               <span className="text-[10px] font-extrabold uppercase tracking-[0.24em] text-[#FF7A00] block">
-                Transit Planning Tool · Live Google Routing
+                Transit Planning Tool · {hasGoogleMapsKey ? "Live Google Routing" : "Offline Hub Estimates"}
               </span>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#062B3A] tracking-tight leading-tight">
                 Plan your lane in{" "}
                 <span className="text-[#FF7A00]">seconds</span>
               </h2>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Pick any two Indian locations and a vehicle class — Google Maps
-                plots the real driving route, and we translate distance and drive
-                time into a delivery window calibrated to our Mundra Port dispatch
-                model. Then hand the route to our desk for a binding tariff.
+                {hasGoogleMapsKey
+                  ? "Pick any two Indian locations and a vehicle class. Google Maps plots the driving route, and we turn distance and drive time into a delivery window calibrated to our Mundra Port dispatch model. Send the route to our desk for a binding tariff."
+                  : "Choose two locations from Arrowline’s Indian hub network and a vehicle class. Get an offline distance and delivery-window estimate calibrated to our Mundra Port dispatch model, then send the route to our desk for a binding tariff."}
               </p>
               <ul className="space-y-2 pt-1">
                 {[
-                  "Live Google Maps routes between any two Indian locations",
+                  hasGoogleMapsKey
+                    ? "Live Google Maps routes between any two Indian locations"
+                    : "Offline route estimates across Arrowline’s Indian hub network",
                   "Vehicle-aware speeds for containers, FTL, trailers, ODC & project cargo",
                   "One tap pre-fills your quote request with the full route summary",
                 ].map((point) => (

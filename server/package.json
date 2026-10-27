@@ -1,7 +1,7 @@
 {
   "name": "arrowline-logistics-server",
   "version": "1.0.0",
-  "description": "Backend API for Arrowline Logistics - collects customer inquiries in MongoDB and sends email notifications.",
+  "description": "Backend API for Arrowline Logistics - admin content, media uploads, lead capture and email notifications.",
   "main": "index.js",
   "type": "module",
   "scripts": {

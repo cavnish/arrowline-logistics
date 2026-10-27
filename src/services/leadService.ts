@@ -48,7 +48,8 @@ export async function submitLead(payload: LeadPayload): Promise<LeadResponse> {
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12000);
+  // Render may need several seconds to wake a sleeping instance.
+  const timeout = setTimeout(() => controller.abort(), 60000);
 
   try {
     const response = await fetch(apiUrl("/api/lead"), {
@@ -70,6 +71,18 @@ export async function submitLead(payload: LeadPayload): Promise<LeadResponse> {
       emailSent: data.emailSent === true,
       message: data.message,
     };
+  } catch (error) {
+    if (error instanceof TypeError && error.message === "Failed to fetch") {
+      throw new Error(
+        "We couldn't connect to the quote service. Please try again in a moment, or contact our logistics desk directly."
+      );
+    }
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error(
+        "The quote service is taking longer than expected. Please try again shortly."
+      );
+    }
+    throw error;
   } finally {
     clearTimeout(timeout);
   }

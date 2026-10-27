@@ -1,91 +1,10 @@
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { getOptimizedImageUrl } from "../utils/imageUrl";
-import { apiUrl } from "../lib/api";
+import { Anchor } from "lucide-react";
+import { CLIENT_LOGOS } from "../data/logisticsData";
 import Reveal from "./Reveal";
 
-interface TrustedPartner {
-  id: string;
-  name: string;
-  logo: string | null;
-  logo_alt: string | null;
-}
-
-async function fetchTrustedNetwork(): Promise<TrustedPartner[]> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
-  try {
-    const response = await fetch(apiUrl("/api/trusted-network"), {
-      method: "GET",
-      headers: { Accept: "application/json" },
-      signal: controller.signal,
-    });
-    if (!response.ok) {
-      throw new Error(`API request failed (${response.status})`);
-    }
-    const body = await response.json();
-    return Array.isArray(body?.data) ? (body.data as TrustedPartner[]) : [];
-  } catch (error) {
-    console.error("Trusted network fetch error:", error);
-    return [];
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-function PartnerCard({ partner }: { partner: TrustedPartner }) {
-  const [imageError, setImageError] = useState(false);
-  const alt = partner.logo_alt || `${partner.name} logo`;
-
-  if (!partner.logo || imageError) {
-    return null;
-  }
-
-  return (
-    <div
-      className="flex h-14 w-[120px] shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white p-2.5 transition-colors duration-200 hover:bg-slate-50 sm:h-16 sm:w-[140px]"
-      aria-label={`${partner.name} logo`}
-    >
-      <img
-        src={getOptimizedImageUrl(partner.logo, { width: 240 })}
-        alt={alt}
-        loading="lazy"
-        decoding="async"
-        onError={() => setImageError(true)}
-        className="max-h-full max-w-full object-contain"
-      />
-    </div>
-  );
-}
-
-function SkeletonTile() {
-  return (
-    <div className="h-14 w-[120px] shrink-0 animate-pulse rounded-lg border border-slate-200 bg-slate-100 sm:h-16 sm:w-[140px]" />
-  );
-}
-
 export default function TrustStrip() {
-  const [partners, setPartners] = useState<TrustedPartner[] | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    fetchTrustedNetwork().then((data) => {
-      if (mounted) setPartners(data);
-    });
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const loaded = partners !== null;
-  const list = (partners ?? []).filter((partner) => Boolean(partner.logo));
-
-  if (loaded && list.length === 0) {
-    return null;
-  }
-
-  const skeletonCount = 8;
-  const marqueeItems = loaded ? [...list, ...list] : [];
+  const logos = [...CLIENT_LOGOS, ...CLIENT_LOGOS];
 
   return (
     <section
@@ -93,13 +12,8 @@ export default function TrustStrip() {
       aria-labelledby="trust-heading"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
         {/* Header */}
         <Reveal delay={60}>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#FF6B1A]">
-            Our Trusted Network
-          </p>
-
           <h2
             id="trust-heading"
             className="mt-1 text-lg font-bold tracking-tight text-[#1E3A8A] sm:text-xl"
@@ -118,27 +32,39 @@ export default function TrustStrip() {
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-white to-transparent sm:w-20" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-white to-transparent sm:w-20" />
 
-        {!loaded ? (
-          <div className="flex w-max gap-3 px-3 sm:gap-4">
-            {Array.from({ length: skeletonCount }).map((_, index) => (
-              <SkeletonTile key={index} />
-            ))}
-          </div>
-        ) : (
-          <motion.div
-            className="flex w-max gap-3 px-3 sm:gap-4"
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{
-              duration: 35,
-              ease: "linear",
-              repeat: Infinity,
-            }}
-          >
-            {marqueeItems.map((partner, index) => (
-              <PartnerCard key={`${partner.id}-${index}`} partner={partner} />
-            ))}
-          </motion.div>
-        )}
+        <motion.div
+          className="flex w-max gap-3 px-3 sm:gap-4"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{
+            duration: 35,
+            ease: "linear",
+            repeat: Infinity,
+          }}
+        >
+          {logos.map((client, index) => (
+            <div
+              key={`${client.logoType}-${index}`}
+              className="
+                flex h-14 w-[140px] shrink-0 items-center justify-center
+                overflow-hidden rounded-lg border border-slate-200
+                bg-white p-2 transition-colors duration-200
+                hover:bg-slate-50 sm:h-16 sm:w-[160px] sm:p-2.5
+              "
+            >
+              {client.logo ? (
+                <img
+                  src={client.logo}
+                  alt={`${client.name} logo`}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-full w-full object-contain"
+                />
+              ) : (
+                <Anchor aria-hidden="true" className="h-8 w-8 text-[#FF6B1A]" />
+              )}
+            </div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

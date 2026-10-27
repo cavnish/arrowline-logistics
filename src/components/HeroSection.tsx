@@ -18,7 +18,9 @@ const HERO_IMAGE_FALLBACK =
 
 export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSectionProps) {
   const content = useSiteContent();
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(
+    () => typeof window === "undefined"
+  );
   const [activeService, setActiveService] = useState(0);
   const [videoModal, setVideoModal] = useState(false);
 

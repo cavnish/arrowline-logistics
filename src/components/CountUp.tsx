@@ -20,7 +20,9 @@ export default function CountUp({
   className,
 }: CountUpProps) {
   const { ref, isVisible } = useScrollReveal<HTMLSpanElement>();
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(
+    () => (typeof window === "undefined" ? end : 0)
+  );
 
   useEffect(() => {
     if (!isVisible) return;

@@ -123,9 +123,15 @@ function NotFoundView({
   );
 }
 
-export default function App() {
+export default function App({
+  initialPage,
+  ssr = false,
+}: {
+  initialPage?: string;
+  ssr?: boolean;
+} = {}) {
   const [activePage, setActivePage] =
-    useState<string>("home");
+    useState<string>(initialPage || "home");
 
   const [
     isGlobalQuoteOpen,
@@ -147,7 +153,7 @@ export default function App() {
   const [
     isAdminRoute,
     setIsAdminRoute,
-  ] = useState(false);
+  ] = useState(initialPage === "admin");
 
   const [
     globalQuotePrefill,
@@ -162,9 +168,13 @@ export default function App() {
   const [
     showLoader,
     setShowLoader,
-  ] = useState<boolean>(
-    () => routeFromUrl() !== "admin"
-  );
+  ] = useState<boolean>(() => {
+    if (ssr || typeof window === "undefined") return false;
+    // Prerendered pages already contain real content and must be readable
+    // before JS executes; never cover them with a boot loader.
+    if ((window as any).__ARROWLINE_PRERENDERED__) return false;
+    return routeFromUrl() !== "admin";
+  });
 
   // Admin-editable site content. Overrides static defaults (e.g. the
   // WhatsApp number on the floating button) when configured in Admin > Content.
@@ -541,7 +551,7 @@ export default function App() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activePage}
-              initial={{ opacity: 0, y: 10 }}
+              initial={ssr ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -575,7 +585,7 @@ export default function App() {
 
       {/* COOKIE CONSENT (public site only) */}
 
-      {!isAdminRoute && (
+      {!ssr && !isAdminRoute && (
         <CookieConsent
         />
       )}

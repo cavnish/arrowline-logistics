@@ -1,5 +1,9 @@
 import "dotenv/config";
 
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import express from "express";
 import cookieParser from "cookie-parser";
 import multer from "multer";
@@ -13,6 +17,8 @@ import {
   generateAdminToken,
   isAllowedAdminEmail,
 } from "../middleware/adminAuth.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const router = express.Router();
 
@@ -2139,6 +2145,145 @@ router.delete("/cargo-applications/:id", requireAdmin, async (req, res) => {
   } catch (err) {
     console.error("Admin delete cargo-application exception:", err);
     return res.status(500).json({ success: false, message: "Failed to delete cargo application" });
+  }
+});
+
+// =====================================================
+// PUBLISHING (Vercel Deploy Hook)
+// POST /api/admin/publish
+// GET  /api/admin/publish/status
+//
+// Publishing is deliberately server-side only:
+//  - the caller must have a valid admin session (requireAdmin);
+//  - the deploy hook URL lives in VERCEL_DEPLOY_HOOK_URL and is never sent
+//    to the browser;
+//  - a short cooldown stops accidental double-clicks from queueing builds.
+// The build itself re-exports published Supabase rows in strict mode, so a
+// failed export fails the deployment and the previous static version stays
+// live.
+// =====================================================
+
+const PUBLISH_COOLDOWN_MS = 60 * 1000;
+const PUBLIC_SITE_URL = (process.env.PUBLIC_SITE_URL || "https://arrowlinelogistics.in").replace(/\/+$/, "");
+const VERSION_CACHE_MS = 15 * 1000;
+let lastPublish = null;
+let versionCache = { at: 0, value: null };
+
+async function readDeployedContentVersion() {
+  // Self-hosted deployments (Express serving dist/) can read the marker
+  // directly. The standard Vercel + Render split does not share a filesystem,
+  // so fall back to the public marker and cache it briefly.
+  try {
+    const file = path.join(__dirname, "..", "..", "dist", "content-version.json");
+    if (fs.existsSync(file)) {
+      return JSON.parse(fs.readFileSync(file, "utf8"));
+    }
+  } catch {
+    // Fall through to the public marker.
+  }
+
+  if (versionCache.value && Date.now() - versionCache.at < VERSION_CACHE_MS) {
+    return versionCache.value;
+  }
+  try {
+    const response = await fetch(`${PUBLIC_SITE_URL}/content-version.json`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(2_500),
+    });
+    if (!response.ok) return versionCache.value;
+    const value = await response.json();
+    versionCache = { at: Date.now(), value };
+    return value;
+  } catch {
+    return versionCache.value;
+  }
+}
+
+async function publishStatus() {
+  return {
+    configured: Boolean(process.env.VERCEL_DEPLOY_HOOK_URL),
+    lastTriggeredAt: lastPublish?.at || null,
+    lastTriggeredBy: lastPublish?.by || null,
+    deployedContentVersion: await readDeployedContentVersion(),
+  };
+}
+
+router.get("/publish/status", requireAdmin, async (_req, res) => {
+  return res.json({ success: true, data: await publishStatus() });
+});
+
+router.post("/publish", requireAdmin, async (req, res) => {
+  const hookUrl = process.env.VERCEL_DEPLOY_HOOK_URL;
+  if (!hookUrl) {
+    return res.status(503).json({
+      success: false,
+      message: "Publishing is not configured. Set VERCEL_DEPLOY_HOOK_URL on the server.",
+    });
+  }
+
+  const now = Date.now();
+  if (lastPublish && now - lastPublish.at < PUBLISH_COOLDOWN_MS) {
+    const retryAfter = Math.ceil((PUBLISH_COOLDOWN_MS - (now - lastPublish.at)) / 1000);
+    res.setHeader("Retry-After", String(retryAfter));
+    return res.status(429).json({
+      success: false,
+      message: `A publish was triggered moments ago. Try again in ${retryAfter}s.`,
+      retryAfter,
+    });
+  }
+
+  const reason = String(req.body?.reason || "").trim().slice(0, 300);
+
+  try {
+    const response = await fetch(hookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        source: "arrowline-admin",
+        requestedBy: req.admin?.email || "admin",
+        reason: reason || undefined,
+        requestedAt: new Date(now).toISOString(),
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
+
+    const text = await response.text().catch(() => "");
+    if (!response.ok) {
+      console.error(`Publish hook failed: HTTP ${response.status} ${text.slice(0, 300)}`);
+      return res.status(502).json({
+        success: false,
+        message: `The deploy hook rejected the request (HTTP ${response.status}).`,
+      });
+    }
+
+    let payload = null;
+    try {
+      payload = text ? JSON.parse(text) : null;
+    } catch {
+      payload = null;
+    }
+
+    lastPublish = { at: now, by: req.admin?.email || "admin" };
+    console.log(`[publish] Deploy triggered by ${lastPublish.by}${reason ? `: ${reason}` : ""}`);
+
+    return res.status(202).json({
+      success: true,
+      message: "Deployment triggered. The current version stays live until the new build succeeds.",
+      data: {
+        triggeredAt: new Date(now).toISOString(),
+        job: payload?.job || null,
+        deployedContentVersion: await readDeployedContentVersion(),
+      },
+    });
+  } catch (error) {
+    console.error("Publish trigger failed:", error?.message || error);
+    return res.status(502).json({
+      success: false,
+      message:
+        error?.name === "TimeoutError"
+          ? "The deploy hook did not respond in time. Check the Vercel dashboard."
+          : "Unable to reach the deploy hook.",
+    });
   }
 });
 

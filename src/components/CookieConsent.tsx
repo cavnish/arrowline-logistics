@@ -20,6 +20,7 @@ const DEFAULT_PREFS: ConsentState = {
 
 function loadStoredConsent(): ConsentState | null {
   try {
+    if (typeof window === "undefined") return null;
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as ConsentState;

@@ -1,226 +1,84 @@
-# 🚛 Arrowline Logistics — Backend API
+# Arrowline Logistics — Backend API
 
-Production-ready Node.js + Express server that **stores customer inquiries in MongoDB** and **sends professional email notifications** (both to the internal Arrowline team and an acknowledgement to the customer).
+Express service for the Arrowline Logistics admin panel, lead capture, media
+uploads and deploy publishing. The public marketing site is rendered as a
+static build and does **not** call these content APIs at visitor request time.
 
----
+## Runtime
 
-## ✨ Features
+- Node.js 20+ (ES modules)
+- Supabase Postgres (service-role access, server only)
+- Resend (lead notification email)
+- Cloudinary (admin image/video uploads)
 
-- ✅ `POST /api/lead` — validates and stores inquiries in MongoDB
-- ✅ Sends beautifully formatted HTML email to the Arrowline team
-- ✅ Sends acknowledgement email to the customer with reference number
-- ✅ Rate limiting (20 inquiries per IP per hour)
-- ✅ CORS-locked to allowed origins
-- ✅ Input validation & sanitisation
-- ✅ Health check endpoint at `/health`
-- ✅ Admin endpoint `GET /api/leads` (protected by API key)
-- ✅ Handles email failures gracefully — inquiry still saved to DB
-
----
-
-## 🚀 Quick Start (Local Development)
-
-### 1. Install dependencies
+## Local development
 
 ```bash
 cd server
 npm install
+cp .env.example .env   # fill in real values
+npm run dev            # node --watch index.js
 ```
 
-### 2. Set up MongoDB
+Deploy on Render with `render.yaml` (root directory `server`, health check
+`/health`). The Vite frontend deploys separately on Vercel and reaches this API
+through `VITE_API_URL`.
 
-**Option A — Local MongoDB:**
-```bash
-# Install MongoDB Community Edition and start it:
-mongod --dbpath /path/to/data
-```
-Your URI will be: `mongodb://localhost:27017/arrowline`
+## Endpoints
 
-**Option B — MongoDB Atlas (recommended for production):**
-1. Go to [mongodb.com/atlas](https://www.mongodb.com/atlas), create a free cluster
-2. Add a database user + whitelist your IP (or `0.0.0.0/0` for anywhere)
-3. Copy the connection string — it looks like:
-   ```
-   mongodb+srv://<user>:<pass>@cluster.xxx.mongodb.net/arrowline?retryWrites=true&w=majority
-   ```
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/health` | Configuration/uptime check |
+| POST | `/api/lead` | Validated inquiry, stored in Supabase, emailed via Resend |
+| POST | `/api/admin/login` | Supabase Auth sign-in, sets httpOnly `admin_token` cookie |
+| POST | `/api/admin/logout` | Revokes the server-side session |
+| GET | `/api/admin/me` | Current admin identity |
+| GET/POST/PUT/DELETE | `/api/admin/*` | Content CRUD, media library, settings |
+| GET | `/api/admin/publish/status` | Whether publishing is configured and last trigger |
+| POST | `/api/admin/publish` | Admin-only Vercel Deploy Hook trigger |
 
-### 3. Set up SMTP for email
+Public `/api/content`, `/api/services`, `/api/faqs`, `/api/about`, etc. remain
+available as read-only endpoints, but the static frontend no longer depends on
+them.
 
-**Recommended: Gmail with App Password**
-1. Enable **2-Step Verification** on your Google account
-2. Go to [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
-3. Generate a new App Password (16 characters, no spaces)
-4. Use it as `SMTP_PASS` in `.env`
+## Environment
 
-**Alternative providers:**
-- **Zoho Mail** (`smtp.zoho.in`, port 587) — for `@arrowlinelogistics.in`
-- **SendGrid**, **Mailgun**, **AWS SES** — for high volume
-- **Google Workspace** — same as Gmail
+Copy `.env.example` to `.env`. Key groups:
 
-### 4. Create `.env`
+- **Supabase:** `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+- **Admin auth:** `ADMIN_API_KEY` (JWT signing secret, 32+ chars),
+  `ADMIN_EMAIL`, optional `ADMIN_EMAILS`
+- **Email:** `RESEND_API_KEY`, `RESEND_FROM_EMAIL`,
+  `LEAD_NOTIFICATION_EMAIL` (legacy `FROM_EMAIL` / `NOTIFY_EMAILS` supported)
+- **Media:** `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`,
+  `CLOUDINARY_API_SECRET`
+- **CORS:** `CORS_ORIGIN` (comma-separated origins, no trailing slash)
+- **Publishing:** `VERCEL_DEPLOY_HOOK_URL` (server only; never exposed to the
+  browser), optional `PUBLIC_SITE_URL` (defaults to
+  `https://arrowlinelogistics.in`, used to read the deployed
+  `content-version.json`)
 
-```bash
-cp .env.example .env
-```
+Optional diagnostic-only variables (`SUPABASE_PROJECT_REF`,
+`SUPABASE_DB_PASSWORD`, `DATABASE_URL`) are used by scripts under
+`server/scripts/`, not by the running API.
 
-Then edit `.env` and fill in:
-- `MONGODB_URI` — your MongoDB connection string
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` — your email credentials
-- `NOTIFY_EMAILS` — comma-separated list of team emails (e.g. `mundra@arrowlinelogistics.in,vinay@arrowlinelogistics.in`)
-- `CORS_ORIGIN` — your frontend URL (e.g. `http://localhost:5173,https://www.arrowlinelogistics.in`)
+Never put backend secrets in root `.env` or any `VITE_*` variable — those are
+bundled into the public site.
 
-### 5. Run the server
+## Publishing flow
 
-```bash
-npm run dev     # with auto-reload
-# or
-npm start       # production
-```
+1. An authenticated admin edits content at `/arrowline-admin`.
+2. The admin clicks **Publish**; the browser calls `POST /api/admin/publish`.
+3. This server calls the Vercel Deploy Hook. The hook URL never leaves the
+   server.
+4. The Vercel build runs with `CONTENT_EXPORT_STRICT=1`, re-exports published
+   Supabase rows, and fails without replacing the previous deployment if the
+   export is unavailable or invalid.
 
-You should see:
-```
-✅ Connected to MongoDB
-🚛 Arrowline API running on http://localhost:5000
-```
+## Notes
 
-### 6. Configure the frontend
-
-In the **root** of the React project (not `server/`), create a `.env` file:
-
-```env
-VITE_API_URL=http://localhost:5000
-```
-
-Restart the Vite dev server. Now every contact form submission on the site will:
-1. `POST` to `http://localhost:5000/api/lead`
-2. Store the inquiry in your MongoDB `leads` collection
-3. Send an HTML email to your team
-4. Send an acknowledgement email to the customer
-5. Return a reference number back to the frontend
-
----
-
-## 📮 Testing the API
-
-```bash
-curl -X POST http://localhost:5000/api/lead \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Test Client",
-    "company": "Test Corp Pvt Ltd",
-    "email": "test@example.com",
-    "phone": "+91 9876543210",
-    "service": "Road Transport (FTL Services)",
-    "message": "20 ft container from Mundra to Delhi NCR."
-  }'
-```
-
-Expected response:
-```json
-{
-  "ok": true,
-  "referenceNumber": "ALQ-847293",
-  "storedInDatabase": true,
-  "emailSent": true,
-  "message": "Inquiry received. Our routing team will respond within 2 hours."
-}
-```
-
----
-
-## 🚢 Production Deployment
-
-### Recommended Stack
-| Component | Provider |
-|---|---|
-| API Hosting | **Render**, **Railway**, **Fly.io**, or **AWS EC2** |
-| Database | **MongoDB Atlas** (M0 free tier is enough to start) |
-| Email | **Zoho Mail** (free for custom domain), **SendGrid**, or **AWS SES** |
-| Domain | Point `api.arrowlinelogistics.in` to your API host |
-
-### Deploy to Render (easiest)
-1. Push this `server/` folder to a GitHub repo
-2. Go to [render.com](https://render.com), create a new **Web Service**
-3. Point it to your repo, set the build command to `npm install` and start command to `node index.js`
-4. Add all `.env` variables in the Environment section
-5. Deploy!
-
-### Deploy to Railway
-1. `npm install -g @railway/cli`
-2. `railway login && railway init && railway up`
-3. Add env vars in Railway dashboard
-
-### After Deploying
-- Update the frontend `.env`:
-  ```env
-  VITE_API_URL=https://api.arrowlinelogistics.in
-  ```
-- Rebuild the frontend: `npm run build`
-- Add `https://www.arrowlinelogistics.in` to `CORS_ORIGIN` in the server env
-
----
-
-## 🔐 Admin: View All Inquiries
-
-Add `ADMIN_API_KEY=<some-strong-random-string>` to your `.env`, then:
-
-```bash
-curl https://api.arrowlinelogistics.in/api/leads?limit=20 \
-  -H "x-api-key: <your-key>"
-```
-
-Returns JSON of all recent inquiries. Build a simple admin dashboard on top of this later if needed.
-
----
-
-## 📊 MongoDB Schema
-
-```js
-{
-  referenceNumber: "ALQ-847293",   // unique
-  name: "Test Client",
-  company: "Test Corp Pvt Ltd",
-  email: "test@example.com",       // indexed
-  phone: "+91 9876543210",
-  service: "Road Transport (FTL Services)",
-  message: "20 ft container from Mundra to Delhi NCR.",
-  status: "new",                   // new | contacted | quoted | won | lost
-  emailSent: true,
-  emailSentAt: ISODate("..."),
-  source: "website",
-  ipAddress: "203.0.113.45",
-  userAgent: "Mozilla/5.0 ...",
-  createdAt: ISODate("..."),
-  updatedAt: ISODate("...")
-}
-```
-
-Query examples:
-```js
-// Recent 10 inquiries
-db.leads.find().sort({createdAt: -1}).limit(10)
-
-// All "new" leads that haven't been contacted
-db.leads.find({status: "new"})
-
-// Leads for a specific service
-db.leads.find({service: /Coastal/})
-```
-
----
-
-## 🛠️ Troubleshooting
-
-| Problem | Fix |
-|---|---|
-| `MongoDB connection error` | Verify `MONGODB_URI` and network access rules in Atlas |
-| `SMTP authentication failed` | Use an **App Password**, not your regular Gmail password |
-| Emails go to spam | Set up **SPF + DKIM + DMARC** records for your domain |
-| CORS errors from frontend | Add your frontend URL to `CORS_ORIGIN` |
-| Rate limit hit | Adjust the `max` in `leadLimiter` in `index.js` |
-
----
-
-## 📝 License
-
-Proprietary © Arrowline Logistics Pvt Ltd.
+- Admin login uses Supabase Auth accounts; `ADMIN_EMAIL` must be a confirmed
+  user. Sessions are recorded in `public.admin_sessions` and can be revoked.
+- Lead submission is fail-safe: the browser shows an error when the backend is
+  unreachable and never pretends the inquiry was stored.
+- `GET /health` returns 503 until all required environment variables are set.

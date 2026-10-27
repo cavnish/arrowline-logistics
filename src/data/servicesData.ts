@@ -1,3 +1,13 @@
+import {
+  getSnapshotServiceCargo,
+  getSnapshotServiceFaqs,
+  getSnapshotServiceItemRows,
+  getSnapshotServiceProcessSteps,
+  getSnapshotServiceRows,
+  getSnapshotServiceShowcase,
+  type SnapshotRow,
+} from "./snapshot";
+
 export interface ProcessStepItem {
   step: string;
   title: string;
@@ -1915,21 +1925,370 @@ export const MAIN_SERVICES: MainServiceData[] = [
   },
 ];
 
+/* =========================================================================
+ * PUBLISHED SNAPSHOT MAPPING
+ *
+ * Supabase rows are published-only, exported at build time, and normalised
+ * here into the page shapes. The static arrays above remain the fallback for
+ * missing optional fields (and for a checkout without an exported snapshot).
+ * ========================================================================= */
+
+const DEFAULT_SERVICE_IMAGE =
+  "https://res.cloudinary.com/uorctww6/image/upload/v1789377038/arrowline/general/hero-logistics.jpg";
+
+function hasValue(value: unknown): boolean {
+  if (value === null || value === undefined) return false;
+  if (typeof value === "string") return value.trim() !== "";
+  if (Array.isArray(value)) return value.length > 0;
+  return true;
+}
+
+function firstValue<T>(...values: T[]): T | undefined {
+  return values.find((value) => hasValue(value));
+}
+
+function asArray<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : [];
+}
+
+function byDisplayOrder(a: SnapshotRow, b: SnapshotRow): number {
+  return Number(a.display_order ?? 0) - Number(b.display_order ?? 0);
+}
+
+function mapShowcaseRows(rows: SnapshotRow[], serviceName: string): GalleryMediaItem[] {
+  return rows
+    .filter((row) => hasValue(row.image_url))
+    .map((row) => ({
+      id: String(row.id),
+      url: String(row.image_url),
+      title: String(row.title || `${serviceName} operations`),
+      caption: row.caption ? String(row.caption) : undefined,
+      alt_text: row.alt_text ? String(row.alt_text) : undefined,
+    }));
+}
+
+function mapCargoRows(rows: SnapshotRow[]): ApplicationItem[] {
+  return rows
+    .filter((row) => hasValue(row.title))
+    .map((row) => ({
+      title: String(row.title),
+      desc: String(row.description || ""),
+      image: String(row.image_url || DEFAULT_SERVICE_IMAGE),
+    }));
+}
+
+function mapFaqRows(rows: SnapshotRow[]): FAQItemData[] {
+  return rows
+    .filter((row) => hasValue(row.question) && hasValue(row.answer))
+    .map((row) => ({ q: String(row.question), a: String(row.answer) }));
+}
+
+function mapStepRows(rows: SnapshotRow[]): ProcessStepItem[] {
+  return rows
+    .filter((row) => hasValue(row.title))
+    .map((row) => ({
+      step: String(row.step || ""),
+      title: String(row.title),
+      desc: String(row.description || ""),
+      icon: row.icon ? String(row.icon) : undefined,
+    }));
+}
+
+function buildMainService(record: SnapshotRow, fallback?: MainServiceData): MainServiceData {
+  const id = String(record.id);
+  const slug = String(record.slug);
+  const title = String(record.title || fallback?.title || "");
+  const serviceName = title;
+
+  const relationFaqs = mapFaqRows(
+    getSnapshotServiceFaqs()
+      .filter((row) => row.service_id === id && !row.service_item_id)
+      .sort(byDisplayOrder)
+  );
+  const relationSteps = mapStepRows(
+    getSnapshotServiceProcessSteps()
+      .filter((row) => row.service_id === id && !row.service_item_id)
+      .sort(byDisplayOrder)
+  );
+  const relationShowcase = mapShowcaseRows(
+    getSnapshotServiceShowcase()
+      .filter((row) => row.service_id === id)
+      .sort(byDisplayOrder),
+    serviceName
+  );
+  const relationCargo = mapCargoRows(
+    getSnapshotServiceCargo()
+      .filter((row) => row.service_id === id)
+      .sort(byDisplayOrder)
+  );
+
+  return {
+    id,
+    slug,
+    title,
+    shortDesc: String(firstValue(record.short_description, fallback?.shortDesc, "")),
+    category: String(firstValue(record.category, fallback?.category, "LOGISTICS VERTICAL")),
+    keyCapability: String(firstValue(record.key_capability, fallback?.keyCapability, "")),
+    heroBadge: String(firstValue(record.hero_badge, fallback?.heroBadge, "ARROWLINE CORE VERTICAL")),
+    heroHeadline: String(firstValue(record.hero_headline, fallback?.heroHeadline, title)),
+    heroSubheadline: String(
+      firstValue(record.hero_subheadline, record.short_description, fallback?.heroSubheadline, "")
+    ),
+    heroDescription: String(
+      firstValue(record.hero_description, record.full_description, fallback?.heroDescription, "")
+    ),
+    heroImage: String(firstValue(record.hero_image, fallback?.heroImage, DEFAULT_SERVICE_IMAGE)),
+    heroVideo: (firstValue(record.hero_video, fallback?.heroVideo) as string | undefined) || undefined,
+    heroFallbackImage:
+      (firstValue(record.hero_fallback_image, fallback?.heroFallbackImage) as string | undefined) ||
+      undefined,
+    imageAlt: String(firstValue(record.image_alt, fallback?.imageAlt, "")),
+    highlights: asArray<string>(firstValue(record.highlights, fallback?.highlights)),
+    aboutBadge: String(firstValue(record.about_badge, fallback?.aboutBadge, "ABOUT THIS SERVICE")),
+    aboutHeading: String(
+      firstValue(record.about_heading, fallback?.aboutHeading, `${title} Excellence`)
+    ),
+    aboutDescription: String(
+      firstValue(record.about_description, record.full_description, fallback?.aboutDescription, "")
+    ),
+    aboutBulletPoints: asArray<string>(
+      firstValue(record.about_bullet_points, fallback?.aboutBulletPoints)
+    ),
+    aboutImage: String(
+      firstValue(record.about_image, fallback?.aboutImage, record.hero_image, DEFAULT_SERVICE_IMAGE)
+    ),
+    whyArrowline: asArray<AdvantageItem>(firstValue(record.why_arrowline, fallback?.whyArrowline)),
+    processSteps: relationSteps.length > 0
+      ? relationSteps
+      : asArray<ProcessStepItem>(firstValue(record.process_steps, fallback?.processSteps)),
+    applications: relationCargo.length > 0
+      ? relationCargo
+      : asArray<ApplicationItem>(firstValue(record.applications, fallback?.applications)),
+    industries: asArray<string>(firstValue(record.industries, fallback?.industries)),
+    networkDescription: String(
+      firstValue(record.network_description, fallback?.networkDescription, "")
+    ),
+    faqs: relationFaqs.length > 0
+      ? relationFaqs
+      : asArray<FAQItemData>(firstValue(record.faqs, fallback?.faqs)),
+    gallery: relationShowcase.length > 0
+      ? relationShowcase
+      : asArray<GalleryMediaItem>(firstValue(record.gallery, fallback?.gallery)),
+    showcaseHeading:
+      (firstValue(record.showcase_heading, fallback?.showcaseHeading) as string | undefined) ||
+      `${title} in Action`,
+    showcaseDescription: String(
+      firstValue(
+        record.showcase_description,
+        fallback?.showcaseDescription,
+        "Real-world fleet operations, port handling, terminal staging, and heavy transport execution."
+      )
+    ),
+    cargoHeading:
+      (firstValue(record.cargo_heading, fallback?.cargoHeading) as string | undefined) ||
+      "What We Transport & Handle",
+    cargoDescription: String(
+      firstValue(
+        record.cargo_description,
+        fallback?.cargoDescription,
+        `Specialized handling protocols configured specifically for ${title.toLowerCase()} cargo profiles.`
+      )
+    ),
+    videoUrl: (firstValue(record.video_url, fallback?.videoUrl) as string | undefined) || undefined,
+    videoPoster:
+      (firstValue(record.video_poster, fallback?.videoPoster) as string | undefined) || undefined,
+    ctaHeadline: String(
+      firstValue(record.cta_headline, fallback?.ctaHeadline, "Ready to Streamline Your Freight?")
+    ),
+    seoTitle: String(
+      firstValue(record.seo_title, record.meta_title, fallback?.seoTitle, title)
+    ),
+    seoDesc: String(
+      firstValue(
+        record.seo_desc,
+        record.meta_description,
+        fallback?.seoDesc,
+        record.short_description,
+        ""
+      )
+    ),
+    canonicalUrl:
+      (firstValue(record.canonical_url, fallback?.canonicalUrl) as string | undefined) || undefined,
+    isPublished: record.is_published !== false,
+    displayOrder: Number(record.display_order ?? fallback?.displayOrder ?? 0),
+    subServices: [],
+  };
+}
+
+function buildSubService(
+  record: SnapshotRow,
+  parent: { slug: string; title: string },
+  fallback?: SubServiceData
+): SubServiceData {
+  const id = String(record.id);
+  const title = String(record.title || fallback?.title || "");
+  const serviceName = title;
+
+  const relationFaqs = mapFaqRows(
+    getSnapshotServiceFaqs()
+      .filter((row) => row.service_item_id === id)
+      .sort(byDisplayOrder)
+  );
+  const relationSteps = mapStepRows(
+    getSnapshotServiceProcessSteps()
+      .filter((row) => row.service_item_id === id)
+      .sort(byDisplayOrder)
+  );
+  const relationShowcase = mapShowcaseRows(
+    getSnapshotServiceShowcase()
+      .filter((row) => row.service_item_id === id)
+      .sort(byDisplayOrder),
+    serviceName
+  );
+  const relationCargo = mapCargoRows(
+    getSnapshotServiceCargo()
+      .filter((row) => row.service_item_id === id)
+      .sort(byDisplayOrder)
+  );
+
+  return {
+    id,
+    slug: String(record.slug),
+    parentSlug: parent.slug,
+    parentName: parent.title,
+    title,
+    shortDesc: String(firstValue(record.short_description, fallback?.shortDesc, "")),
+    heroHeadline: String(firstValue(record.hero_headline, fallback?.heroHeadline, title)),
+    heroSubheadline: String(
+      firstValue(record.hero_subheadline, record.short_description, fallback?.heroSubheadline, "")
+    ),
+    heroBadge: String(
+      firstValue(record.hero_badge, fallback?.heroBadge, `${parent.title.toUpperCase()} • SPECIALIZED SERVICE`)
+    ),
+    heroImage: String(firstValue(record.hero_image, fallback?.heroImage, DEFAULT_SERVICE_IMAGE)),
+    heroVideo: (firstValue(record.hero_video, fallback?.heroVideo) as string | undefined) || undefined,
+    heroFallbackImage:
+      (firstValue(record.hero_fallback_image, fallback?.heroFallbackImage) as string | undefined) ||
+      undefined,
+    imageAlt: String(firstValue(record.image_alt, fallback?.imageAlt, "")),
+    aboutBadge: String(firstValue(record.about_badge, fallback?.aboutBadge, "OPERATIONAL CAPABILITY")),
+    aboutHeading: String(
+      firstValue(record.about_heading, fallback?.aboutHeading, `${title} Built Around Your Cargo`)
+    ),
+    aboutDescription: String(
+      firstValue(record.about_description, record.full_description, fallback?.aboutDescription, "")
+    ),
+    aboutBulletPoints: asArray<string>(
+      firstValue(record.about_bullet_points, fallback?.aboutBulletPoints)
+    ),
+    aboutImage: String(
+      firstValue(record.about_image, fallback?.aboutImage, record.hero_image, DEFAULT_SERVICE_IMAGE)
+    ),
+    capabilities: asArray<{ title: string; desc: string }>(
+      firstValue(record.capabilities, fallback?.capabilities)
+    ),
+    whyArrowline: asArray<AdvantageItem>(firstValue(record.why_arrowline, fallback?.whyArrowline)),
+    processSteps: relationSteps.length > 0
+      ? relationSteps
+      : asArray<ProcessStepItem>(firstValue(record.process_steps, fallback?.processSteps)),
+    applications: relationCargo.length > 0
+      ? relationCargo
+      : asArray<ApplicationItem>(firstValue(record.applications, fallback?.applications)),
+    industries: asArray<string>(firstValue(record.industries, fallback?.industries)),
+    faqs: relationFaqs.length > 0
+      ? relationFaqs
+      : asArray<FAQItemData>(firstValue(record.faqs, fallback?.faqs)),
+    gallery: relationShowcase.length > 0
+      ? relationShowcase
+      : asArray<GalleryMediaItem>(firstValue(record.gallery, fallback?.gallery)),
+    showcaseHeading:
+      (firstValue(record.showcase_heading, fallback?.showcaseHeading) as string | undefined) ||
+      `${title} in Action`,
+    showcaseDescription: String(
+      firstValue(
+        record.showcase_description,
+        fallback?.showcaseDescription,
+        "Real-world fleet operations, port handling, terminal staging, and heavy transport execution."
+      )
+    ),
+    cargoHeading:
+      (firstValue(record.cargo_heading, fallback?.cargoHeading) as string | undefined) ||
+      "What We Transport & Handle",
+    cargoDescription: String(
+      firstValue(
+        record.cargo_description,
+        fallback?.cargoDescription,
+        `Specialized handling protocols configured specifically for ${title.toLowerCase()} cargo profiles.`
+      )
+    ),
+    videoUrl: (firstValue(record.video_url, fallback?.videoUrl) as string | undefined) || undefined,
+    videoPoster:
+      (firstValue(record.video_poster, fallback?.videoPoster) as string | undefined) || undefined,
+    ctaHeadline: String(
+      firstValue(record.cta_headline, fallback?.ctaHeadline, "Ready to Coordinate Your Shipment?")
+    ),
+    seoTitle: String(firstValue(record.seo_title, record.meta_title, fallback?.seoTitle, title)),
+    seoDesc: String(
+      firstValue(
+        record.seo_desc,
+        record.meta_description,
+        fallback?.seoDesc,
+        record.short_description,
+        ""
+      )
+    ),
+    canonicalUrl:
+      (firstValue(record.canonical_url, fallback?.canonicalUrl) as string | undefined) || undefined,
+    isPublished: record.is_published !== false,
+    displayOrder: Number(record.display_order ?? fallback?.displayOrder ?? 0),
+  };
+}
+
+function buildSnapshotMainServices(): MainServiceData[] {
+  const serviceRows = getSnapshotServiceRows();
+  if (serviceRows.length === 0) return [];
+
+  const itemRows = getSnapshotServiceItemRows();
+
+  return serviceRows
+    .slice()
+    .sort(byDisplayOrder)
+    .map((serviceRow) => {
+      const fallback = MAIN_SERVICES.find((service) => service.slug === serviceRow.slug);
+      const main = buildMainService(serviceRow, fallback);
+      const parent = { slug: main.slug, title: main.title };
+      main.subServices = itemRows
+        .filter((item) => item.service_id === serviceRow.id)
+        .sort(byDisplayOrder)
+        .map((item) => {
+          const subFallback = fallback?.subServices.find((sub) => sub.slug === item.slug);
+          return buildSubService(item, parent, subFallback);
+        });
+      return main;
+    });
+}
+
+export const SNAPSHOT_MAIN_SERVICES: MainServiceData[] = buildSnapshotMainServices();
+
+function currentMainServices(): MainServiceData[] {
+  return SNAPSHOT_MAIN_SERVICES.length > 0 ? SNAPSHOT_MAIN_SERVICES : MAIN_SERVICES;
+}
+
 // Helper functions for easy access
 export function getAllMainServices(): MainServiceData[] {
-  return MAIN_SERVICES.filter(s => s.isPublished);
+  return currentMainServices().filter((service) => service.isPublished);
 }
 
 export function getMainServiceBySlug(slug: string): MainServiceData | undefined {
-  return MAIN_SERVICES.find(s => s.slug === slug);
+  return currentMainServices().find((service) => service.slug === slug);
 }
 
 export function getSubServiceBySlug(parentSlug: string, subSlug: string): SubServiceData | undefined {
   const parent = getMainServiceBySlug(parentSlug);
   if (!parent) return undefined;
-  return parent.subServices.find(sub => sub.slug === subSlug);
+  return parent.subServices.find((sub) => sub.slug === subSlug);
 }
 
 export function getAllSubServices(): SubServiceData[] {
-  return MAIN_SERVICES.flatMap(m => m.subServices);
+  return currentMainServices().flatMap((service) => service.subServices);
 }

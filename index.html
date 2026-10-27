@@ -12,6 +12,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="https://arrowlinelogistics.in/android-chrome-192x192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="https://arrowlinelogistics.in/android-chrome-512x512.png" />
     <!-- SEO Meta Elements -->
+    <!-- PRERENDER:HEAD:START -->
     <title>Arrowline Logistics | Mundra Port Logistics &amp; Pan-India Transportation Services</title>
     <meta name="description" content="Arrowline Logistics is an authorized multimodal logistics and transportation company headquartered at Mundra Port, Gujarat. Operating pan-India container haulage, FTL road freight, rail corridors, ODC heavy haulage, and warehousing." />
     <meta name="author" content="Arrowline Logistics" />
@@ -54,11 +55,13 @@
         "logo": "https://arrowlinelogistics.in/images/arrowline-logo.png"
       }
     </script>
+    <!-- PRERENDER:HEAD:END -->
 
     <!-- Preconnect for Cloudinary (LCP image preloaded per-route by React) -->
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
 
     <!-- Instant boot splash (critical CSS, painted before React mounts) -->
+    <!-- PRERENDER:SPLASH_STYLE:START -->
     <style>
       #boot-splash {
         position: fixed;
@@ -119,8 +122,10 @@
         }
       }
     </style>
+    <!-- PRERENDER:SPLASH_STYLE:END -->
   </head>
   <body>
+    <!-- PRERENDER:SPLASH:START -->
     <div id="boot-splash" aria-hidden="true">
       <div class="bs-inner">
         <div class="bs-logo">
@@ -140,6 +145,7 @@
       </div>
     </div>
     <noscript><style>#boot-splash{display:none}</style></noscript>
+    <!-- PRERENDER:SPLASH:END -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

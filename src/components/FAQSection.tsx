@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 import { FAQ_ITEMS } from "../data/logisticsData";
 import type { FAQItem } from "../data/logisticsData";
 import { ChevronDown, HelpCircle, Phone } from "lucide-react";
 import { COMPANY_DETAILS } from "../data/logisticsData";
 import { buildTel } from "../utils/contactLinks";
-import { apiUrl } from "../lib/api";
 import Reveal from "./Reveal";
 import SectionBackground from "./SectionBackground";
 
@@ -14,33 +12,8 @@ const FAQ_BACKGROUND =
   "https://res.cloudinary.com/uorctww6/image/upload/v1789377042/arrowline/general/project-port.jpg";
 
 export default function FAQSection() {
-  const [faqs, setFaqs] = useState<FAQItem[]>(FAQ_ITEMS);
+  const faqs: FAQItem[] = FAQ_ITEMS;
   const [openFaqId, setOpenFaqId] = useState<string>(FAQ_ITEMS[0]?.id || "");
-
-  useEffect(() => {
-    let mounted = true;
-    axios
-      .get(apiUrl("/api/faqs"))
-      .then((response) => {
-        const fetched: FAQItem[] = (response.data?.data || [])
-          .filter((item: any) => item.question && item.answer)
-          .map((item: any): FAQItem => ({
-            id: String(item.id),
-            question: item.question,
-            answer: item.answer,
-            category: item.category || "",
-          }));
-        if (!mounted || fetched.length === 0) return;
-        setFaqs(fetched);
-        setOpenFaqId((current) => (fetched.some((item) => item.id === current) ? current : fetched[0].id));
-      })
-      .catch((error) => {
-        console.error("Error fetching FAQs:", error);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   const toggleFaq = (id: string) => {
     setOpenFaqId((prev) => (prev === id ? "" : id));

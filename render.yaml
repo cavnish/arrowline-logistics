@@ -14,6 +14,7 @@
 #   - RESEND_API_KEY / RESEND_FROM_EMAIL / LEAD_NOTIFICATION_EMAIL
 #   - ADMIN_API_KEY / ADMIN_EMAIL / ADMIN_EMAILS
 #   - CLOUDINARY_CLOUD_NAME / CLOUDINARY_API_KEY / CLOUDINARY_API_SECRET
+#   - VERCEL_DEPLOY_HOOK_URL / PUBLIC_SITE_URL (optional publishing)
 
 services:
   - type: web
@@ -50,4 +51,12 @@ services:
       - key: CLOUDINARY_API_KEY
         sync: false
       - key: CLOUDINARY_API_SECRET
+        sync: false
+      # Vercel Deploy Hook used by POST /api/admin/publish. Optional: when
+      # unset, the admin publish panel reports "not configured" (503).
+      - key: VERCEL_DEPLOY_HOOK_URL
+        sync: false
+      # Public frontend origin used to read content-version.json for the
+      # admin Publish panel. Defaults to https://arrowlinelogistics.in.
+      - key: PUBLIC_SITE_URL
         sync: false

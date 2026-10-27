@@ -1,6 +1,6 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { COMPANY_DETAILS, TEAM_MEMBERS } from "../data/logisticsData";
-import { contentService } from "../services/contentService";
+import type { ReactNode } from "react";
+import { COMPANY_DETAILS, CORE_VALUES, TEAM_MEMBERS } from "../data/logisticsData";
+import { SNAPSHOT_ABOUT } from "../data/snapshot";
 import SEOMeta from "../components/SEOMeta";
 import Reveal from "../components/Reveal";
 import CountUp from "../components/CountUp";
@@ -213,28 +213,9 @@ function TimelineItem({
    ABOUT PAGE
    ================================================================ */
 export default function About() {
-  const [dbAbout, setDbAbout] = useState<AboutData | null>(null);
-  const [dbLeaders, setDbLeaders] = useState<any[]>([]);
-  const [dbValues, setDbValues] = useState<any[]>([]);
-
-  useEffect(() => {
-    let mounted = true;
-    contentService
-      .getAbout()
-      .then((data) => { if (mounted) setDbAbout(data); })
-      .catch(() => undefined);
-    contentService
-      .getLeadership()
-      .then((rows) => { if (mounted) setDbLeaders(rows); })
-      .catch(() => undefined);
-    contentService
-      .getCoreValues()
-      .then((rows) => { if (mounted) setDbValues(rows); })
-      .catch(() => undefined);
-    return () => { mounted = false; };
-  }, []);
-
-  const about = dbAbout; // API data wins; null keeps static fallbacks
+  // Published snapshot content is bundled at build time: the About page has
+  // real data in the prerendered HTML and needs no runtime API request.
+  const about: AboutData = SNAPSHOT_ABOUT;
 
   const pillars =
     about && about.pillars.length > 0
@@ -257,32 +238,20 @@ export default function About() {
   const differentiatorsImage = resolveImage(about, "differentiators");
   const coreValuesImage = resolveImage(about, "core-values");
 
-  const leaders =
-    dbLeaders.length > 0
-      ? dbLeaders
-      : TEAM_MEMBERS.map((member) => ({
-          name: member.name,
-          role: member.role,
-          location: member.location,
-          email: member.email,
-          image: member.image,
-          bio: member.bio,
-        }));
+  const leaders = TEAM_MEMBERS.map((member) => ({
+    name: member.name,
+    role: member.role,
+    location: member.location,
+    email: member.email,
+    image: member.image,
+    bio: member.bio,
+  }));
 
-  const coreValues =
-    dbValues.length > 0
-      ? dbValues.map((value) => ({
-          icon: CORE_VALUE_ICONS[value.icon] || Handshake,
-          title: value.title,
-          text: value.description,
-        }))
-      : [
-          { icon: Handshake, title: "Customer Commitment", text: "We don't just meet expectations, we anticipate them and exceed them at every touchpoint." },
-          { icon: Shield, title: "Integrity", text: "Every shipment, every transaction, every handshake is grounded in honesty and transparency." },
-          { icon: Lightbulb, title: "Innovation", text: "We adopt, adapt, and scale technologies that simplify logistics and empower our customers." },
-          { icon: Users, title: "Teamwork", text: "Our people are our biggest asset. We win when we work together across departments and geographies." },
-          { icon: Leaf, title: "Sustainability", text: "From route optimization to green warehouses, we act responsibly for the long term." },
-        ];
+  const coreValues = CORE_VALUES.map((value) => ({
+    icon: CORE_VALUE_ICONS[value.icon] || Handshake,
+    title: value.title,
+    text: value.desc,
+  }));
 
   const heroBadgeLabel = tileText(about, "about_hero_badge_label", "Est. 2014");
   const heroBadgePlace = tileText(about, "about_hero_badge_place", "Mundra, Gujarat");

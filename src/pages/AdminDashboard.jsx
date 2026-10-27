@@ -2,6 +2,7 @@
 import adminApi from "../services/adminApi";
 import StatsCard from "../components/admin/StatsCard";
 import EnquiryTable from "../components/admin/EnquiryTable";
+import PublishPanel from "../components/admin/PublishPanel";
 import { Inbox, Clock, UserPlus, PhoneCall, CheckCircle, XCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -54,6 +55,8 @@ export default function AdminDashboard() {
           <StatsCard key={idx} {...card} />
         ))}
       </div>
+
+      <PublishPanel />
 
       <div>
         <div className="flex items-center justify-between mb-3">

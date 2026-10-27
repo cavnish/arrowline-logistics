@@ -31,6 +31,7 @@ interface RouteMapProps {
   destination: MapPlace | null;
   route?: DrivingRoute | null;
   busy?: boolean;
+  showOfflineFallback?: boolean;
   className?: string;
 }
 
@@ -39,6 +40,7 @@ export default function RouteMap({
   destination,
   route,
   busy = false,
+  showOfflineFallback = false,
   className,
 }: RouteMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -50,6 +52,7 @@ export default function RouteMap({
   const [failed, setFailed] = useState<string | null>(null);
 
   const showPreview = Boolean(origin || destination);
+  const missingApiKey = Boolean(failed?.includes("VITE_GOOGLE_MAPS_API_KEY is not set"));
 
   // Lazy-load the Maps library only once there is something to show.
   useEffect(() => {
@@ -184,7 +187,30 @@ export default function RouteMap({
       )}
 
       {/* Professional failure state */}
-      {failed && (
+      {failed && missingApiKey && showOfflineFallback && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-[#F5F8FA] p-5 text-center">
+          <div className="flex items-center gap-2 rounded-full border border-[#D6E7EE] bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#062B3A]">
+            <MapPin className="h-3.5 w-3.5 text-[#FF6B1A]" />
+            Arrowline offline network
+          </div>
+          <div className="flex w-full max-w-md items-center justify-center gap-3 sm:gap-5">
+            <div className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-3">
+              <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400">Origin</span>
+              <span className="mt-1 block truncate text-xs font-black text-[#062B3A]">{origin?.label || "Select a location"}</span>
+            </div>
+            <div className="h-px w-8 shrink-0 bg-[#FF6B1A] sm:w-12" aria-hidden="true" />
+            <div className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-3">
+              <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400">Destination</span>
+              <span className="mt-1 block truncate text-xs font-black text-[#062B3A]">{destination?.label || "Select a location"}</span>
+            </div>
+          </div>
+          <p className="max-w-sm text-[11px] leading-relaxed text-slate-500">
+            Map preview is unavailable, but you can still estimate routes between supported hubs below.
+          </p>
+        </div>
+      )}
+
+      {failed && !missingApiKey && (
         <div className="absolute inset-0 z-20 bg-[#F5F8FA] flex flex-col items-center justify-center gap-3 p-6 text-center">
           <div className="w-10 h-10 rounded-full bg-[#FEF3C7] text-[#B45309] flex items-center justify-center">
             <AlertTriangle className="w-5 h-5" />

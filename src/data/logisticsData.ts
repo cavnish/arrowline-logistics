@@ -1,3 +1,17 @@
+import {
+  SNAPSHOT_CASE_STUDIES,
+  SNAPSHOT_COMPANY_OVERRIDES,
+  SNAPSHOT_CORE_VALUES,
+  SNAPSHOT_FAQS,
+  SNAPSHOT_GALLERY,
+  SNAPSHOT_INDUSTRIES,
+  SNAPSHOT_STATS,
+  SNAPSHOT_TEAM,
+  SNAPSHOT_TESTIMONIALS,
+  SNAPSHOT_TRUST_LOGOS,
+  buildSnapshotHubs,
+} from "./snapshot";
+
 export interface ServiceDetail {
   id: string;
   title: string;
@@ -112,6 +126,24 @@ export const COMPANY_DETAILS = {
   aboutShort: "ARROWLINE LOGISTICS is a premier multimodal logistics and transportation company operating across India. Centered at Mundra Port, Gujarat—the gateway of India's maritime trade—we integrate road transportation (FTL/PTL), rail freight, coastal shipping, and customs clearance to deliver reliable, optimized, and secure door-to-door supply chain solutions.",
   aboutDetailed: "Arrowline Logistics provides end-to-end logistics, material transport, and supply chain solutions designed to move industrial goods, containers, and oversized cargo efficiently across India. Grounded at Mundra Port, Gujarat, we coordinate highway transport, CONCOR rail links, coastal shipping routes, and global freight forwarding to deliver seamless pan-India connectivity for major industries."
 };
+
+export const CLIENT_LOGOS: Array<{
+  logoType: string;
+  name: string;
+  logo?: string;
+  description?: string;
+}> = [
+  { logoType: "ADANI", name: "Mundra Port Alliance" },
+  { logoType: "CONCOR", name: "Rail Freight Partner" },
+  { logoType: "IATA", name: "Air Cargo Licensed" },
+  { logoType: "DP WORLD", name: "Terminal Operator" },
+  { logoType: "MAERSK", name: "Ocean Carrier" },
+  { logoType: "MSC", name: "Global Shipping" },
+  { logoType: "KRIBHCO", name: "Bulk Fertilizer" },
+  { logoType: "TATA STEEL", name: "Industrial Metals" },
+  { logoType: "RELIANCE", name: "Petrochemicals" },
+  { logoType: "ADITYA BIRLA", name: "Manufacturing Group" },
+];
 
 // Section 13: Verified Company Statistics
 export const LOGISTICS_STATS: StatItem[] = [
@@ -1000,6 +1032,33 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     caption: "Pre-shipment custom document checks and container seal verifications performed by Arrowline CHA agents."
   }
 ];
+
+/* =========================================================================
+ * PUBLISHED SNAPSHOT OVERRIDES
+ *
+ * The static values above are deliberate fallbacks for a fresh checkout with
+ * no exported content. On every build the published Supabase snapshot is
+ * applied here so all public components render live, admin-editable content
+ * without a runtime API request.
+ * ========================================================================= */
+
+Object.assign(COMPANY_DETAILS, SNAPSHOT_COMPANY_OVERRIDES);
+
+function applySnapshot<T>(target: T[], source: T[] | undefined): void {
+  if (!Array.isArray(source) || source.length === 0) return;
+  target.splice(0, target.length, ...source);
+}
+
+applySnapshot(INDUSTRIES_SERVED, SNAPSHOT_INDUSTRIES);
+applySnapshot(FAQ_ITEMS, SNAPSHOT_FAQS);
+applySnapshot(CLIENT_TESTIMONIALS, SNAPSHOT_TESTIMONIALS);
+applySnapshot(GALLERY_ITEMS, SNAPSHOT_GALLERY);
+applySnapshot(CASE_STUDIES, SNAPSHOT_CASE_STUDIES);
+applySnapshot(TEAM_MEMBERS, SNAPSHOT_TEAM);
+applySnapshot(CORE_VALUES, SNAPSHOT_CORE_VALUES);
+applySnapshot(LOGISTICS_STATS, SNAPSHOT_STATS);
+applySnapshot(CLIENT_LOGOS, SNAPSHOT_TRUST_LOGOS);
+applySnapshot(REGIONAL_HUBS, buildSnapshotHubs(REGIONAL_HUBS));
 
 // Helper to generate SEO structured data (JSON-LD)
 export const getOrganizationSchema = () => {

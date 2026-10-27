@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "20261027T055913Z-575685d4",
+  "generatedAt": "2026-10-27T05:59:13.008Z",
+  "source": "supabase-live",
+  "checksum": "575685d476c82462d3cec83c1d2431e5bf1129dd2fc297d0d4942cc8bca26d05",
+  "totalRecords": 393,
+  "counts": {
+    "site_content": 56,
+    "site_settings": 11,
+    "services": 4,
+    "service_items": 22,
+    "service_faqs": 28,
+    "service_process_steps": 24,
+    "service_visual_showcase": 59,
+    "service_cargo_applications": 112,
+    "industries": 8,
+    "clients": 0,
+    "trusted_network": 10,
+    "about_images": 4,
+    "about_pillars": 4,
+    "about_milestones": 5,
+    "about_differentiators": 3,
+    "leadership": 3,
+    "core_values": 5,
+    "testimonials": 6,
+    "faqs": 6,
+    "statistics": 4,
+    "blog_categories": 0,
+    "blog_posts": 0,
+    "gallery_items": 5,
+    "case_studies": 4,
+    "social_videos": 0,
+    "locations": 10
+  },
+  "files": {
+    "snapshot": "src/data/content-snapshot.json",
+    "manifest": "src/data/content-snapshot.manifest.json"
+  }
+}

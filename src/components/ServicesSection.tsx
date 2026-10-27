@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { contentService } from "../services/contentService";
-import { getAllMainServices } from "../data/servicesData";
-import { getOptimizedImageUrl, buildImageAlt } from "../utils/imageUrl";
+import { getAllSubServices } from "../data/servicesData";
+import { getOptimizedImageUrl } from "../utils/imageUrl";
 import SmartImage from "./ui/SmartImage";
 import Reveal from "./Reveal";
 import SectionBackground from "./SectionBackground";
@@ -16,56 +14,23 @@ interface ServicesSectionProps {
   onSelectService: (slug: string) => void;
 }
 
-interface DisplayService {
-  id: string;
-  slug: string;
-  title: string;
-  shortDesc: string;
-  image: string;
-  imageAlt: string;
-}
-
 export default function ServicesSection({ onSelectService }: ServicesSectionProps) {
-  const [services, setServices] = useState<DisplayService[]>(() => {
-    // Default to the 4 approved main services
-    return getAllMainServices().map((s) => ({
-      id: s.id,
-      slug: s.slug,
-      title: s.title,
-      shortDesc: s.shortDesc,
-      image: s.heroImage || s.aboutImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
-      imageAlt: s.imageAlt || buildImageAlt(s.title),
-    }));
-  });
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function fetchDynamicServices() {
-      try {
-        const dbServices = await contentService.getServices();
-        if (mounted && dbServices && dbServices.length > 0) {
-          const mapped: DisplayService[] = dbServices.map((item) => ({
-            id: item.id,
-            slug: item.slug,
-            title: item.title,
-            shortDesc: item.short_description || "",
-            image: item.hero_image || item.about_image || "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
-            imageAlt: item.image_alt || buildImageAlt(item.title),
-          }));
-          setServices(mapped);
-        }
-      } catch (err) {
-        console.warn("[ServicesSection] Dynamic fetch fallback to static dataset:", err);
-      }
-    }
-
-    fetchDynamicServices();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  // Static build-time data replaces runtime API fetch
+  const allServices = getAllSubServices();
+  const services = allServices.slice(0, 6).map((s) => ({
+    id: s.id,
+    slug: s.slug,
+    parentSlug: s.parentSlug,
+    title: s.title,
+    shortDesc:
+      s.slug === "container-transportation"
+        ? "Dedicated 20ft and 40ft container chassis transport from Mundra Port and major terminals to industrial destinations across India."
+        : s.slug === "ftl-ltl-transportation"
+          ? "Full Truckload (FTL) and Less-than-Truckload (LTL) road freight solutions tailored for commercial, industrial, and scheduled distribution."
+          : s.shortDesc,
+    image: s.heroImage || s.aboutImage || "https://res.cloudinary.com/uorctww6/image/upload/v1789377046/arrowline/general/road-transport.jpg",
+    imageAlt: s.imageAlt || s.shortDesc,
+  }));
 
   return (
     <section id="services-section" className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden">
@@ -86,14 +51,14 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
         </Reveal>
 
         {/* Service cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 min-[1200px]:grid-cols-4 gap-5 lg:gap-6 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6 items-stretch">
           {services.map((service, index) => (
             <Reveal key={service.id || service.slug} delay={index * 80} duration={500} className="h-full">
             <a
-              href={`/services/${service.slug}`}
+              href={`/services/${service.parentSlug}/${service.slug}`}
               onClick={(event) => {
                 event.preventDefault();
-                onSelectService(service.slug);
+                onSelectService(`${service.parentSlug}/${service.slug}`);
               }}
               aria-label={`Explore ${service.title}`}
               className="group block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2 motion-reduce:transition-none"
