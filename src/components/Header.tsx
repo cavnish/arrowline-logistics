@@ -262,13 +262,14 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                         }
                         .mega-fade { animation: megaFade 0.22s ease-out; }
                       `}</style>
-                      <div className="w-[min(880px,calc(100vw-3rem))] bg-white rounded-2xl border border-slate-200/80 shadow-[0_25px_70px_-15px_rgba(6,43,58,0.28)] overflow-hidden">
-                        <div className="flex">
+                      <div className="w-[min(880px,calc(100vw-1.5rem))] max-h-[calc(100dvh-6rem)] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_25px_70px_-15px_rgba(6,43,58,0.28)]">
+                        <div className="flex max-h-[calc(100dvh-6rem)] min-h-0">
                           {/* Left Column: Service Categories */}
-                          <div className="w-64 sm:w-72 shrink-0 border-r border-slate-100 bg-[#FAFCFD] p-4 space-y-1">
-                            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 px-2 mb-3">
+                          <div className="flex w-[clamp(14rem,28vw,18rem)] shrink-0 flex-col gap-1 overflow-y-auto border-r border-slate-100 bg-[#FAFCFD] p-3 sm:p-4">
+                            <p className="mb-2 shrink-0 px-2 text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 sm:mb-3">
                               Explore Services
                             </p>
+                            <div className="shrink-0 space-y-1">
                             {mainServices.map((srv) => {
                               const isActiveCat = srv.slug === activeCategorySlug;
                               const isCurrent = activePage === `services/${srv.slug}`;
@@ -309,13 +310,30 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                                 </a>
                               );
                             })}
+                            </div>
+                            <div className="relative mt-2 min-h-[84px] flex-1 overflow-hidden rounded-xl border border-[#062B3A]/10 bg-[#062B3A]">
+                              <img
+                                src="/images/truck-fleet-yard.jpg"
+                                alt="Container truck at a cargo terminal"
+                                loading="lazy"
+                                decoding="async"
+                                className="absolute inset-0 h-full w-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-r from-[#062B3A]/80 via-[#062B3A]/40 to-transparent" />
+                              <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 px-3 py-2 text-white">
+                                <span className="h-4 w-1 shrink-0 rounded-full bg-[#FF6B1A]" aria-hidden="true" />
+                                <span className="text-[9px] font-extrabold uppercase leading-tight tracking-[0.12em] sm:text-[10px]">
+                                  Mundra Port · Pan-India
+                                </span>
+                              </div>
+                            </div>
                           </div>
 
                           {/* Right Column: Services of the Selected Category */}
                           {hoveredServiceData && (
                             <div
                               key={activeCategorySlug}
-                              className="mega-fade flex-1 min-w-0 p-5 sm:p-6 flex flex-col"
+                              className="mega-fade flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto p-4 sm:p-5 lg:p-6"
                             >
                               {/* Panel Header */}
                               <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
