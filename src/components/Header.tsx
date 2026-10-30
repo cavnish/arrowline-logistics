@@ -29,9 +29,17 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
   const [megaOffset, setMegaOffset] = useState(0);
   const megaRef = useRef<HTMLDivElement>(null);
 
+  /* The home hero runs edge-to-edge behind the header, so the header is
+     transparent while that hero is at the top and turns into the regular
+     white bar as soon as the page scrolls. Every other page keeps the white
+     header at all times. */
+  const isHome = activePage === "home";
+  const transparentHeader = isHome && !isScrolled && !isMobileMenuOpen;
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // correct state on reload/restored scroll positions
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -60,6 +68,24 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
       return () => document.removeEventListener("keydown", handleEscape);
     }
   }, [isServicesOpen]);
+
+  /* Keep the two navigation modes in sync when crossing the lg breakpoint
+     (e.g. rotating a tablet): a hidden mobile drawer or desktop mega menu
+     must not keep forcing the header out of its transparent home state. */
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const handleBreakpoint = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        setIsMobileMenuOpen(false);
+        setExpandedService(null);
+      } else {
+        setIsServicesOpen(false);
+        setHoveredService(null);
+      }
+    };
+    mq.addEventListener("change", handleBreakpoint);
+    return () => mq.removeEventListener("change", handleBreakpoint);
+  }, []);
 
   useEffect(() => {
     const computeOffset = () => {
@@ -133,8 +159,10 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
       {/* Top Micro-Bar */}
       <div
         className={cn(
-          "relative z-50 bg-[#F0F5FA] text-[#062B3A] border-b border-slate-200/80",
-          "transition-all duration-500 ease-in-out overflow-hidden",
+          "relative z-50 border-b transition-all duration-500 ease-in-out overflow-hidden",
+          transparentHeader
+            ? "bg-transparent text-white border-white/15"
+            : "bg-[#F0F5FA] text-[#062B3A] border-slate-200/80",
           isScrolled ? "h-0 py-0 opacity-0" : "h-7 sm:h-8 py-0 opacity-100"
         )}
       >
@@ -150,7 +178,12 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
           <div className="flex items-center min-w-0">
             <a
               href={buildMailto({ to: primaryEmail, context: "general" })}
-              className="flex items-center gap-1 text-[8px] sm:text-[9px] md:text-[10px] font-medium text-[#062B3A] hover:text-[#FF6B1A] transition-colors max-w-[125px] sm:max-w-none truncate"
+              className={cn(
+                "flex items-center gap-1 text-[8px] sm:text-[9px] md:text-[10px] font-medium transition-colors max-w-[125px] sm:max-w-none truncate",
+                transparentHeader
+                  ? "text-white/90 hover:text-[#FFB27D]"
+                  : "text-[#062B3A] hover:text-[#FF6B1A]"
+              )}
               aria-label={`Send email to ${primaryEmail}`}
             >
               <Mail className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#FF6B1A] shrink-0" />
@@ -161,10 +194,20 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
               </span>
             </a>
             <div className="hidden sm:flex items-center">
-              <span className="mx-2 md:mx-3 h-3 w-px bg-slate-300" />
+              <span
+                className={cn(
+                  "mx-2 md:mx-3 h-3 w-px",
+                  transparentHeader ? "bg-white/25" : "bg-slate-300"
+                )}
+              />
               <a
                 href={buildTel(phone)}
-                className="flex items-center gap-1 text-[9px] md:text-[10px] font-bold text-[#062B3A] hover:text-[#FF6B1A] transition-colors whitespace-nowrap"
+                className={cn(
+                  "flex items-center gap-1 text-[9px] md:text-[10px] font-bold transition-colors whitespace-nowrap",
+                  transparentHeader
+                    ? "text-white/90 hover:text-[#FFB27D]"
+                    : "text-[#062B3A] hover:text-[#FF6B1A]"
+                )}
                 aria-label={`Call ${phone}`}
               >
                 <Phone className="w-3 h-3 text-[#FF6B1A]" />
@@ -190,10 +233,12 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
       {/* Main Nav */}
       <nav
         className={cn(
-          "transition-all duration-300 px-4 sm:px-6 lg:px-8 border-b",
-          isScrolled
-            ? "bg-white/95 backdrop-blur-md py-3.5 shadow-md border-slate-200/90"
-            : "bg-white py-4 border-slate-200/70 shadow-sm"
+          "relative z-50 transition-all duration-300 px-4 sm:px-6 lg:px-8 border-b",
+          transparentHeader
+            ? "bg-transparent py-4 border-transparent shadow-none"
+            : isScrolled
+              ? "bg-white/95 backdrop-blur-md py-3.5 shadow-md border-slate-200/90"
+              : "bg-white py-4 border-slate-200/70 shadow-sm"
         )}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -203,11 +248,19 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
             className="flex items-center focus:outline-none group transition-transform hover:scale-[1.02] cursor-pointer"
             aria-label="Arrowline Logistics Home"
           >
-            <ArrowlineLogo size="md" />
+            <ArrowlineLogo size="md" inverted={transparentHeader} />
           </a>
 
-          {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center space-x-8">
+          {/* Desktop Nav — iOS-style glass capsule */}
+          <div
+            className={cn(
+              "relative z-30 hidden lg:flex items-center space-x-5 xl:space-x-8 rounded-2xl border px-4 xl:px-5 py-1.5",
+              "backdrop-blur-2xl backdrop-saturate-150 transition-all duration-300",
+              transparentHeader
+                ? "border-white/20 bg-[#03212D]/45 shadow-[0_12px_36px_-14px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.22)]"
+                : "border-white/80 bg-[#EDF4F8]/85 shadow-[0_12px_36px_-18px_rgba(3,33,45,0.28),inset_0_1px_0_rgba(255,255,255,0.95)]"
+            )}
+          >
             {navItems.map((item) => {
               if (item.hasDropdown) {
                 return (
@@ -231,8 +284,11 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                         if (!isServicesOpen) setHoveredService(null);
                       }}
                       className={cn(
-                        "flex items-center space-x-1 text-sm font-bold tracking-wide transition-all duration-200 hover:text-[#FF6B1A] py-2 cursor-pointer",
-                        activePage.startsWith("services") ? "text-[#FF6B1A]" : "text-[#062B3A]"
+                        "flex items-center space-x-1 text-sm font-bold tracking-wide transition-all duration-200 py-2 cursor-pointer",
+                        transparentHeader
+                          ? "text-white hover:text-[#FFB27D]"
+                          : "text-[#062B3A] hover:text-[#FF6B1A]",
+                        activePage.startsWith("services") && "text-[#FF6B1A]"
                       )}
                     >
                       <span>Services</span>
@@ -262,11 +318,11 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                         }
                         .mega-fade { animation: megaFade 0.22s ease-out; }
                       `}</style>
-                      <div className="w-[min(880px,calc(100vw-1.5rem))] max-h-[calc(100dvh-6rem)] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_25px_70px_-15px_rgba(6,43,58,0.28)]">
+                      <div className="liquid-glass w-[min(880px,calc(100vw-1.5rem))] max-h-[calc(100dvh-6rem)] overflow-hidden rounded-2xl">
                         <div className="flex max-h-[calc(100dvh-6rem)] min-h-0">
                           {/* Left Column: Service Categories */}
-                          <div className="flex w-[clamp(14rem,28vw,18rem)] shrink-0 flex-col gap-1 overflow-y-auto border-r border-slate-100 bg-[#FAFCFD] p-3 sm:p-4">
-                            <p className="mb-2 shrink-0 px-2 text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 sm:mb-3">
+                          <div className="flex w-[clamp(14rem,28vw,18rem)] shrink-0 flex-col gap-1 overflow-y-auto border-r border-[#062B3A]/10 bg-white/25 p-3 sm:p-4">
+                            <p className="mb-2 shrink-0 px-2 text-[10px] font-black uppercase tracking-[0.24em] text-slate-600 sm:mb-3">
                               Explore Services
                             </p>
                             <div className="shrink-0 space-y-1">
@@ -281,7 +337,7 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                                   onClick={(e) => handleSPANav(e, `services/${srv.slug}`)}
                                   className={cn(
                                     "relative w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-left transition-all duration-200 group cursor-pointer",
-                                    isActiveCat ? "bg-[#EDF4F8]" : "hover:bg-[#F1F6F9]"
+                                    isActiveCat ? "bg-[#EAF3F6]/80" : "hover:bg-white/55"
                                   )}
                                 >
                                   {isActiveCat && (
@@ -336,7 +392,7 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                               className="mega-fade flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto p-4 sm:p-5 lg:p-6"
                             >
                               {/* Panel Header */}
-                              <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+                              <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-[#062B3A]/10">
                                 <div className="flex items-center gap-2.5 min-w-0">
                                   <h3 className="text-base font-black text-[#062B3A] truncate">
                                     {hoveredServiceData.title}
@@ -373,8 +429,8 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                                       className={cn(
                                         "group/sub w-full text-left px-3 py-2.5 rounded-xl border border-transparent transition-all duration-200 cursor-pointer",
                                         isSubActive
-                                          ? "bg-[#EAF3F6] border-[#D6E7EE]"
-                                          : "hover:bg-[#F6F9FB] hover:border-slate-100"
+                                          ? "bg-[#EAF3F6]/80 border-white/70"
+                                          : "hover:bg-white/55 hover:border-white/60"
                                       )}
                                     >
                                       <span className="flex items-start justify-between gap-2">
@@ -397,7 +453,7 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                                           )}
                                         />
                                       </span>
-                                      <span className="mt-1 block text-[11px] leading-snug text-slate-500 line-clamp-2">
+                                      <span className="mt-1 block text-[11px] leading-snug text-slate-600 line-clamp-2">
                                         {sub.shortDesc}
                                       </span>
                                     </a>
@@ -406,8 +462,8 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                               </div>
 
                               {/* Panel Footer */}
-                              <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
-                                <p className="text-[11px] text-slate-500">
+                              <div className="mt-4 pt-4 border-t border-[#062B3A]/10 flex items-center justify-between gap-4">
+                                <p className="text-[11px] text-slate-600">
                                   Planning a shipment?{" "}
                                   <span className="font-bold text-[#062B3A]">
                                     Our logistics experts are on call 24/7.
@@ -435,8 +491,11 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
                   href={pageIdToPath(item.id)}
                   onClick={(e) => handleSPANav(e, item.id)}
                   className={cn(
-                    "text-sm font-bold tracking-wide transition-all duration-200 hover:text-[#FF6B1A] relative py-2 cursor-pointer",
-                    activePage === item.id ? "text-[#FF6B1A]" : "text-[#062B3A]"
+                    "text-sm font-bold tracking-wide transition-all duration-200 relative py-2 cursor-pointer",
+                    transparentHeader
+                      ? "text-white hover:text-[#FFB27D]"
+                      : "text-[#062B3A] hover:text-[#FF6B1A]",
+                    activePage === item.id && "text-[#FF6B1A]"
                   )}
                 >
                   {item.label}
@@ -468,7 +527,12 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
             </button>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 bg-[#F5F8FA] border border-slate-200 rounded-xl text-[#062B3A] hover:text-[#FF6B1A] hover:bg-white transition-colors focus:outline-none"
+              className={cn(
+                "p-2 rounded-xl transition-colors focus:outline-none",
+                transparentHeader
+                  ? "bg-white/10 border border-white/25 text-white backdrop-blur-sm hover:text-[#FFB27D] hover:bg-white/20"
+                  : "bg-[#F5F8FA] border border-slate-200 text-[#062B3A] hover:text-[#FF6B1A] hover:bg-white"
+              )}
               aria-expanded={isMobileMenuOpen}
               aria-label="Toggle navigation menu"
             >
@@ -485,7 +549,7 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
           isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none translate-y-4"
         )}
       >
-        <div className="overflow-y-auto px-6 py-8 space-y-6 flex-1">
+        <div className="overflow-y-auto px-6 pb-8 pt-14 sm:pt-16 space-y-6 flex-1">
           <div className="space-y-4">
             <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 pb-2">
               Arrowline Navigation

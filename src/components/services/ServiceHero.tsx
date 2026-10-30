@@ -138,7 +138,7 @@ export default function ServiceHero({
             initial={reduceMotion ? false : { opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: AL_EASE, delay: 0.15 }}
-            className="text-[clamp(1.8rem,4.5vw,3.9rem)] font-black leading-[1.02] tracking-tight text-white [text-wrap:balance]"
+            className="hero-heading text-[clamp(1.5rem,6.6vw,3.55rem)] text-white [text-wrap:balance]"
           >
             <span className="block">{headlineA}</span>
             {headlineB && (

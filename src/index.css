@@ -266,25 +266,42 @@ html.lenis, html.lenis body {
 
 /* ----------------------------------------------------
    HOME HERO SIZING & MOTION
-   Content-driven on mobile (never crops CTAs), fixed
-   70–80vh tablets, 75–90vh desktop with an upper cap.
-   Mobile uses content-driven height so the hero ends
-   right after the CTAs with no empty dark space.
+   The mobile hero sizes to its content so the copy and
+   CTAs stay compact. Tablet and desktop retain the
+   full-viewport composition.
    ---------------------------------------------------- */
 .hero-min {
   min-height: auto;
 }
 
-@media (min-width: 768px) and (max-width: 1023.98px) {
+@media (min-width: 768px) {
   .hero-min {
-    min-height: clamp(660px, 78svh, 900px);
+    min-height: 100vh;
   }
 }
 
-@media (min-width: 1024px) {
-  .hero-min {
-    min-height: clamp(720px, 88svh, 1000px);
+@supports (height: 100svh) {
+  @media (min-width: 768px) {
+    .hero-min {
+      min-height: 100svh;
+    }
   }
+}
+
+@supports (height: 100dvh) {
+  @media (min-width: 768px) {
+    .hero-min {
+      min-height: 100dvh;
+    }
+  }
+}
+
+/* Shared display typography keeps the home and service heroes consistent. */
+.hero-heading {
+  font-family: inherit;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
 }
 
 /* Very subtle slow Ken Burns zoom on the hero photo only. */
@@ -296,6 +313,46 @@ html.lenis, html.lenis body {
 .hero-bg-zoom {
   animation: hero-kenburns 40s ease-in-out infinite alternate;
   will-change: transform;
+}
+
+/* ----------------------------------------------------
+   LIQUID GLASS SURFACE
+   Used by the services mega-menu card. Deliberately
+   kept near-opaque (~97% white) so small slate labels
+   keep their contrast over the hero photo, while the
+   blur, saturation, cool tint and specular edge provide
+   a subtle liquid-glass finish rather than heavy
+   transparency.
+   ---------------------------------------------------- */
+.liquid-glass {
+  background-color: rgba(255, 255, 255, 0.97);
+  background-image:
+    radial-gradient(
+      80% 55% at 18% 0%,
+      rgba(255, 255, 255, 0.75),
+      rgba(255, 255, 255, 0) 70%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(201, 229, 242, 0.24) 45%,
+      rgba(255, 255, 255, 0.5) 100%
+    );
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  backdrop-filter: blur(30px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 30px 80px -20px rgba(3, 33, 45, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.45);
+}
+
+/* No backdrop-filter support: go effectively solid so the
+   menu's small text never lands on a busy photo. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .liquid-glass {
+    background-color: rgba(255, 255, 255, 0.99);
+  }
 }
 
 /* ----------------------------------------------------

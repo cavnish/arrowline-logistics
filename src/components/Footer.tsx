@@ -43,7 +43,7 @@ export default function Footer({ setActivePage }: { setActivePage: (page: string
 
           {/* Company Info */}
           <div className="lg:col-span-4 space-y-4">
-            <ArrowlineLogo size="sm" />
+            <ArrowlineLogo size="sm" inverted />
             <p className="text-xs text-slate-400 leading-relaxed max-w-xs">
               {COMPANY_DETAILS.aboutShort}
             </p>
