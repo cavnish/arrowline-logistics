@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "../env.js";
 import jwt from "jsonwebtoken";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";

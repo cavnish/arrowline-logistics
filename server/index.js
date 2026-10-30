@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "./env.js";
 
 import path from "node:path";
 import fs from "node:fs";
@@ -12,6 +12,7 @@ import { createClient } from "@supabase/supabase-js";
 
 import adminRouter from "./routes/admin.js";
 import { sendLeadNotifications, getSenderDomainStatus } from "./services/emailService.js";
+import { buildContentSnapshot } from "./services/contentSnapshotService.js";
 
 const app = express();
 
@@ -54,12 +55,19 @@ app.use(cookieParser());
 // lead IP audit see the real client IP via X-Forwarded-For.
 app.set("trust proxy", 1);
 
+// Normalize configured origins: trim whitespace and remove trailing slashes.
+// A value like "https://example.vercel.app/" must match the browser's
+// Origin header ("https://example.vercel.app") exactly, otherwise the CORS
+// check fails and the admin login request never reaches the API.
+const normalizeOrigin = (value) =>
+  String(value || "").trim().replace(/\/+$/, "");
+
 const corsOrigins = (
   process.env.CORS_ORIGIN ||
   "http://localhost:5173,http://127.0.0.1:5173"
 )
   .split(",")
-  .map((s) => s.trim())
+  .map(normalizeOrigin)
   .filter(Boolean);
 
 app.use(
@@ -254,6 +262,23 @@ app.get("/api/content", async (_req, res) => {
   } catch (err) {
     console.error("Public content error:", err);
     return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// Public published-content snapshot used by the static build.
+// Contains only the same published/public rows that are already served by the
+// individual public endpoints, never admin or draft data.
+app.get("/api/content/snapshot", async (_req, res) => {
+  try {
+    const snapshot = await buildContentSnapshot(supabase);
+    res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
+    return res.json({ success: true, data: snapshot });
+  } catch (err) {
+    console.error("Public content snapshot error:", err?.message || err);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to build content snapshot",
+    });
   }
 });
 
