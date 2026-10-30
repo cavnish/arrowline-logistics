@@ -8,12 +8,19 @@
  * build fails here.
  *
  * Modes (environment variables):
- *   (default)                  Validate the committed snapshot and reuse it.
- *   CONTENT_EXPORT_LIVE=1      Try a live Supabase export, keep the committed
- *                              snapshot if Supabase is unavailable.
- *   CONTENT_EXPORT_STRICT=1    Require a successful live export. Used by the
- *                              "Publish content" flow so a Supabase outage
- *                              fails the deploy instead of shipping stale data.
+ *   (default)                  Refresh the snapshot from live published content
+ *                              (Supabase, or the backend snapshot endpoint when
+ *                              Supabase credentials are not present). If the
+ *                              source is unreachable the committed snapshot is
+ *                              reused, so offline builds still work.
+ *   CONTENT_EXPORT_STRICT=1    Require a successful live refresh. A Supabase or
+ *                              backend outage fails the deploy instead of
+ *                              shipping stale content.
+ *   CONTENT_EXPORT_LIVE=1      Explicit alias for the default live refresh.
+ *   CONTENT_EXPORT_OFFLINE=1   Skip the live refresh and only validate the
+ *                              committed snapshot (fully offline builds).
+ *   CONTENT_EXPORT_SOURCE_URL  Backend base URL used when Supabase credentials
+ *                              are absent. Defaults to the production API.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -26,9 +33,19 @@ const DIST = path.join(ROOT, "dist");
 const SSR_DIR = path.join(ROOT, "dist-ssr");
 const SNAPSHOT_FILE = path.join(ROOT, "src", "data", "content-snapshot.json");
 
-const strict = process.env.CONTENT_EXPORT_STRICT === "1";
-const live = strict || process.env.CONTENT_EXPORT_LIVE === "1";
-const mode = strict ? "strict-live" : live ? "soft-live" : "committed-snapshot";
+// Production deploys must never silently reuse a stale snapshot: if the live
+// source cannot be read the build fails and the previous deployment stays live.
+// CONTENT_EXPORT_ALLOW_STALE=1 is the explicit escape hatch.
+const isVercelProduction =
+  process.env.VERCEL === "1" && process.env.VERCEL_ENV === "production";
+const strict =
+  process.env.CONTENT_EXPORT_STRICT === "1" ||
+  (isVercelProduction && process.env.CONTENT_EXPORT_ALLOW_STALE !== "1");
+const offline =
+  process.env.CONTENT_EXPORT_OFFLINE === "1" ||
+  process.env.CONTENT_EXPORT_MODE === "committed";
+const live = !offline;
+const mode = offline ? "committed-snapshot" : strict ? "strict-live" : "auto-live";
 
 const steps = [];
 let logBuffer = "";

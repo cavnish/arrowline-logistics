@@ -56,7 +56,11 @@ export function AdminAuthProvider({ children }) {
             success: false,
             message:
               error?.response?.data?.message ||
-              "Unable to sign in. Please try again.",
+              (error?.response?.status === 404
+                ? "The admin API could not be found. Please contact the site administrator to restore the backend service."
+                : error?.code === "ERR_NETWORK"
+                  ? "Unable to reach the admin service. Check your connection or contact the site administrator."
+                  : "Unable to sign in. Please try again."),
           };
         }
       },

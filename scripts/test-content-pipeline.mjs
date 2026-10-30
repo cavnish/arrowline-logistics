@@ -106,6 +106,25 @@ async function startFakeSupabase(services) {
   const requests = [];
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://localhost");
+
+    // Public backend snapshot endpoint used by the credential-free build path.
+    if (url.pathname === "/api/content/snapshot") {
+      const tables = {
+        services,
+        site_content: [
+          { id: "c1", content_key: "hero_description", content_value: "Test", is_published: true },
+          { id: "c2", content_key: "draft_only", content_value: "Draft", is_published: false },
+        ],
+        site_settings: [
+          { id: "s1", setting_key: "phone", setting_value: "+91 00000 00000", is_public: true },
+          { id: "s2", setting_key: "secret_setting", setting_value: "hidden", is_public: false },
+        ],
+      };
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, data: { tables } }));
+      return;
+    }
+
     const match = url.pathname.match(/^\/rest\/v1\/([a-z_]+)$/);
     if (!match) {
       res.writeHead(404).end("not found");
@@ -235,6 +254,26 @@ async function main() {
     );
     check(pagedData.tables.site_content.length === 1, "draft content filtered in live export");
     check(pagedData.tables.site_settings.length === 1, "private settings filtered in live export");
+
+    // 7b. Credential-free backend snapshot path (the Vercel fallback).
+    console.log("\n[test] 7b. Backend snapshot export (no Supabase credentials)");
+    const remoteSnapshot = path.join(TEMP_ROOT, "remote.json");
+    const remoteManifest = path.join(TEMP_ROOT, "remote.manifest.json");
+    const remote = await runAsync(
+      ["--remote", fake.url, "--out", remoteSnapshot, "--manifest", remoteManifest],
+      {
+        SUPABASE_URL: "",
+        SUPABASE_SERVICE_ROLE_KEY: "",
+        SUPABASE_ANON_KEY: "",
+        SUPABASE_KEY: "",
+      }
+    );
+    check(remote.status === 0, "remote export exits 0", remote.output.slice(-600));
+    const remoteData = JSON.parse(fs.readFileSync(remoteSnapshot, "utf8"));
+    check(remoteData.tables.services.length === 1200, "remote export keeps every service row");
+    check(remoteData.tables.site_content.length === 1, "remote export filters drafts");
+    check(remoteData.tables.site_settings.length === 1, "remote export filters private settings");
+    check(/Source: backend snapshot/i.test(remote.output), "remote source is reported");
   } finally {
     await new Promise((resolve) => fake.server.close(resolve));
   }

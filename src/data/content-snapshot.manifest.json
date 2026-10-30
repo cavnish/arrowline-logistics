@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "20261027T055913Z-575685d4",
-  "generatedAt": "2026-10-27T05:59:13.008Z",
+  "contentVersion": "20261030T085859Z-9c291069",
+  "generatedAt": "2026-10-30T08:58:59.603Z",
   "source": "supabase-live",
-  "checksum": "575685d476c82462d3cec83c1d2431e5bf1129dd2fc297d0d4942cc8bca26d05",
+  "checksum": "9c29106963e421f4eb4bb73ff24866456d286161cd93129121a678e7cb68cf93",
   "totalRecords": 393,
   "counts": {
     "site_content": 56,

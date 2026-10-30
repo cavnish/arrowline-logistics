@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "20261027T055913Z-575685d4",
-  "generatedAt": "2026-10-27T05:59:13.008Z",
+  "contentVersion": "20261030T085859Z-9c291069",
+  "generatedAt": "2026-10-30T08:58:59.603Z",
   "source": "supabase-live",
-  "checksum": "575685d476c82462d3cec83c1d2431e5bf1129dd2fc297d0d4942cc8bca26d05",
+  "checksum": "9c29106963e421f4eb4bb73ff24866456d286161cd93129121a678e7cb68cf93",
   "tables": {
     "site_content": [
       {
@@ -359,11 +359,11 @@
       {
         "id": "8c62fdf3-718d-4ed5-abf6-bc5c6373e334",
         "content_key": "about_secondary_image",
-        "content_value": "https://res.cloudinary.com/uorctww6/image/upload/v1790159860/arrowline/site-content/r8zhigq6is9zyvlk2ste.png",
+        "content_value": "https://res.cloudinary.com/uorctww6/image/upload/v1793350207/arrowline/site-content/dzny8awfs0bwfhbbandx.png",
         "content_type": "image",
         "section": "About",
         "is_published": true,
-        "updated_at": "2026-09-23T10:37:42.864+00:00",
+        "updated_at": "2026-10-30T08:50:07.949+00:00",
         "updated_by": null
       },
       {
@@ -529,21 +529,21 @@
       {
         "id": "6888a585-a517-47dc-92cd-27feba9e9684",
         "content_key": "process_image",
-        "content_value": "https://res.cloudinary.com/uorctww6/image/upload/v1789474539/arrowline/site-content/rdwi1tkumdt3lfcvx7in.png",
+        "content_value": "https://res.cloudinary.com/uorctww6/image/upload/v1793350435/arrowline/site-content/stzv9ma0jrk12pukthfo.png",
         "content_type": "image",
         "section": "Process",
         "is_published": true,
-        "updated_at": "2026-09-15T12:15:40.264+00:00",
+        "updated_at": "2026-10-30T08:54:03.396+00:00",
         "updated_by": null
       },
       {
         "id": "0ea1a6a1-efc0-4c52-b8f9-1b264cbe4dfb",
         "content_key": "services_image",
-        "content_value": "https://res.cloudinary.com/uorctww6/image/upload/v1790229990/arrowline/general/road-transport.jpg",
+        "content_value": "https://res.cloudinary.com/uorctww6/image/upload/v1793350394/arrowline/site-content/rmbhrsdpyjhddmexgozy.png",
         "content_type": "image",
         "section": "Services",
         "is_published": true,
-        "updated_at": "2026-09-14T13:02:41.242+00:00",
+        "updated_at": "2026-10-30T08:53:15.611+00:00",
         "updated_by": null
       },
       {

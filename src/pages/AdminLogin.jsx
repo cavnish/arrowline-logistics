@@ -1,5 +1,6 @@
 ﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAdminAuth } from "../admin/AdminAuthProvider";
 import adminApi from "../services/adminApi";
 
 import {
@@ -13,6 +14,7 @@ import {
 
 export default function AdminLogin() {
   const navigate = useNavigate();
+  const { signIn } = useAdminAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,19 +33,25 @@ export default function AdminLogin() {
     setError("");
 
     try {
-      const response = await adminApi.post("/login", {
-        email: email.trim(),
-        password,
-      });
+      const result = await signIn(email, password);
 
-      if (!response.data?.success) {
+      if (!result.success) {
         throw new Error(
-          response.data?.message || "Login failed."
+          result.message || "Login failed."
         );
       }
 
-      // Verify that the backend actually created the session.
-      await adminApi.get("/me");
+      // Verify that the backend actually created the session cookie.
+      // Without this check the dashboard would immediately bounce back to
+      // the login screen when the cookie was rejected by the browser.
+      try {
+        await adminApi.get("/me");
+      } catch (sessionError) {
+        throw new Error(
+          "Login succeeded, but the admin session was not saved. " +
+            "Please allow cookies for this site and try again."
+        );
+      }
 
       navigate(
         "/arrowline-admin/dashboard",
@@ -55,8 +63,11 @@ export default function AdminLogin() {
 
       const message =
         err?.response?.data?.message ||
-        err?.message ||
-        "Invalid admin email or password.";
+        (err?.response?.status === 404
+          ? "The admin API could not be found. Please contact the site administrator to restore the backend service."
+          : err?.code === "ERR_NETWORK"
+            ? "Unable to reach the admin service. Check your connection or contact the site administrator."
+            : err?.message || "Invalid admin email or password.");
 
       setError(message);
 

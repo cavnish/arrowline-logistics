@@ -262,9 +262,14 @@ The public snapshot contains no rows from these tables and no credential fields.
 | `node scripts/export-content.mjs` | Yes | Non-zero; previous snapshot untouched. |
 | `node scripts/export-content.mjs --soft` | Yes | Keeps the last valid snapshot and exits 0. |
 | `node scripts/export-content.mjs --from-file fixture.json` | No | Validates/filters fixture rows. Used by tests. |
-| `CONTENT_EXPORT_LIVE=1 npm run build` | Yes | Soft live export; falls back to committed snapshot. |
+| `node scripts/export-content.mjs --remote https://api.example.com` | Yes | Reads `GET /api/content/snapshot` instead of Supabase. |
 | `CONTENT_EXPORT_STRICT=1 npm run build` | Yes | Build fails; previous Vercel deployment stays live. |
-| `npm run build` (default) | No | Validates committed snapshot only. |
+| `CONTENT_EXPORT_OFFLINE=1 npm run build` | No | Validates the committed snapshot only. |
+| `npm run build` (default) | Yes | Refreshes from Supabase when credentials exist, otherwise from the backend snapshot; falls back to the committed snapshot on a local/offline failure. |
+
+Production Vercel builds are strict by default (`VERCEL_ENV=production`): if the
+live source cannot be read, the build fails and the previous deployment stays
+live. Set `CONTENT_EXPORT_ALLOW_STALE=1` only as an explicit escape hatch.
 
 ---
 
@@ -272,7 +277,8 @@ The public snapshot contains no rows from these tables and no credential fields.
 
 ### 5.1 Build pipeline (`scripts/build.mjs`)
 
-1. Validate or refresh the published-content snapshot.
+1. Refresh the published-content snapshot from Supabase (or from the backend
+   `GET /api/content/snapshot` when no Supabase credentials are present).
 2. Re-validate the snapshot.
 3. TypeScript strict typecheck.
 4. Client Vite build → `dist/`.
@@ -381,8 +387,10 @@ curl https://arrowlinelogistics.in/content-version.json
 1. Editor creates/updates content and marks rows published.
 2. Editor clicks **Publish latest content**.
 3. Express calls the Vercel Deploy Hook.
-4. Vercel runs `npm run build` with `CONTENT_EXPORT_STRICT=1`.
-5. Exporter pulls all published rows, validates, and writes the snapshot.
+4. Vercel runs `npm run build`; production builds are strict.
+5. Exporter pulls all published rows from Supabase (when build credentials are
+   configured) or from the backend snapshot endpoint, validates, and writes the
+   snapshot.
 6. TypeScript → client build → SSR build → prerender → static verification.
 7. Vercel promotes the new deployment only if every step passes.
 8. `/content-version.json` changes to the new version; the admin panel can read it from the public site (15-second cache).
@@ -393,10 +401,12 @@ If Supabase is down, the export fails validation, the build stops, and the previ
 
 - Build command: `npm run build`
 - Output directory: `dist`
-- Production environment:
-  - `CONTENT_EXPORT_STRICT=1`
-  - `SUPABASE_URL`
-  - `SUPABASE_SERVICE_ROLE_KEY` (server/build only)
+- Production environment (either source works):
+  - `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (server/build only), **or**
+  - leave them unset and let the build read
+    `https://arrowline-logistics.onrender.com/api/content/snapshot`
+    (override with `CONTENT_EXPORT_SOURCE_URL`).
+  - `CONTENT_EXPORT_STRICT=1` is optional; production builds are already strict.
 - Optional frontend variables:
   - `VITE_API_URL` (Render API origin for forms/admin)
   - `VITE_GA_ID`
@@ -558,10 +568,12 @@ Public page rendering has **no runtime dependency** on Supabase, Express content
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `SUPABASE_URL` | Strict build | Supabase project URL. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Strict build | Read published rows during export. Server/build only. |
-| `CONTENT_EXPORT_STRICT` | Production publish | `1` requires a fresh valid export; failed build keeps previous deployment. |
-| `CONTENT_EXPORT_LIVE` | Optional | `1` performs a soft live export; falls back to the committed snapshot. |
+| `SUPABASE_URL` | Optional | Supabase project URL; when both Supabase variables are set the build reads Supabase directly. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Optional | Read published rows during export. Server/build only. |
+| `CONTENT_EXPORT_SOURCE_URL` | Optional | Backend base URL for the credential-free `GET /api/content/snapshot` refresh. Defaults to the production API. |
+| `CONTENT_EXPORT_STRICT` | Optional | `1` requires a fresh valid export; failed build keeps previous deployment. Production builds are strict by default. |
+| `CONTENT_EXPORT_OFFLINE` | Optional | `1` skips the live refresh and validates the committed snapshot only. |
+| `CONTENT_EXPORT_ALLOW_STALE` | Optional | `1` lets a production build fall back to the committed snapshot when the live source is unreachable. |
 
 ### Backend — `server/.env` / Render
 

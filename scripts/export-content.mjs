@@ -18,9 +18,17 @@
  *   node scripts/export-content.mjs --soft         # keep last good snapshot on failure
  *   node scripts/export-content.mjs --check        # validate existing snapshot only
  *   node scripts/export-content.mjs --from-file tmp_live.json
+ *   node scripts/export-content.mjs --remote URL   # read the public backend snapshot
+ *   node scripts/export-content.mjs --source supabase|remote
+ *
+ * Source selection (when not --from-file):
+ *   1. `CONTENT_EXPORT_SOURCE_URL` / `--remote` -> public backend snapshot.
+ *   2. Supabase credentials present -> direct Supabase read.
+ *   3. Otherwise -> the production backend snapshot URL.
  *
  * The service-role key is read from the server environment only. It is never
- * written to the snapshot or to any browser bundle.
+ * written to the snapshot or to any browser bundle. The remote fallback exists
+ * so Vercel builds can refresh content without holding that secret.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -34,6 +42,10 @@ const SNAPSHOT_FILE = path.join(ROOT, "src", "data", "content-snapshot.json");
 const MANIFEST_FILE = path.join(ROOT, "src", "data", "content-snapshot.manifest.json");
 const SCHEMA_VERSION = 1;
 const PAGE_SIZE = 1000;
+const DEFAULT_REMOTE_URL = "https://arrowline-logistics.onrender.com";
+const REMOTE_TIMEOUT_MS = 90_000;
+const REMOTE_ATTEMPTS = 4;
+const REMOTE_RETRY_DELAYS_MS = [10_000, 20_000, 30_000];
 
 /**
  * Tables exported into the public snapshot. `filter` is the column that marks
@@ -143,6 +155,8 @@ function parseArgs(argv) {
     soft: false,
     check: false,
     fromFile: null,
+    remote: null,
+    source: null,
     out: SNAPSHOT_FILE,
     manifest: MANIFEST_FILE,
     verbose: false,
@@ -154,13 +168,17 @@ function parseArgs(argv) {
     else if (arg === "--verbose") args.verbose = true;
     else if (arg === "--from-file") args.fromFile = argv[++i];
     else if (arg.startsWith("--from-file=")) args.fromFile = arg.split("=")[1];
+    else if (arg === "--remote") args.remote = argv[++i];
+    else if (arg.startsWith("--remote=")) args.remote = arg.split("=")[1];
+    else if (arg === "--source") args.source = argv[++i];
+    else if (arg.startsWith("--source=")) args.source = arg.split("=")[1];
     else if (arg === "--out") args.out = path.resolve(argv[++i]);
     else if (arg.startsWith("--out=")) args.out = path.resolve(arg.split("=")[1]);
     else if (arg === "--manifest") args.manifest = path.resolve(argv[++i]);
     else if (arg.startsWith("--manifest=")) args.manifest = path.resolve(arg.split("=")[1]);
     else if (arg === "--help" || arg === "-h") {
       console.log(
-        "Usage: node scripts/export-content.mjs [--soft] [--check] [--from-file file.json] [--out file] [--manifest file] [--verbose]"
+        "Usage: node scripts/export-content.mjs [--soft] [--check] [--from-file file.json] [--remote url] [--source supabase|remote] [--out file] [--manifest file] [--verbose]"
       );
       process.exit(0);
     } else {
@@ -473,6 +491,38 @@ async function fetchTableLive(table) {
   return normalizeRows(table.name, rows, table.filter);
 }
 
+function hasSupabaseCredentials() {
+  const url = (process.env.SUPABASE_URL || "").trim();
+  const key = (
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
+    process.env.SUPABASE_KEY ||
+    ""
+  ).trim();
+  return Boolean(url && key);
+}
+
+function selectSource(args) {
+  const requested = String(args.source || "").trim().toLowerCase();
+  if (requested && requested !== "supabase" && requested !== "remote") {
+    throw new ExportError(`Unknown --source "${args.source}" (expected supabase or remote)`);
+  }
+
+  const remoteUrl =
+    args.remote ||
+    process.env.CONTENT_EXPORT_SOURCE_URL ||
+    process.env.CONTENT_EXPORT_API_URL ||
+    "";
+
+  if (args.fromFile) return { kind: "file", value: args.fromFile };
+  if (requested === "remote" || remoteUrl) {
+    return { kind: "remote", value: remoteUrl || DEFAULT_REMOTE_URL };
+  }
+  if (requested === "supabase") return { kind: "supabase" };
+  if (hasSupabaseCredentials()) return { kind: "supabase" };
+  return { kind: "remote", value: DEFAULT_REMOTE_URL };
+}
+
 async function collectLive() {
   const tables = {};
   for (const table of TABLES) {
@@ -481,6 +531,73 @@ async function collectLive() {
     log(`${table.name}: ${rows.length} published row(s)`);
   }
   return { tables, source: "supabase-live" };
+}
+
+/**
+ * Reads the same published snapshot from a running Arrowline backend.
+ *
+ * This is the fallback used by Vercel builds: the backend already holds the
+ * Supabase credentials, so the build only needs a public URL, never the
+ * service-role key. Retries cover Render cold starts.
+ */
+async function collectRemote(baseUrl) {
+  const trimmed = String(baseUrl || DEFAULT_REMOTE_URL).trim().replace(/\/+$/, "");
+  const endpoint = /\/api\/content\/snapshot$/.test(trimmed)
+    ? trimmed
+    : `${trimmed}/api/content/snapshot`;
+
+  let lastError = null;
+  for (let attempt = 1; attempt <= REMOTE_ATTEMPTS; attempt += 1) {
+    try {
+      log(`Fetching published snapshot from ${endpoint} (attempt ${attempt}/${REMOTE_ATTEMPTS})`);
+      const response = await fetch(endpoint, {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(REMOTE_TIMEOUT_MS),
+      });
+
+      if (!response.ok) {
+        const body = await response.text().catch(() => "");
+        throw new ExportError(
+          `Remote snapshot failed: HTTP ${response.status} ${body.slice(0, 200)}`
+        );
+      }
+
+      const body = await response.json();
+      const payload = body?.data ?? body;
+      const remoteTables = payload?.tables ?? payload;
+      if (!remoteTables || typeof remoteTables !== "object" || Array.isArray(remoteTables)) {
+        throw new ExportError("Remote snapshot did not contain a tables object");
+      }
+
+      const tables = {};
+      for (const table of TABLES) {
+        const rows = remoteTables[table.name];
+        if (rows === undefined) {
+          warn(`remote snapshot is missing table ${table.name}; exporting []`);
+          tables[table.name] = [];
+          continue;
+        }
+        tables[table.name] = normalizeRows(table.name, rows, table.filter);
+      }
+
+      let sourceHost = endpoint;
+      try {
+        sourceHost = new URL(endpoint).host;
+      } catch {
+        // Keep the raw endpoint for display when it is a relative URL.
+      }
+      return { tables, source: `remote:${sourceHost}` };
+    } catch (error) {
+      lastError = error;
+      if (attempt < REMOTE_ATTEMPTS) {
+        const delay = REMOTE_RETRY_DELAYS_MS[attempt - 1] ?? 30_000;
+        warn(`${error instanceof Error ? error.message : error} — retrying in ${Math.round(delay / 1000)}s`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new ExportError(String(lastError));
 }
 
 function collectFromFile(file) {
@@ -539,11 +656,22 @@ async function main() {
 
   const previous = readExistingSnapshot(args.out);
 
+  const source = selectSource(args);
   let collected;
   try {
-    collected = args.fromFile
-      ? collectFromFile(args.fromFile)
-      : await collectLive();
+    log(
+      source.kind === "supabase"
+        ? "Source: Supabase REST (live)"
+        : source.kind === "remote"
+          ? `Source: backend snapshot (${source.value})`
+          : `Source: fixture (${source.value})`
+    );
+    collected =
+      source.kind === "file"
+        ? collectFromFile(source.value)
+        : source.kind === "remote"
+          ? await collectRemote(source.value)
+          : await collectLive();
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`[export-content] Export failed: ${message}`);
