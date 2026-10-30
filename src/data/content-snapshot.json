@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "20261030T085859Z-9c291069",
-  "generatedAt": "2026-10-30T08:58:59.603Z",
+  "contentVersion": "20261030T093000Z-f4cc68e5",
+  "generatedAt": "2026-10-30T09:30:00.713Z",
   "source": "supabase-live",
-  "checksum": "9c29106963e421f4eb4bb73ff24866456d286161cd93129121a678e7cb68cf93",
+  "checksum": "f4cc68e515238636ec644b5982513e0ed8d7ef986258ab6f32f9a3ba3a494eca",
   "tables": {
     "site_content": [
       {
@@ -359,11 +359,11 @@
       {
         "id": "8c62fdf3-718d-4ed5-abf6-bc5c6373e334",
         "content_key": "about_secondary_image",
-        "content_value": "https://res.cloudinary.com/uorctww6/image/upload/v1793350207/arrowline/site-content/dzny8awfs0bwfhbbandx.png",
+        "content_value": "https://res.cloudinary.com/uorctww6/image/upload/v1793350845/arrowline/site-content/f32ac3lqfefdxhngnajz.png",
         "content_type": "image",
         "section": "About",
         "is_published": true,
-        "updated_at": "2026-10-30T08:50:07.949+00:00",
+        "updated_at": "2026-10-30T09:00:45.597+00:00",
         "updated_by": null
       },
       {

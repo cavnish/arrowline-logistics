@@ -2166,8 +2166,51 @@ router.delete("/cargo-applications/:id", requireAdmin, async (req, res) => {
 const PUBLISH_COOLDOWN_MS = 60 * 1000;
 const PUBLIC_SITE_URL = (process.env.PUBLIC_SITE_URL || "https://arrowlinelogistics.in").replace(/\/+$/, "");
 const VERSION_CACHE_MS = 15 * 1000;
+const DEPLOY_HOOK_SETTING_KEY = "vercelDeployHookUrl";
 let lastPublish = null;
 let versionCache = { at: 0, value: null };
+
+/**
+ * Resolves the Vercel Deploy Hook from the environment first, then from the
+ * private site_settings row so an operator can enable publishing from the admin
+ * area without redeploying the backend. The value is never returned to clients.
+ */
+async function getDeployHookUrl() {
+  const envUrl = String(process.env.VERCEL_DEPLOY_HOOK_URL || "").trim();
+  if (envUrl) return { url: envUrl, source: "env" };
+
+  try {
+    const { data, error } = await supabase
+      .from("site_settings")
+      .select("setting_value, is_public")
+      .eq("setting_key", DEPLOY_HOOK_SETTING_KEY)
+      .maybeSingle();
+
+    if (error) {
+      console.warn("Deploy hook lookup failed:", error.message);
+      return { url: "", source: null };
+    }
+    if (!data || data.is_public) return { url: "", source: null };
+
+    const stored = String(data.setting_value || "").trim();
+    return stored ? { url: stored, source: "database" } : { url: "", source: null };
+  } catch (error) {
+    console.warn("Deploy hook lookup failed:", error?.message || error);
+    return { url: "", source: null };
+  }
+}
+
+function isValidDeployHookUrl(value) {
+  try {
+    const url = new URL(String(value));
+    return (
+      url.protocol === "https:" &&
+      (url.hostname === "api.vercel.com" || url.hostname.endsWith(".vercel.com"))
+    );
+  } catch {
+    return false;
+  }
+}
 
 async function readDeployedContentVersion() {
   // Self-hosted deployments (Express serving dist/) can read the marker
@@ -2200,8 +2243,10 @@ async function readDeployedContentVersion() {
 }
 
 async function publishStatus() {
+  const hook = await getDeployHookUrl();
   return {
-    configured: Boolean(process.env.VERCEL_DEPLOY_HOOK_URL),
+    configured: Boolean(hook.url),
+    configuredSource: hook.source,
     lastTriggeredAt: lastPublish?.at || null,
     lastTriggeredBy: lastPublish?.by || null,
     deployedContentVersion: await readDeployedContentVersion(),
@@ -2212,12 +2257,71 @@ router.get("/publish/status", requireAdmin, async (_req, res) => {
   return res.json({ success: true, data: await publishStatus() });
 });
 
+router.get("/publish/config", requireAdmin, async (_req, res) => {
+  const hook = await getDeployHookUrl();
+  return res.json({
+    success: true,
+    data: { configured: Boolean(hook.url), source: hook.source },
+  });
+});
+
+router.put("/publish/config", requireAdmin, async (req, res) => {
+  const deployHookUrl = String(req.body?.deployHookUrl || "").trim();
+  if (!isValidDeployHookUrl(deployHookUrl)) {
+    return res.status(400).json({
+      success: false,
+      message: "Enter a valid Vercel Deploy Hook URL (https://api.vercel.com/...).",
+    });
+  }
+
+  try {
+    const payload = {
+      setting_value: deployHookUrl,
+      setting_type: "text",
+      is_public: false,
+      updated_at: new Date().toISOString(),
+    };
+
+    let { data, error } = await supabase
+      .from("site_settings")
+      .update(payload)
+      .eq("setting_key", DEPLOY_HOOK_SETTING_KEY)
+      .select("setting_key")
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (!data) {
+      const inserted = await supabase
+        .from("site_settings")
+        .insert([{ setting_key: DEPLOY_HOOK_SETTING_KEY, ...payload }])
+        .select("setting_key")
+        .single();
+      if (inserted.error) throw inserted.error;
+    }
+
+    versionCache = { at: 0, value: null };
+    return res.json({
+      success: true,
+      message: "Publishing is configured. Future updates can be published from this panel.",
+      data: { configured: true, source: "database" },
+    });
+  } catch (error) {
+    console.error("Save deploy hook failed:", error?.message || error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to save the deploy hook. Check the server logs.",
+    });
+  }
+});
+
 router.post("/publish", requireAdmin, async (req, res) => {
-  const hookUrl = process.env.VERCEL_DEPLOY_HOOK_URL;
+  const hook = await getDeployHookUrl();
+  const hookUrl = hook.url;
   if (!hookUrl) {
     return res.status(503).json({
       success: false,
-      message: "Publishing is not configured. Set VERCEL_DEPLOY_HOOK_URL on the server.",
+      message: "Publishing is not configured. Add a Vercel Deploy Hook in the Publish panel.",
     });
   }
 

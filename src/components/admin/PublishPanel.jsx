@@ -14,6 +14,8 @@ export default function PublishPanel() {
   const [loading, setLoading] = useState(true);
   const [publishing, setPublishing] = useState(false);
   const [result, setResult] = useState(null);
+  const [hookUrl, setHookUrl] = useState("");
+  const [savingHook, setSavingHook] = useState(false);
 
   const loadStatus = useCallback(async () => {
     try {
@@ -53,6 +55,27 @@ export default function PublishPanel() {
       });
     } finally {
       setPublishing(false);
+    }
+  };
+
+  const saveHook = async (event) => {
+    event.preventDefault();
+    setSavingHook(true);
+    setResult(null);
+    try {
+      await adminApi.put("/publish/config", { deployHookUrl: hookUrl.trim() });
+      setHookUrl("");
+      setResult({ ok: true, message: "Deploy hook saved. Publishing is now enabled." });
+      await loadStatus();
+    } catch (error) {
+      setResult({
+        ok: false,
+        message:
+          error?.response?.data?.message ||
+          "Unable to save the deploy hook. Check the server logs.",
+      });
+    } finally {
+      setSavingHook(false);
     }
   };
 
@@ -137,9 +160,28 @@ export default function PublishPanel() {
             Refresh status
           </button>
           {status && status.configured === false && (
-            <p className="max-w-[220px] text-[11px] leading-relaxed text-amber-700">
-              Publishing is disabled: set <code>VERCEL_DEPLOY_HOOK_URL</code> on the server.
-            </p>
+            <form onSubmit={saveHook} className="w-full max-w-[260px] space-y-2">
+              <p className="text-[11px] leading-relaxed text-amber-700">
+                Publishing is disabled. Create a Deploy Hook in Vercel
+                (Project → Settings → Git → Deploy Hooks), then paste its URL
+                here.
+              </p>
+              <input
+                type="url"
+                required
+                value={hookUrl}
+                onChange={(event) => setHookUrl(event.target.value)}
+                placeholder="https://api.vercel.com/v1/integrations/deploy/..."
+                className="w-full rounded-lg border border-slate-200 px-2.5 py-2 text-[11px] text-slate-700 outline-none focus:border-[#1E3A8A]"
+              />
+              <button
+                type="submit"
+                disabled={savingHook || !hookUrl.trim()}
+                className="inline-flex w-full items-center justify-center rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {savingHook ? "Saving…" : "Save deploy hook"}
+              </button>
+            </form>
           )}
         </div>
       </div>
