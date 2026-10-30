@@ -2164,7 +2164,16 @@ router.delete("/cargo-applications/:id", requireAdmin, async (req, res) => {
 // =====================================================
 
 const PUBLISH_COOLDOWN_MS = 60 * 1000;
-const PUBLIC_SITE_URL = (process.env.PUBLIC_SITE_URL || "https://arrowlinelogistics.in").replace(/\/+$/, "");
+// The custom domain may still point at a legacy WordPress site, so try the
+// configured origin first and fall back to the Vercel deployment URL.
+const PUBLIC_SITE_URLS = [
+  process.env.PUBLIC_SITE_URL,
+  "https://arrowline-logistics-n4iw.vercel.app",
+  "https://arrowlinelogistics.in",
+]
+  .filter(Boolean)
+  .map((value) => String(value).replace(/\/+$/, ""))
+  .filter((value, index, list) => list.indexOf(value) === index);
 const VERSION_CACHE_MS = 15 * 1000;
 const DEPLOY_HOOK_SETTING_KEY = "vercelDeployHookUrl";
 let lastPublish = null;
@@ -2228,18 +2237,21 @@ async function readDeployedContentVersion() {
   if (versionCache.value && Date.now() - versionCache.at < VERSION_CACHE_MS) {
     return versionCache.value;
   }
-  try {
-    const response = await fetch(`${PUBLIC_SITE_URL}/content-version.json`, {
-      headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(2_500),
-    });
-    if (!response.ok) return versionCache.value;
-    const value = await response.json();
-    versionCache = { at: Date.now(), value };
-    return value;
-  } catch {
-    return versionCache.value;
+  for (const baseUrl of PUBLIC_SITE_URLS) {
+    try {
+      const response = await fetch(`${baseUrl}/content-version.json`, {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(2_500),
+      });
+      if (!response.ok) continue;
+      const value = await response.json();
+      versionCache = { at: Date.now(), value };
+      return value;
+    } catch {
+      // Try the next candidate origin.
+    }
   }
+  return versionCache.value;
 }
 
 async function publishStatus() {
