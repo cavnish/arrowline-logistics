@@ -1,0 +1,66 @@
+name: Refresh static content
+
+# Safety net for admin content updates: if the published Supabase rows changed
+# but no one pressed "Publish latest content" (or the deploy hook is not
+# configured yet), this scheduled job triggers a Vercel rebuild by pushing an
+# empty commit. The build itself re-exports the live published snapshot.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-static-content
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Compare live published content with the deployed version
+        id: compare
+        env:
+          CONTENT_EXPORT_SOURCE_URL: https://arrowline-logistics.onrender.com
+          PUBLIC_SITE_URL: https://arrowline-logistics-n4iw.vercel.app
+        run: |
+          set -euo pipefail
+          node scripts/export-content.mjs \
+            --remote "$CONTENT_EXPORT_SOURCE_URL" \
+            --out "$RUNNER_TEMP/snapshot.json" \
+            --manifest "$RUNNER_TEMP/snapshot.manifest.json"
+
+          node --input-type=module -e "import fs from 'node:fs'; console.log(JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + '/snapshot.json', 'utf8')).checksum)" > "$RUNNER_TEMP/live.txt"
+          curl -fsSL "$PUBLIC_SITE_URL/content-version.json" > "$RUNNER_TEMP/deployed.json"
+          node --input-type=module -e "import fs from 'node:fs'; console.log(JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + '/deployed.json', 'utf8')).checksum)" > "$RUNNER_TEMP/deployed.txt"
+
+          LIVE="$(cat "$RUNNER_TEMP/live.txt")"
+          DEPLOYED="$(cat "$RUNNER_TEMP/deployed.txt")"
+          echo "Live checksum:     $LIVE"
+          echo "Deployed checksum: $DEPLOYED"
+
+          if [ "$LIVE" = "$DEPLOYED" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Trigger a static rebuild
+        if: steps.compare.outputs.changed == 'true'
+        run: |
+          git config user.name "arrowline-content-bot"
+          git config user.email "arrowline-content-bot@users.noreply.github.com"
+          git commit --allow-empty -m "chore: refresh static content from published CMS"
+          git push origin HEAD:main
