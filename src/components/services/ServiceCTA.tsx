@@ -14,9 +14,9 @@ export default function ServiceCTA({
   onOpenQuote,
 }: ServiceCTAProps) {
   return (
-    <section className="py-12 sm:py-16 lg:py-20 bg-[#03212D] text-white relative overflow-hidden">
+    <section className="py-9 sm:py-14 lg:py-20 bg-[#03212D] text-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="relative bg-gradient-to-r from-[#062B3A] via-[#0C4A60] to-[#062B3A] rounded-3xl overflow-hidden shadow-2xl p-7 sm:p-10 lg:p-14 border border-white/15">
+        <div className="relative bg-gradient-to-r from-[#062B3A] via-[#0C4A60] to-[#062B3A] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl p-5 sm:p-10 lg:p-14 border border-white/15">
 
           {/* Background Ambient Glow */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,107,26,0.3),transparent_60%)] pointer-events-none" />

@@ -23,9 +23,9 @@ export default function ServiceFAQSection({
   };
 
   return (
-    <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
+    <section className="py-10 sm:py-14 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
           {/* Left Column: Heading & Contact Card */}
           <Reveal direction="left" className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
@@ -34,7 +34,7 @@ export default function ServiceFAQSection({
                 <span>FREQUENTLY ASKED QUESTIONS</span>
               </div>
 
-              <h2 className="text-3xl sm:text-4xl font-black text-[#062B3A] tracking-tight leading-tight">
+              <h2 className="text-[clamp(1.7rem,7.2vw,2.25rem)] sm:text-4xl font-black text-[#062B3A] tracking-tight leading-tight">
                 {serviceTitle} <br />
                 <span className="text-[#FF6B1A]">Questions Answered</span>
               </h2>
@@ -45,7 +45,7 @@ export default function ServiceFAQSection({
             </div>
 
             {/* Assistance Card */}
-            <div className="bg-[#062B3A] text-white p-6 rounded-3xl space-y-4 shadow-xl">
+            <div className="bg-[#062B3A] text-white p-5 sm:p-6 rounded-2xl sm:rounded-3xl space-y-4 shadow-xl">
               <span className="text-[10px] font-black uppercase tracking-widest text-[#FF7A00] block">
                 Mundra Operations Desk
               </span>

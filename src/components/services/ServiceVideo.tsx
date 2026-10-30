@@ -14,11 +14,11 @@ export default function ServiceVideo({ serviceName, videoUrl, posterImage }: Ser
   if (!videoUrl) return null;
 
   return (
-    <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
+    <section className="py-10 sm:py-14 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-10 sm:mb-14">
+        <div className="text-center max-w-3xl mx-auto space-y-3 mb-7 sm:mb-10 lg:mb-14">
           <Reveal>
             <div className="inline-flex items-center space-x-2 px-3.5 py-1 bg-white border border-[#062B3A]/15 rounded-full text-xs font-bold text-[#FF6B1A] tracking-widest uppercase shadow-sm">
               <VideoIcon className="w-3.5 h-3.5" />
@@ -27,7 +27,7 @@ export default function ServiceVideo({ serviceName, videoUrl, posterImage }: Ser
           </Reveal>
 
           <Reveal delay={80}>
-            <h2 className="text-3xl sm:text-4xl font-black text-[#062B3A] tracking-tight">
+            <h2 className="text-[clamp(1.7rem,7.2vw,2.25rem)] sm:text-4xl font-black text-[#062B3A] tracking-tight leading-tight">
               Watch {serviceName} Logistics
             </h2>
           </Reveal>

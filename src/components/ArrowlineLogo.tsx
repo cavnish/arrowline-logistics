@@ -1,7 +1,7 @@
 import { cn } from "../utils/cn";
 
 interface ArrowlineLogoProps {
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "responsive";
   showTagline?: boolean;
   className?: string;
   inverted?: boolean;
@@ -21,6 +21,12 @@ export default function ArrowlineLogo({
     sm: { wordmark: "text-lg", sub: "text-[8px]", tag: "text-[9px]", arrow: "h-5 w-6" },
     md: { wordmark: "text-2xl", sub: "text-[10px]", tag: "text-xs", arrow: "h-7 w-8" },
     lg: { wordmark: "text-4xl", sub: "text-xs", tag: "text-sm", arrow: "h-10 w-12" },
+    responsive: {
+      wordmark: "text-lg sm:text-2xl",
+      sub: "text-[8px] sm:text-[10px]",
+      tag: "text-[9px] sm:text-xs",
+      arrow: "h-5 w-6 sm:h-7 sm:w-8",
+    },
   };
 
   const s = sizeMap[size];

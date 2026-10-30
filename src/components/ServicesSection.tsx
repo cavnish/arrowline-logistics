@@ -33,19 +33,19 @@ export default function ServicesSection({ onSelectService }: ServicesSectionProp
   }));
 
   return (
-    <section id="services-section" className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden">
+    <section id="services-section" className="relative overflow-hidden bg-[#F5F8FA] py-12 sm:py-16 lg:py-24">
       {/* Premium logistics backdrop — one wide photograph behind the grid */}
       <SectionBackground image={SERVICES_BACKGROUND} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[2]">
 
         {/* Section Header */}
-        <Reveal className="text-center max-w-3xl mx-auto space-y-3 mb-10 lg:mb-14">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight">
+        <Reveal className="text-center max-w-3xl mx-auto space-y-3 mb-8 sm:mb-10 lg:mb-14">
+          <h2 className="text-[clamp(1.7rem,7.2vw,2.25rem)] sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight leading-tight">
             Complete Multimodal <span className="text-[#FF6B1A]">Logistics Solutions</span>
           </h2>
 
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+          <p className="text-[0.9375rem] sm:text-base text-slate-600 leading-relaxed">
             From single container highway dispatches to multimodal rail rakes, specialized heavy-lift engineering, and modern industrial warehousing, we provide end-to-end supply chain integration.
           </p>
         </Reveal>

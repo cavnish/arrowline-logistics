@@ -20,7 +20,7 @@ export default function FAQSection() {
   };
 
   return (
-    <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden">
+    <section className="relative overflow-hidden bg-[#F5F8FA] py-10 sm:py-14 lg:py-24">
       {/* Premium logistics backdrop */}
       <SectionBackground image={FAQ_BACKGROUND} />
 
@@ -35,7 +35,7 @@ export default function FAQSection() {
                 <span>FREQUENTLY ASKED QUESTIONS</span>
               </div>
 
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight leading-tight">
+              <h2 className="text-[clamp(1.7rem,7.2vw,2.25rem)] sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight leading-tight">
                 Do you have any question? <br />
                 <span className="text-[#FF6B1A]">Find answer here</span>
               </h2>

@@ -241,14 +241,14 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
               : "bg-white py-4 border-slate-200/70 shadow-sm"
         )}
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="mx-auto flex w-full min-w-0 max-w-7xl items-center justify-between gap-2">
           <a
             href={pageIdToPath("home")}
             onClick={(e) => handleSPANav(e, "home")}
             className="flex items-center focus:outline-none group transition-transform hover:scale-[1.02] cursor-pointer"
             aria-label="Arrowline Logistics Home"
           >
-            <ArrowlineLogo size="md" inverted={transparentHeader} />
+            <ArrowlineLogo size="responsive" inverted={transparentHeader} />
           </a>
 
           {/* Desktop Nav — iOS-style glass capsule */}
@@ -518,17 +518,17 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
           </div>
 
           {/* Mobile hamburger */}
-          <div className="flex lg:hidden items-center space-x-3">
+          <div className="flex shrink-0 items-center gap-2 lg:hidden">
             <button
               onClick={openQuoteForm}
-              className="px-3.5 py-1.5 bg-[#FF6B1A] text-white text-[11px] font-black uppercase tracking-wider rounded-lg shadow-md cursor-pointer"
+              className="min-h-10 rounded-lg bg-[#FF6B1A] px-2.5 text-[10px] font-black uppercase tracking-wide text-white shadow-md cursor-pointer sm:px-3.5 sm:text-[11px] sm:tracking-wider"
             >
               QUOTE
             </button>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={cn(
-                "p-2 rounded-xl transition-colors focus:outline-none",
+                "flex h-10 w-10 items-center justify-center rounded-xl transition-colors focus:outline-none",
                 transparentHeader
                   ? "bg-white/10 border border-white/25 text-white backdrop-blur-sm hover:text-[#FFB27D] hover:bg-white/20"
                   : "bg-[#F5F8FA] border border-slate-200 text-[#062B3A] hover:text-[#FF6B1A] hover:bg-white"
@@ -545,11 +545,12 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
       {/* Mobile Menu */}
       <div
         className={cn(
-          "fixed inset-0 top-[58px] sm:top-[68px] bg-white text-[#062B3A] z-40 transition-all duration-300 flex flex-col justify-between lg:hidden border-t border-slate-200 shadow-2xl",
+          "fixed inset-0 bg-white text-[#062B3A] z-40 transition-all duration-300 flex flex-col justify-between lg:hidden border-t border-slate-200 shadow-2xl",
+          isScrolled ? "top-[60px] sm:top-[64px]" : "top-[92px] sm:top-[96px]",
           isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none translate-y-4"
         )}
       >
-        <div className="overflow-y-auto px-6 pb-8 pt-14 sm:pt-16 space-y-6 flex-1">
+        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-5 pb-6 pt-6 sm:px-6 sm:pb-8 sm:pt-8">
           <div className="space-y-4">
             <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 pb-2">
               Arrowline Navigation
@@ -711,7 +712,7 @@ export default function Header({ activePage, setActivePage, openQuoteForm }: Hea
           </div>
         </div>
 
-        <div className="bg-[#F5F8FA] p-6 border-t border-slate-200 space-y-4">
+        <div className="shrink-0 space-y-3 border-t border-slate-200 bg-[#F5F8FA] p-4 sm:space-y-4 sm:p-6">
           <div className="text-xs text-slate-600">
             <span className="block font-bold text-[#062B3A] mb-1">Mundra Headquarters:</span>
             <span className="block text-[11px] leading-relaxed">

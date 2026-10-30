@@ -23,15 +23,15 @@ export default function ServiceAbout({
   onOpenQuote,
 }: ServiceAboutProps) {
   return (
-    <section className="py-16 lg:py-24 bg-white relative overflow-hidden">
+    <section className="py-10 sm:py-14 lg:py-24 bg-white relative overflow-hidden">
       {/* Premium logistics backdrop relevant to this service */}
       <ServiceSectionBackground image={image} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-9 sm:gap-12 lg:gap-16 items-center">
 
           {/* Left Column: Text & Bullets */}
-          <div className="lg:col-span-6 space-y-6">
+          <div className="lg:col-span-6 space-y-5 sm:space-y-6">
             <Reveal>
               <div className="inline-flex items-center space-x-2 px-3 py-1 bg-[#EAF3F6] border border-[#062B3A]/20 rounded-full text-[11px] font-extrabold text-[#062B3A] tracking-wider uppercase">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B1A]" />
@@ -40,13 +40,13 @@ export default function ServiceAbout({
             </Reveal>
 
             <Reveal delay={80}>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight leading-[1.15]">
+              <h2 className="text-[clamp(1.7rem,7.2vw,2.25rem)] sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight leading-[1.12]">
                 {heading}
               </h2>
             </Reveal>
 
             <Reveal delay={140}>
-              <p className="text-base text-slate-600 leading-relaxed font-normal">
+              <p className="text-[0.9375rem] sm:text-base text-slate-600 leading-relaxed font-normal">
                 {description}
               </p>
             </Reveal>
@@ -117,7 +117,7 @@ export default function ServiceAbout({
                 </div>
 
                 {/* Floating Bottom Card */}
-                <div className="absolute -bottom-6 -left-4 sm:left-6 bg-[#062B3A] border border-white/20 text-white p-4 sm:p-5 rounded-2xl shadow-2xl backdrop-blur-md max-w-[280px] sm:max-w-xs">
+                <div className="relative z-10 mx-3 -mt-5 bg-[#062B3A] border border-white/20 text-white p-4 sm:absolute sm:-bottom-6 sm:left-6 sm:mx-0 sm:mt-0 sm:p-5 rounded-2xl shadow-2xl backdrop-blur-md max-w-[280px] sm:max-w-xs">
                   <div className="flex items-center gap-2 mb-1.5">
                     <ShieldCheck className="w-4 h-4 text-[#FF6B1A]" />
                     <span className="text-[10px] font-black uppercase tracking-widest text-[#FF9A5B]">

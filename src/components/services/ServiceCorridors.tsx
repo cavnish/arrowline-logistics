@@ -162,10 +162,10 @@ export default function ServiceCorridors({
   };
 
   return (
-    <section className="py-16 lg:py-24 bg-white relative overflow-hidden border-t border-slate-200">
+    <section className="py-10 sm:py-14 lg:py-24 bg-white relative overflow-hidden border-t border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
+        <div className="text-center max-w-3xl mx-auto space-y-3 mb-8 sm:mb-12 lg:mb-16">
           <Reveal>
             <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 bg-[#EAF3F6] border border-[#062B3A]/20 rounded-full text-xs font-bold text-[#062B3A] tracking-wider uppercase mb-2">
               <MapPin className="w-3.5 h-3.5 text-[#FF6B1A]" />
@@ -174,7 +174,7 @@ export default function ServiceCorridors({
           </Reveal>
 
           <Reveal delay={80}>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight">
+            <h2 className="text-[clamp(1.7rem,7.2vw,2.25rem)] sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight leading-tight">
               High-Frequency Routes From <span className="text-[#FF6B1A]">Mundra Port</span>
             </h2>
           </Reveal>
@@ -187,19 +187,19 @@ export default function ServiceCorridors({
         </div>
 
         {/* Primary Corridors Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
           {PRIMARY_CORRIDORS.map((corridor, idx) => (
             <Reveal key={corridor.destination} delay={idx * 60}>
-              <div className="bg-[#F5F8FA] border border-slate-200 hover:border-[#FF6B1A]/40 rounded-2xl p-5 sm:p-6 space-y-4 hover:shadow-lg transition-all duration-300 h-full flex flex-col justify-between group">
+              <div className="min-w-0 bg-[#F5F8FA] border border-slate-200 hover:border-[#FF6B1A]/40 rounded-2xl p-4 sm:p-6 space-y-3 sm:space-y-4 hover:shadow-lg transition-all duration-300 h-full flex flex-col justify-between group">
                 <div className="space-y-3">
                   {/* Origin to Destination */}
                   <div className="flex items-center justify-between gap-2 border-b border-slate-200/80 pb-3">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#062B3A]">
+                    <div className="flex min-w-0 items-center gap-1.5 text-[11px] sm:text-xs font-bold text-[#062B3A]">
                       <Anchor className="w-3.5 h-3.5 text-[#FF6B1A] shrink-0" />
                       <span>{corridor.origin}</span>
                     </div>
                     <ArrowRight className="w-3.5 h-3.5 text-[#FF6B1A] shrink-0" />
-                    <div className="flex items-center gap-1.5 text-xs font-black text-[#FF6B1A]">
+                    <div className="flex min-w-0 items-center gap-1.5 text-[11px] sm:text-xs font-black text-[#FF6B1A]">
                       <MapPin className="w-3.5 h-3.5 text-[#FF6B1A] shrink-0" />
                       <span>{corridor.destination}</span>
                     </div>
@@ -256,10 +256,10 @@ export default function ServiceCorridors({
 
         {/* Interstate Corridors Strip */}
         <Reveal delay={200}>
-          <div className="bg-[#062B3A] text-white rounded-3xl p-6 sm:p-8 lg:p-10 shadow-xl relative overflow-hidden">
+          <div className="bg-[#062B3A] text-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-10 shadow-xl relative overflow-hidden">
             <div className="absolute right-0 top-0 -mr-16 -mt-16 w-64 h-64 bg-[#FF6B1A]/10 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="relative z-10 space-y-6">
+            <div className="relative z-10 space-y-4 sm:space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
                 <div>
                   <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#FF7A00] block mb-1">
@@ -275,7 +275,7 @@ export default function ServiceCorridors({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
                 {INTERSTATE_CORRIDORS.map((item) => (
                   <div key={item.title} className="space-y-1.5 bg-white/5 p-4 rounded-2xl border border-white/10">
                     <h4 className="text-sm font-bold text-[#FF7A00]">

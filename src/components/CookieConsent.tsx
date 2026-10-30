@@ -129,12 +129,12 @@ export default function CookieConsent() {
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="fixed bottom-0 left-0 right-0 z-50 px-3 pb-3 sm:px-6 sm:pb-6"
           >
-            <div className="mx-auto max-w-3xl bg-white border border-slate-200 rounded-2xl shadow-[0_14px_40px_-12px_rgba(3,33,45,0.22)] px-4 sm:px-6 py-4 sm:py-5 overflow-hidden relative">
+            <div className="relative mx-auto max-h-[55dvh] max-w-3xl overflow-y-auto rounded-2xl border border-slate-200 bg-white px-4 py-2 shadow-[0_14px_40px_-12px_rgba(3,33,45,0.22)] sm:max-h-none sm:overflow-hidden sm:px-6 sm:py-5">
               {/* Thin orange top accent */}
               <div className="absolute left-0 right-0 top-0 h-1 bg-gradient-to-r from-[#FF6B1A] to-[#FFB366]" />
 
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
-                <div className="w-10 h-10 shrink-0 rounded-xl bg-[#FEF6EE] border border-[#FF6B1A]/15 flex items-center justify-center">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-5">
+                <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#FF6B1A]/15 bg-[#FEF6EE] sm:flex">
                   <ShieldCheck className="w-5 h-5 text-[#FF6B1A]" />
                 </div>
 
@@ -147,11 +147,11 @@ export default function CookieConsent() {
                       Your Choice
                     </span>
                   </div>
-                  <p className="mt-1.5 text-sm text-slate-600 leading-relaxed">
+                  <p className="mt-1 text-xs leading-4 text-slate-600 sm:mt-1.5 sm:text-sm sm:leading-relaxed">
                     We use cookies to improve your experience, remember your
                     preferences, and help our website work smoothly.
                   </p>
-                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 sm:mt-2">
                     <button
                       type="button"
                       onClick={openSettings}
@@ -159,17 +159,17 @@ export default function CookieConsent() {
                     >
                       Cookie Preferences
                     </button>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="hidden text-[11px] text-slate-400 sm:inline">
                       You can change your preferences at any time.
                     </span>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-2 sm:shrink-0 sm:items-center">
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:shrink-0 sm:items-center">
                   <button
                     type="button"
                     onClick={rejectOptional}
-                    className="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-300 text-[#1E3A8A] text-xs font-bold uppercase tracking-wide transition-all active:scale-[0.98] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2"
+                    className="w-full min-w-0 rounded-xl border border-slate-300 px-2 py-2 text-[10px] font-bold uppercase tracking-wide text-[#1E3A8A] transition-all active:scale-[0.98] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B1A] focus-visible:ring-offset-2 sm:w-auto sm:px-5 sm:py-3 sm:text-xs"
                   >
                     Essential Only
                   </button>
@@ -177,7 +177,7 @@ export default function CookieConsent() {
                     type="button"
                     onClick={acceptAll}
                     autoFocus
-                    className="w-full sm:w-auto px-5 py-3 rounded-xl bg-[#FF7A00] hover:bg-[#E56D00] text-white text-xs font-black uppercase tracking-wide transition-all active:scale-[0.98] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A00] focus-visible:ring-offset-2"
+                    className="w-full min-w-0 rounded-xl bg-[#FF7A00] px-2 py-2 text-[10px] font-black uppercase tracking-wide text-white transition-all active:scale-[0.98] hover:-translate-y-0.5 hover:bg-[#E56D00] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A00] focus-visible:ring-offset-2 sm:w-auto sm:px-5 sm:py-3 sm:text-xs"
                   >
                     Accept All
                   </button>

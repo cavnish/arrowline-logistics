@@ -127,11 +127,11 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
       </div>
 
       {/* ── MAIN CONTENT ── */}
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col px-5 pb-7 pt-24 sm:px-6 sm:pb-3 sm:pt-32 md:flex-1 md:justify-center md:pb-1 md:pt-36 lg:px-8 lg:pt-40">
-        <div className="max-w-[880px] space-y-3 md:space-y-5 lg:space-y-6" style={{ containerType: "inline-size" }}>
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-none flex-col justify-start px-5 pt-28 pb-8 sm:px-6 sm:pt-28 sm:pb-8 md:flex-1 md:justify-center md:pb-1 md:pt-36 lg:px-8 lg:pt-40">
+        <div className="flex w-full min-w-0 max-w-[880px] flex-col space-y-2.5 sm:space-y-5 lg:space-y-6" style={{ containerType: "inline-size" }}>
           {/* Heading — exactly two rows, fluid sized to the heading container */}
           <div style={anim(loaded, 140)}>
-            <h1 className="hero-heading max-w-[880px] text-[clamp(1.5rem,6.6vw,3.55rem)] text-white [text-wrap:balance]">
+            <h1 className="hero-heading w-full min-w-0 max-w-[880px] break-words text-[clamp(1.625rem,8vw,2.25rem)] text-white [text-wrap:balance] sm:text-[clamp(1.5rem,6.6cqw,3.55rem)]">
               <span className="block">
                 {row1}
               </span>
@@ -153,7 +153,7 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
           <div style={anim(loaded, 240)}>
             <div className="flex items-center gap-3">
               <span className="h-0.5 w-10 shrink-0 rounded-full bg-gradient-to-r from-[#FF6B1A] to-[#FF9552]" aria-hidden="true" />
-              <p className="text-sm font-semibold text-white/90 sm:text-base lg:text-lg">
+              <p className="text-sm font-semibold leading-snug text-white/95 sm:text-base lg:text-lg">
                 Moving Possibilities. Delivering Trust.
               </p>
             </div>
@@ -161,7 +161,7 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
 
           {/* Description */}
           <div style={anim(loaded, 320)}>
-              <p className="max-w-[640px] text-sm leading-relaxed text-white/75 sm:text-base lg:text-[17px]">
+            <p className="max-w-[640px] text-[15px] leading-relaxed text-white/90 sm:text-base lg:text-[17px]">
               Arrowline Logistics provides FTL transportation, container transportation, multimodal logistics, project cargo and customs clearance services from Mundra, Gujarat, serving businesses across India.
             </p>
           </div>
@@ -169,7 +169,7 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
           {/* Specialization */}
           <div style={anim(loaded, 400)}>
             <p
-              className="flex flex-wrap items-center gap-x-2.5 gap-y-2 text-xs text-white/70 sm:text-[15px]"
+              className="flex flex-wrap items-center gap-x-2.5 gap-y-2 text-xs text-white/75 sm:text-[15px]"
               aria-label={`We specialize in ${SERVICES[activeService]}`}
             >
               <span className="font-semibold text-white/70">We specialize in</span>
@@ -185,11 +185,11 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
           </div>
 
           {/* CTAs */}
-          <div className="flex w-full flex-col gap-2.5 pt-1 sm:w-auto sm:flex-row sm:flex-wrap md:gap-3" style={anim(loaded, 480)}>
+          <div className="flex w-full flex-col gap-2.5 pt-0 sm:w-auto sm:flex-row sm:flex-wrap sm:gap-3 sm:pt-2 md:gap-3" style={anim(loaded, 480)}>
             <button
               type="button"
               onClick={onOpenQuote}
-              className="group relative inline-flex h-11 w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-gradient-to-b from-[#FF7A2F] to-[#FF6B1A] px-5 text-sm font-bold text-white shadow-[0_10px_30px_-8px_rgba(255,107,26,0.65)] transition-all duration-200 hover:-translate-y-0.5 hover:from-[#E55A0D] hover:to-[#FF7A00] hover:shadow-[0_16px_38px_-10px_rgba(255,107,26,0.8)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB27D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#03212D] active:translate-y-0 sm:h-[50px] sm:w-auto sm:px-8 md:h-[54px]"
+              className="group relative inline-flex h-[52px] w-full max-w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-gradient-to-b from-[#FF7A2F] to-[#FF6B1A] px-5 text-sm font-bold text-white shadow-[0_10px_30px_-8px_rgba(255,107,26,0.65)] transition-all duration-200 hover:-translate-y-0.5 hover:from-[#E55A0D] hover:to-[#FF7A00] hover:shadow-[0_16px_38px_-10px_rgba(255,107,26,0.8)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFB27D] focus-visible:ring-offset-2 focus-visible:ring-offset-[#03212D] active:translate-y-0 sm:h-[50px] sm:w-auto sm:px-8 md:h-[54px]"
             >
               <span
                 aria-hidden="true"
@@ -204,7 +204,7 @@ export default function HeroSection({ onOpenQuote, onExploreServices }: HeroSect
             <button
               type="button"
               onClick={() => setVideoModal(true)}
-              className="group inline-flex h-11 w-full items-center justify-center gap-3 rounded-xl border border-white/25 bg-white/10 px-5 text-sm font-bold text-white backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:border-white/40 hover:bg-white/[0.18] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#03212D] active:translate-y-0 sm:h-[50px] sm:w-auto sm:px-8 md:h-[54px]"
+              className="group inline-flex h-[52px] w-full max-w-full items-center justify-center gap-3 rounded-xl border border-white/35 bg-[#03212D]/80 px-5 text-sm font-bold text-white shadow-[0_8px_24px_-14px_rgba(0,0,0,0.8)] backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:border-white/50 hover:bg-[#03212D]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#03212D] active:translate-y-0 sm:h-[50px] sm:w-auto sm:px-8 md:h-[54px]"
             >
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FF6B1A]/25 transition-colors duration-200 group-hover:bg-[#FF6B1A]/40" aria-hidden="true">
                 <Play className="ml-0.5 h-3.5 w-3.5 fill-white text-white" />

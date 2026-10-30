@@ -23,29 +23,29 @@ export default function AboutSection({ onNavigateToAbout }: AboutSectionProps) {
   ];
 
   return (
-    <section className="py-16 lg:py-24 bg-white relative overflow-hidden">
+    <section className="relative overflow-hidden bg-white py-12 sm:py-16 lg:py-24">
       {/* Premium logistics backdrop */}
       <SectionBackground image={aboutImage} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-9 sm:gap-12 lg:gap-16 items-center">
 
           {/* Left Column: Text & Benefits */}
-          <Reveal direction="left" className="lg:col-span-6 space-y-6">
+          <Reveal direction="left" className="lg:col-span-6 space-y-5 sm:space-y-6">
 
            
             {/* Main Section Heading — always two rows, fluid sized to its column.
                 Tagged h2: AboutSection is only mounted on the home page, where the
                 hero already owns the single h1. */}
             <div style={{ containerType: "inline-size" }}>
-              <h2 className="max-w-full whitespace-nowrap font-black text-[#062B3A] tracking-tight leading-[1.15] text-[clamp(1.25rem,7.6cqw,3rem)]">
+              <h2 className="max-w-full font-black leading-[1.15] tracking-tight text-[#062B3A] text-[clamp(1.1rem,7.2cqw,3rem)] [text-wrap:balance]">
                 <span className="block">Connecting Ports,Roads,</span>
                 <span className="block text-[#FF6B1A]">Rail &amp; Businesses.</span>
               </h2>
             </div>
 
             {/* Core Paragraph */}
-            <p className="text-base text-slate-600 leading-relaxed">
+            <p className="text-[0.9375rem] sm:text-base text-slate-600 leading-relaxed">
               Arrowline Logistics provides integrated logistics and transportation solutions designed to move cargo efficiently from origin to destination. Strategically centered at <strong className="text-[#062B3A]">Mundra Port, Gujarat</strong>, we coordinate multi-modal networks to bypass bottleneck constraints and optimize freight timelines across India.
             </p>
 

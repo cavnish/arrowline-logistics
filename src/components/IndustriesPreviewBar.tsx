@@ -22,7 +22,7 @@ export default function IndustriesPreviewBar({ onNavigateToIndustries }: Industr
   };
 
   return (
-    <section className="py-14 lg:py-18 bg-white border-y border-slate-200/80 relative overflow-hidden">
+    <section className="relative overflow-hidden border-y border-slate-200/80 bg-white py-12 sm:py-14 lg:py-18">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Header Strip */}

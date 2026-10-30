@@ -31,7 +31,7 @@ export default function ProcessSection() {
   }, [isInView]);
 
   return (
-    <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden" ref={containerRef}>
+    <section className="relative overflow-hidden bg-[#F5F8FA] py-12 sm:py-16 lg:py-24" ref={containerRef}>
       {/* Background routing curves */}
       <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
         <svg className="w-full h-full" viewBox="0 0 1400 600" preserveAspectRatio="none">
@@ -42,11 +42,11 @@ export default function ProcessSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
+        <div className="text-center max-w-3xl mx-auto space-y-3 mb-8 sm:mb-12 lg:mb-16">
           {/* <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#EAF3F6] text-[#062B3A] text-[10px] font-bold tracking-widest uppercase rounded-full">
             WORKFLOW SYNERGY
           </span> */}
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#062B3A] leading-tight">
+          <h2 className="text-[clamp(1.6rem,7vw,2.25rem)] sm:text-3xl md:text-4xl font-black text-[#062B3A] leading-tight">
             We Follow a <span className="text-[#FF6B1A]">Better Way</span> of Moving Cargo
           </h2>
           <p className="text-sm text-slate-600">

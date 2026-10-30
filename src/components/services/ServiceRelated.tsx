@@ -24,15 +24,15 @@ export default function ServiceRelated({
   onNavigateToService,
 }: ServiceRelatedProps) {
   return (
-    <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
+    <section className="py-10 sm:py-14 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
       <ServiceSectionBackground image={backgroundImage || otherMainServices[0]?.heroImage} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
+        <div className="text-center max-w-3xl mx-auto space-y-3 mb-8 sm:mb-12 lg:mb-16">
           <Reveal delay={80}>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight">
+            <h2 className="text-[clamp(1.7rem,7.2vw,2.25rem)] sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight leading-tight">
               Related Logistics Services
             </h2>
           </Reveal>
@@ -46,7 +46,7 @@ export default function ServiceRelated({
 
         {/* ── Sub-service Page View: Sibling sub-services first, then other main services ── */}
         {isSubService && (
-          <div className="space-y-12">
+          <div className="space-y-8 sm:space-y-12">
             {/* Sibling Sub-Services */}
             {siblingSubServices.length > 0 && (
               <div>
@@ -55,7 +55,7 @@ export default function ServiceRelated({
                   <span>Other {parentService?.title || "Specialized"} Services:</span>
                 </h3>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {siblingSubServices.slice(0, 3).map((sub, index) => {
                     const targetUrl = `/services/${sub.parentSlug}/${sub.slug}`;
                     return (
@@ -68,7 +68,7 @@ export default function ServiceRelated({
                               onNavigateToService(sub.parentSlug, sub.slug);
                             }
                           }}
-                          className="group bg-white/90 backdrop-blur-xl border border-white/70 rounded-3xl p-6 shadow-lg shadow-[#062B3A]/5 hover:shadow-xl hover:shadow-[#062B3A]/10 hover:border-[#FF6B1A]/40 transition-all duration-300 flex flex-col justify-between h-full hover:-translate-y-1"
+                          className="group min-w-0 bg-white/90 backdrop-blur-xl border border-white/70 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-lg shadow-[#062B3A]/5 hover:shadow-xl hover:shadow-[#062B3A]/10 hover:border-[#FF6B1A]/40 transition-all duration-300 flex flex-col justify-between h-full hover:-translate-y-1"
                         >
                           <div>
                             <span className="text-[10px] font-black uppercase tracking-wider text-[#FF6B1A] mb-1.5 block">
@@ -101,7 +101,7 @@ export default function ServiceRelated({
                 <span>Core Multimodal Verticals:</span>
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {otherMainServices.map((main, index) => {
 const targetUrl = `/services/${main.slug}`;
                   return (
@@ -114,7 +114,7 @@ const targetUrl = `/services/${main.slug}`;
                             onNavigateToService(main.slug);
                           }
                         }}
-                        className="group relative rounded-3xl overflow-hidden shadow-lg shadow-[#062B3A]/5 hover:shadow-2xl hover:shadow-[#062B3A]/10 border border-white/70 bg-white/90 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
+                        className="group relative min-w-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg shadow-[#062B3A]/5 hover:shadow-2xl hover:shadow-[#062B3A]/10 border border-white/70 bg-white/90 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
                       >
                         <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                           <SmartImage
@@ -175,7 +175,7 @@ const targetUrl = `/services/${main.slug}`;
                       <div className="absolute inset-0 bg-gradient-to-t from-[#062B3A]/70 via-transparent to-transparent" />
                     </div>
 
-                    <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                        <div className="p-4 sm:p-6 flex-1 flex flex-col justify-between space-y-3 sm:space-y-4">
                       <div className="space-y-2">
                         <h3 className="text-xl font-bold text-[#062B3A] group-hover:text-[#FF6B1A] transition-colors leading-snug">
                           {main.title}

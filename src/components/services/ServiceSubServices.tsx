@@ -32,13 +32,13 @@ export default function ServiceSubServices({
   // ── For Sub-Service Page: Display Detailed Capabilities ──
   if (isSubServicePage && capabilities.length > 0) {
     return (
-      <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
+      <section className="py-10 sm:py-14 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
         <ServiceSectionBackground image={backgroundImage || FALLBACK_BACKGROUND} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
+          <div className="text-center max-w-3xl mx-auto space-y-3 mb-8 sm:mb-12 lg:mb-16">
             <Reveal delay={80}>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight">
+              <h2 className="text-[clamp(1.7rem,7.2vw,2.25rem)] sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight leading-tight">
                 {sectionTitle || "Specialized Service Capabilities"}
               </h2>
             </Reveal>
@@ -50,10 +50,10 @@ export default function ServiceSubServices({
             </Reveal>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {capabilities.map((cap, index) => (
               <Reveal key={index} delay={index * 80}>
-                <div className="group h-full bg-white/90 backdrop-blur-xl border border-white/70 rounded-3xl p-6 shadow-lg shadow-[#062B3A]/5 hover:shadow-xl hover:shadow-[#062B3A]/10 hover:border-[#FF6B1A]/40 transition-all duration-300 flex flex-col justify-between hover:-translate-y-1">
+                <div className="group h-full bg-white/90 backdrop-blur-xl border border-white/70 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-lg shadow-[#062B3A]/5 hover:shadow-xl hover:shadow-[#062B3A]/10 hover:border-[#FF6B1A]/40 transition-all duration-300 flex flex-col justify-between hover:-translate-y-1">
                   <div>
                     <div className="w-12 h-12 rounded-2xl bg-[#EAF3F6] group-hover:bg-[#FF6B1A] text-[#062B3A] group-hover:text-white flex items-center justify-center mb-5 transition-colors shadow-xs">
                       <Check className="w-6 h-6" />
@@ -82,12 +82,12 @@ export default function ServiceSubServices({
   if (!subServices || subServices.length === 0) return null;
 
   return (
-    <section id="sub-services" className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
+    <section id="sub-services" className="py-10 sm:py-14 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
       <ServiceSectionBackground image={backgroundImage || FALLBACK_BACKGROUND} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-12 sm:mb-16">
+        <div className="text-center max-w-3xl mx-auto space-y-3 mb-8 sm:mb-12 lg:mb-16">
           <Reveal>
             <div className="inline-flex items-center space-x-2 px-3.5 py-1 bg-white border border-[#062B3A]/15 rounded-full text-xs font-bold text-[#FF6B1A] tracking-widest uppercase shadow-sm">
               <span>SPECIALIZED SERVICES</span>
@@ -95,7 +95,7 @@ export default function ServiceSubServices({
           </Reveal>
 
           <Reveal delay={80}>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight">
+            <h2 className="text-[clamp(1.7rem,7.2vw,2.25rem)] sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight leading-tight">
               {sectionTitle || "Explore Our Sub-Services"}
             </h2>
           </Reveal>
@@ -108,7 +108,7 @@ export default function ServiceSubServices({
         </div>
 
         {/* Sub-Service Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {subServices.map((sub, index) => {
             const targetUrl = `/services/${parentSlug || sub.parentSlug}/${sub.slug}`;
             return (
@@ -121,7 +121,7 @@ export default function ServiceSubServices({
                       onNavigateToSubService(sub.slug);
                     }
                   }}
-                  className="group flex flex-col h-full bg-white/90 backdrop-blur-xl border border-white/70 rounded-3xl overflow-hidden shadow-lg shadow-[#062B3A]/5 hover:shadow-2xl hover:shadow-[#062B3A]/10 hover:border-[#FF6B1A]/40 transition-all duration-300 hover:-translate-y-1.5 focus:outline-none focus:ring-2 focus:ring-[#FF6B1A]"
+                  className="group flex flex-col h-full min-w-0 bg-white/90 backdrop-blur-xl border border-white/70 rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg shadow-[#062B3A]/5 hover:shadow-2xl hover:shadow-[#062B3A]/10 hover:border-[#FF6B1A]/40 transition-all duration-300 hover:-translate-y-1.5 focus:outline-none focus:ring-2 focus:ring-[#FF6B1A]"
                 >
                   {/* Image Frame */}
                   <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
@@ -136,7 +136,7 @@ export default function ServiceSubServices({
                   </div>
 
                   {/* Body */}
-                  <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                  <div className="p-4 sm:p-6 flex-1 flex flex-col justify-between space-y-3 sm:space-y-4">
                     <div className="space-y-2">
                       <h3 className="text-xl font-bold text-[#062B3A] group-hover:text-[#FF6B1A] transition-colors leading-snug">
                         {sub.title}

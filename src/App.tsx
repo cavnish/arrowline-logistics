@@ -132,6 +132,7 @@ export default function App({
 } = {}) {
   const [activePage, setActivePage] =
     useState<string>(initialPage || "home");
+  const [hasScrolled, setHasScrolled] = useState(false);
 
   const [
     isGlobalQuoteOpen,
@@ -184,6 +185,13 @@ export default function App({
       "contact_whatsapp",
       COMPANY_DETAILS.whatsapp
     );
+
+  useEffect(() => {
+    const updateScrollState = () => setHasScrolled(window.scrollY > 160);
+    updateScrollState();
+    window.addEventListener("scroll", updateScrollState, { passive: true });
+    return () => window.removeEventListener("scroll", updateScrollState);
+  }, []);
 
   // ===================================================
   // ROUTING (clean path URLs + legacy hash fallback)
@@ -640,7 +648,7 @@ export default function App({
 
       {/* FLOATING BUTTONS */}
 
-      <div className="fixed bottom-4 right-4 z-40 flex flex-col space-y-2.5 items-end sm:bottom-6 sm:right-6 sm:space-y-3">
+      <div className={`fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-4 z-40 flex flex-col items-end space-y-2.5 transition-all sm:bottom-6 sm:right-6 sm:space-y-3 ${activePage === "home" && !hasScrolled ? "pointer-events-none translate-y-3 opacity-0 md:pointer-events-auto md:translate-y-0 md:opacity-100" : ""}`}>
 
         {/* WHATSAPP */}
 

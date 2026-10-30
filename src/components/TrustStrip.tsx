@@ -8,7 +8,7 @@ export default function TrustStrip() {
 
   return (
     <section
-      className="overflow-hidden border-y border-slate-200 bg-white py-7 sm:py-9"
+      className="overflow-hidden border-y border-slate-200 bg-white py-4 sm:py-9"
       aria-labelledby="trust-heading"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -16,7 +16,7 @@ export default function TrustStrip() {
         <Reveal delay={60}>
           <h2
             id="trust-heading"
-            className="mt-1 text-lg font-bold tracking-tight text-[#1E3A8A] sm:text-xl"
+            className="mt-1 text-base font-bold tracking-tight text-[#1E3A8A] sm:text-xl"
           >
             Trusted by Industry Leaders
           </h2>
@@ -25,7 +25,7 @@ export default function TrustStrip() {
 
       {/* Logo Slider */}
       <div
-        className="relative mt-6 overflow-hidden"
+        className="relative mt-4 overflow-hidden sm:mt-6"
         aria-label="Trusted clients and logistics partners"
       >
         {/* Fade Edges */}
@@ -33,7 +33,7 @@ export default function TrustStrip() {
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-white to-transparent sm:w-20" />
 
         <motion.div
-          className="flex w-max gap-3 px-3 sm:gap-4"
+          className="flex w-max gap-2 px-3 sm:gap-4"
           animate={{ x: ["0%", "-50%"] }}
           transition={{
             duration: 35,
@@ -45,7 +45,7 @@ export default function TrustStrip() {
             <div
               key={`${client.logoType}-${index}`}
               className="
-                flex h-14 w-[140px] shrink-0 items-center justify-center
+                flex h-12 w-[120px] shrink-0 items-center justify-center
                 overflow-hidden rounded-lg border border-slate-200
                 bg-white p-2 transition-colors duration-200
                 hover:bg-slate-50 sm:h-16 sm:w-[160px] sm:p-2.5

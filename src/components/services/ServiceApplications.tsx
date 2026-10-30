@@ -53,15 +53,15 @@ export default function ServiceApplications({ serviceName, applications, heading
   const doubled = [...applications, ...applications];
 
   return (
-    <section className="py-16 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
+    <section className="py-10 sm:py-14 lg:py-24 bg-[#F5F8FA] relative overflow-hidden border-t border-slate-200">
       <ServiceSectionBackground image={backgroundImage || applications[0]?.image} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-10 sm:mb-12">
+        <div className="text-center max-w-3xl mx-auto space-y-3 mb-7 sm:mb-10">
           <Reveal delay={80}>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight">
+            <h2 className="text-[clamp(1.7rem,7.2vw,2.25rem)] sm:text-4xl lg:text-5xl font-black text-[#062B3A] tracking-tight leading-tight">
               {heading || "What We Transport & Handle"}
             </h2>
           </Reveal>
@@ -76,7 +76,7 @@ export default function ServiceApplications({ serviceName, applications, heading
 
       {/* One-row seamless marquee: RIGHT → LEFT */}
       <div
-        className="cargo-marquee relative mx-auto max-w-[100vw] overflow-hidden py-2"
+        className="cargo-marquee relative mx-auto w-full max-w-full overflow-hidden py-2"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
         onFocusCapture={() => setPaused(true)}

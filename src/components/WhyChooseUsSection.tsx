@@ -62,7 +62,7 @@ export default function CoreAdvantages() {
     <section
       id="advantages"
       ref={sectionRef}
-      className="relative overflow-hidden bg-[#071C27] py-14 sm:py-16 lg:py-20"
+      className="relative overflow-hidden bg-[#071C27] py-10 sm:py-14 lg:py-20"
     >
       {/* Background glow */}
       <div className="pointer-events-none absolute -left-40 top-0 h-96 w-96 rounded-full bg-[#FF6B1A]/10 blur-[100px]" />
@@ -78,7 +78,7 @@ export default function CoreAdvantages() {
           <div className="lg:col-span-5">
             {/* Heading */}
             <h2
-              className="max-w-lg text-3xl font-black leading-[1.08] tracking-tight text-white sm:text-4xl lg:text-5xl"
+              className="max-w-lg text-[clamp(1.7rem,7.2vw,2.25rem)] font-black leading-[1.08] tracking-tight text-white sm:text-4xl lg:text-5xl"
               style={animUp(100)}
             >
               Why Corporate India

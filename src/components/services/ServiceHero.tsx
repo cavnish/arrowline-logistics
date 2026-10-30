@@ -102,7 +102,7 @@ export default function ServiceHero({
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <HeroBackdrop
           srcs={backdropSrcs}
-          position="center"
+          position="58% center"
         />
 
         {/* Admin-uploaded hero video (full-bleed, muted/looping) — the
@@ -131,14 +131,14 @@ export default function ServiceHero({
       </div>
 
       {/* ── Layer 2 — copy over the photograph ── */}
-      <div className="relative z-20 mx-auto flex w-full max-w-[1280px] flex-1 flex-col justify-center px-4 pb-16 pt-24 sm:px-6 sm:pb-12 sm:pt-28 md:pt-32 lg:px-8 lg:pb-8 lg:pt-36">
+        <div className="relative z-20 mx-auto flex w-full max-w-[1280px] flex-none flex-col justify-start px-4 pb-8 pt-28 sm:px-6 sm:pb-8 sm:pt-28 md:flex-1 md:justify-center md:pb-12 md:pt-32 lg:px-8 lg:pb-8 lg:pt-36">
         <div className="max-w-[620px]">
           {/* Main heading — white, accent row in brand orange */}
           <motion.h1
             initial={reduceMotion ? false : { opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: AL_EASE, delay: 0.15 }}
-            className="hero-heading text-[clamp(1.5rem,6.6vw,3.55rem)] text-white [text-wrap:balance]"
+            className="hero-heading text-[clamp(1.75rem,7.1vw,2.35rem)] text-white [text-wrap:balance] sm:text-[clamp(2rem,5vw,3.55rem)]"
           >
             <span className="block">{headlineA}</span>
             {headlineB && (
@@ -152,7 +152,7 @@ export default function ServiceHero({
             initial={reduceMotion ? false : { opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, ease: AL_EASE, delay: 0.3 }}
-            className="mt-3 max-w-[560px] text-[0.95rem] leading-[1.6] text-white/[0.88] sm:mt-4 sm:text-[1.05rem]"
+            className="mt-3 max-w-[560px] text-[0.925rem] leading-[1.55] text-white/[0.92] sm:mt-4 sm:text-[1.05rem] sm:leading-relaxed"
           >
             {description}
           </motion.p>
